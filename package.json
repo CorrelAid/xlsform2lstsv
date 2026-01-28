@@ -28,6 +28,7 @@
     "check-version": "ts-node scripts/check-version.ts",
     "sync-version": "ts-node scripts/sync-version.ts",
     "update-version": "ts-node scripts/update-version.ts",
+    "test-compatibility": "ts-node scripts/test-compatibility-fast.ts",
     "prepare": "husky install",
     "lint:commits": "commitlint --from HEAD~1"
   },

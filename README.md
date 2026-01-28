@@ -100,6 +100,23 @@ npm run test:integration:teardown  # Stop LimeSurvey
 1. Has the LimeSurvey import code changed? 
   - If no, no changes necessary.
 
+## Compatibility Testing
+
+To test compatibility with multiple LimeSurvey versions:
+
+```bash
+# Test all versions from 6.16.0 to current max
+npm run test-compatibility
+
+# Test specific version
+LIMESURVEY_VERSION=6.17.3 npm run test:integration:full
+
+# See full compatibility report
+cat COMPATIBILITY_REPORT.md
+```
+
+See [COMPATIBILITY_TESTING.md](COMPATIBILITY_TESTING.md) for detailed instructions.
+
 ## Limesurvey Resources
 
 - Limesurvey TSV Import Code: https://github.com/LimeSurvey/LimeSurvey/blob/50870a0767a3b132344a195bcaa354be82eecddf/application/helpers/admin/import_helper.php#L3836
