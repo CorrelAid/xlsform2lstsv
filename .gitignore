@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+*.tsbuildinfo
+
+.claude/*
+
+# Integration test outputs
+tests/integration/output/*.tsv

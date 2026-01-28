@@ -1,0 +1,59 @@
+{
+  "name": "xform2lstsv",
+  "version": "1.0.0",
+  "description": "Convert XLSForm surveys to LimeSurvey TSV format",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "fixtures:generate": "npm run build && node dist/generateFixtures.js",
+    "fixtures:clean": "rm -rf tests/integration/output/*.tsv",
+    "test:integration": "cd tests/integration && uv run pytest",
+    "test:integration:generated": "cd tests/integration && uv run pytest test_generated_surveys.py",
+    "test:integration:setup": "cd tests/integration && docker-compose up -d && echo 'Waiting for LimeSurvey to start...' && sleep 15",
+    "test:integration:teardown": "cd tests/integration && docker-compose down -v",
+    "test:integration:full": "npm run fixtures:generate && npm run test:integration:generated",
+    "test:all": "npm run test && npm run test:integration:full",
+    "version:major": "npm version major -m \"chore: bump to %s\"",
+    "version:minor": "npm version minor -m \"chore: bump to %s\"",
+    "version:patch": "npm version patch -m \"chore: bump to %s\"",
+    "release": "standard-version",
+    "check-version": "ts-node scripts/check-version.ts",
+    "sync-version": "ts-node scripts/sync-version.ts",
+    "update-version": "ts-node scripts/update-version.ts",
+    "prepare": "husky install",
+    "lint:commits": "commitlint --from HEAD~1"
+  },
+  "keywords": [
+    "xlsform",
+    "limesurvey",
+    "survey",
+    "converter",
+    "tsv"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "devDependencies": {
+    "@commitlint/cli": "^19.5.0",
+    "@commitlint/config-conventional": "^19.5.0",
+    "@types/node": "^25.0.10",
+    "@vitest/ui": "^4.0.18",
+    "husky": "^9.1.6",
+    "standard-version": "^9.5.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3",
+    "vitest": "^4.0.18"
+  }
+}
