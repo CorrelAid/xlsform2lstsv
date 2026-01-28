@@ -1,5 +1,4 @@
 import { execSync } from 'child_process';
-import { readFileSync, writeFileSync } from 'fs';
 import { VERSION_COMPATIBILITY } from '../src/config/version';
 
 interface TestResult {
@@ -9,12 +8,13 @@ interface TestResult {
   duration?: number;
 }
 
-async function testLimeSurveyCompatibility() {
+async function testLimeSurveyCompatibilitySafe() {
   const versionsToTest = getVersionsToTest();
   const results: TestResult[] = [];
   
   console.log(`🔍 Testing xform2lstsv v${VERSION_COMPATIBILITY.xform2lstsv} compatibility`);
-  console.log(`📋 Testing ${versionsToTest.length} LimeSurvey versions...\n`);
+  console.log(`📋 Testing ${versionsToTest.length} LimeSurvey versions...
+`);
   
   for (const version of versionsToTest) {
     console.log(`🧪 Testing LimeSurvey ${version}...`);
@@ -22,8 +22,30 @@ async function testLimeSurveyCompatibility() {
     const startTime = Date.now();
     
     try {
-      // Set the LimeSurvey version
-      execSync(`export LIMESURVEY_VERSION=${version} && npm run test:integration:full`, {
+      // First, teardown any existing containers
+      console.log(`   🧹 Cleaning up previous containers...`);
+      execSync('cd tests/integration && docker-compose down -v', {
+        stdio: 'inherit'
+      });
+      
+      // Start new containers with specific version
+      console.log(`   🐳 Starting LimeSurvey ${version}...`);
+      execSync(`cd tests/integration && LIMESURVEY_VERSION=${version} docker-compose up -d`, {
+        stdio: 'inherit',
+        env: { ...process.env, LIMESURVEY_VERSION: version }
+      });
+      
+      // Wait for LimeSurvey to be ready
+      console.log(`   ⏳ Waiting for LimeSurvey to start...`);
+      execSync('sleep 20', { stdio: 'inherit' });
+      
+      // Generate fixtures
+      console.log(`   📝 Generating test fixtures...`);
+      execSync('npm run fixtures:generate', { stdio: 'inherit' });
+      
+      // Run integration tests
+      console.log(`   🧪 Running integration tests...`);
+      execSync(`cd tests/integration && LIMESURVEY_VERSION=${version} uv run pytest test_generated_surveys.py`, {
         stdio: 'inherit',
         env: { ...process.env, LIMESURVEY_VERSION: version }
       });
@@ -39,30 +61,49 @@ async function testLimeSurveyCompatibility() {
       
     } catch (error) {
       const duration = Math.round((Date.now() - startTime) / 1000);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       results.push({
         version,
         success: false,
-        error: error.message,
+        error: errorMessage,
         duration
       });
       
       console.log(`❌ LimeSurvey ${version} - INCOMPATIBLE (${duration}s)`);
-      console.log(`   Error: ${error.message}\n`);
+      console.log(`   Error: ${errorMessage}\n`);
+    } finally {
+      // Clean up after each test
+      try {
+        execSync('cd tests/integration && docker-compose down -v', {
+          stdio: 'ignore'
+        });
+      } catch (cleanupError) {
+        const cleanupErrorMessage = cleanupError instanceof Error ? cleanupError.message : String(cleanupError);
+        console.log(`   ⚠️  Cleanup warning: ${cleanupErrorMessage}`);
+      }
     }
   }
   
   // Generate compatibility report
   generateCompatibilityReport(results);
   
-  // Update version compatibility matrix
-  updateVersionCompatibility(results);
+  // Check if all specified versions are compatible
+  checkVersionCompatibility(results);
   
   console.log('🎉 Compatibility testing complete!');
 }
 
 function getVersionsToTest(): string[] {
-  // Start from 6.16.0 and go up to the current max version
-  const startVersion = '6.16.0';
+  // Get versions from environment variable or use defaults
+  const specificVersions = process.env.SPECIFIC_VERSIONS;
+  
+  if (specificVersions) {
+    // Test only the versions specified in environment variable
+    return specificVersions.split(',').map(v => v.trim());
+  }
+  
+  // Otherwise test the configured compatible range
+  const startVersion = VERSION_COMPATIBILITY.limeSurvey.min;
   const endVersion = VERSION_COMPATIBILITY.limeSurvey.max;
   
   const versions: string[] = [];
@@ -145,43 +186,39 @@ ${compatible.map(r => `- ${r.version} (${r.duration}s)`).join('\n')}
 ## Incompatible Versions
 ${incompatible.map(r => `- ${r.version}: ${r.error}`).join('\n')}
 
-## Recommendations
-- **Minimum Supported Version**: ${compatible.length > 0 ? compatible[0].version : 'None'}
-- **Maximum Supported Version**: ${compatible.length > 0 ? compatible[compatible.length - 1].version : 'None'}
+## Test Details
+- **Test Duration**: ${results.reduce((sum, r) => sum + (r.duration || 0), 0)} seconds total
+- **Average Test Time**: ${Math.round(results.reduce((sum, r) => sum + (r.duration || 0), 0) / results.length)} seconds per version
 `;
   
   writeFileSync('COMPATIBILITY_REPORT.md', report);
   console.log(`\n📝 Report saved to COMPATIBILITY_REPORT.md`);
 }
 
-function updateVersionCompatibility(results: TestResult[]) {
-  const compatibleVersions = results.filter(r => r.success).map(r => r.version);
+function checkVersionCompatibility(results: TestResult[]) {
+  const incompatibleVersions = results.filter(r => !r.success);
   
-  if (compatibleVersions.length === 0) {
-    console.log('⚠️  No compatible versions found!');
-    return;
+  if (incompatibleVersions.length > 0) {
+    console.log('\n⚠️  INCOMPATIBLE VERSIONS DETECTED:');
+    console.log('The following versions failed compatibility tests:');
+    incompatibleVersions.forEach(r => {
+      console.log(`   ${r.version}: ${r.error}`);
+    });
+    
+    // Exit with error code if any versions failed
+    process.exit(1);
+  } else {
+    console.log('\n✅ ALL TESTED VERSIONS ARE COMPATIBLE');
+    console.log('All specified LimeSurvey versions work correctly with xform2lstsv.');
   }
-  
-  // Read current version.ts
-  let versionTs = readFileSync('src/config/version.ts', 'utf-8');
-  
-  // Update min and max versions
-  const minVersion = compatibleVersions.sort(compareVersions)[0];
-  const maxVersion = compatibleVersions.sort(compareVersions).reverse()[0];
-  
-  // Update the version compatibility
-  const updatedVersionTs = versionTs
-    .replace(/min: "[^"]+"/, `min: "${minVersion}"`)
-    .replace(/max: "[^"]+"/, `max: "${maxVersion}"`)
-    .replace(/tested: \[[^\]]+\]/, `tested: ["${compatibleVersions.join('", "')}"]`);
-  
-  writeFileSync('src/config/version.ts', updatedVersionTs);
-  
-  console.log(`\n🔧 Updated version compatibility:`);
-  console.log(`   Minimum supported: ${minVersion}`);
-  console.log(`   Maximum supported: ${maxVersion}`);
-  console.log(`   Tested versions: ${compatibleVersions.length} versions`);
 }
 
 // Run the compatibility test
-testLimeSurveyCompatibility().catch(console.error);
+if (require.main === module) {
+  testLimeSurveyCompatibilitySafe().catch(error => {
+    console.error('❌ Compatibility test failed:', error);
+    process.exit(1);
+  });
+}
+
+export { testLimeSurveyCompatibilitySafe };
