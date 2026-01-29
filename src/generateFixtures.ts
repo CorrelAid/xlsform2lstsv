@@ -8,7 +8,7 @@
  * 3. Saves output to tests/integration/output/
  */
 
-import { XLSFormToTSVConverter } from './xlsformConverter';
+import { XLSFormToTSVConverter, XLSFormParser } from './index';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -49,13 +49,7 @@ function generateTSVFromFixture(fixturePath: string, outputPath: string): void {
   // Convert to TSV with configuration that removes underscores but doesn't truncate field names
   // This matches LimeSurvey's behavior (removes underscores but allows longer field names)
   // Answer codes are already limited to 5 chars in the fixtures
-  const converter = new XLSFormToTSVConverter({
-    sanitization: {
-      removeUnderscores: true,
-      maxAnswerCodeLength: 100, // Don't truncate field names, only answer codes
-      truncateStrategy: 'silent'
-    }
-  });
+  const converter = new XLSFormToTSVConverter({});
   const tsv = converter.convert(
     fixture.survey,
     fixture.choices,
@@ -71,7 +65,7 @@ function generateTSVFromFixture(fixturePath: string, outputPath: string): void {
   console.log(`  → ${lines} rows (including header)`);
 }
 
-function main(): void {
+async function main(): Promise<void> {
   console.log('Generating TSV files from XLSForm fixtures...\n');
 
   // Ensure output directory exists and clean old files
@@ -104,11 +98,30 @@ function main(): void {
     console.log('');
   }
 
-  console.log(`\nCompleted: ${successCount}/${fixtureFiles.length} fixtures generated successfully`);
+  // Generate TSV from tutorial.xls file
+  console.log('\nGenerating TSV from tutorial.xls...');
+  await generateTutorialTSV();
+
+  console.log(`\nFinal Summary: ${successCount + 1}/${fixtureFiles.length + 1} files generated successfully`);
 
   if (successCount < fixtureFiles.length) {
     process.exit(1);
   }
 }
+async function generateTutorialTSV(): Promise<void> {
+  const tutorialXlsPath = path.join(FIXTURES_DIR, 'tutorial.xls');
+  const tutorialOutputPath = path.join(OUTPUT_DIR, 'tutorial_survey.tsv');
 
-main();
+  try {
+    const tsv = await XLSFormParser.convertXLSFileToTSV(tutorialXlsPath);
+    fs.writeFileSync(tutorialOutputPath, tsv, 'utf-8');
+    console.log(`  → Generated: ${path.basename(tutorialOutputPath)}`);
+    const lines = tsv.split('\n').filter(l => l.trim()).length;
+    console.log(`  → ${lines} rows (including header)`);
+  } catch (error) {
+    console.error(`  ✗ Error processing tutorial.xls:`, error);
+    throw error;
+  }
+}
+
+main().catch(console.error);

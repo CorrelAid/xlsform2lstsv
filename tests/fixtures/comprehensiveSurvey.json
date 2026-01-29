@@ -1,0 +1,175 @@
+{
+  "survey": [
+    {
+      "type": "note",
+      "name": "welcome",
+      "label": "Welcome to our comprehensive survey!"
+    },
+    
+    {
+      "type": "text",
+      "name": "full_name",
+      "label": "What is your full name?",
+      "required": "yes",
+      "hint": "Please enter your first and last name"
+    },
+    
+    {
+      "type": "integer",
+      "name": "age",
+      "label": "How old are you?",
+      "constraint": ". >= 18 and . <= 120",
+      "constraint_message": "Age must be between 18 and 120"
+    },
+    
+    {
+      "type": "decimal",
+      "name": "height",
+      "label": "What is your height in meters?",
+      "hint": "Enter as decimal (e.g., 1.75)"
+    },
+    
+    {
+      "type": "date",
+      "name": "birth_date",
+      "label": "What is your date of birth?"
+    },
+    
+    {
+      "type": "datetime",
+      "name": "survey_time",
+      "label": "When did you start this survey?"
+    },
+    
+    {
+      "type": "time",
+      "name": "wake_up_time",
+      "label": "What time do you usually wake up?"
+    },
+    
+    {
+      "type": "select_one gender",
+      "name": "gender",
+      "label": "What is your gender?"
+    },
+    
+    {
+      "type": "select_multiple interests",
+      "name": "interests",
+      "label": "What are your interests? (Select all that apply)"
+    },
+    
+    {
+      "type": "note",
+      "name": "section_2",
+      "label": "=== Personal Information ==="
+    },
+    
+
+    {
+    },
+    
+    {
+      "type": "rank",
+      "name": "priorities",
+      "label": "Rank your priorities (1 = most important)"
+    },
+    
+    {
+      "type": "start",
+      "name": "survey_start",
+      "label": "Survey start timestamp"
+    },
+    
+    {
+      "type": "end",
+      "name": "survey_end",
+      "label": "Survey end timestamp"
+    },
+    
+    {
+      "type": "today",
+      "name": "survey_date",
+      "label": "Survey date"
+    },
+    
+    {
+      "type": "deviceid",
+      "name": "device_id",
+      "label": "Device identifier"
+    },
+    
+    {
+      "type": "username",
+      "name": "user_name",
+      "label": "Username"
+    }
+  ],
+  
+  "choices": [
+    {
+      "list_name": "gender",
+      "name": "male",
+      "label": "Male"
+    },
+    {
+      "list_name": "gender",
+      "name": "female",
+      "label": "Female"
+    },
+    {
+      "list_name": "gender",
+      "name": "nonbinary",
+      "label": "Non-binary"
+    },
+    {
+      "list_name": "gender",
+      "name": "other",
+      "label": "Other"
+    },
+    {
+      "list_name": "gender",
+      "name": "prefer_not_to_say",
+      "label": "Prefer not to say"
+    },
+    
+    {
+      "list_name": "interests",
+      "name": "sports",
+      "label": "Sports"
+    },
+    {
+      "list_name": "interests",
+      "name": "music",
+      "label": "Music"
+    },
+    {
+      "list_name": "interests",
+      "name": "reading",
+      "label": "Reading"
+    },
+    {
+      "list_name": "interests",
+      "name": "travel",
+      "label": "Travel"
+    },
+    {
+      "list_name": "interests",
+      "name": "cooking",
+      "label": "Cooking"
+    },
+    {
+      "list_name": "interests",
+      "name": "technology",
+      "label": "Technology"
+    }
+  ],
+  
+  "settings": [
+    {
+      "form_title": "Comprehensive Survey Integration Test",
+      "form_id": "comprehensive_test",
+      "default_language": "en"
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "survey": [
+    {
+      "type": "text",
+      "name": "name",
+      "label": {
+        "en": "What is your name?",
+        "es": "¿Cuál es tu nombre?",
+        "fr": "Quel est votre nom?"
+      },
+      "hint": {
+        "en": "Enter your full name",
+        "es": "Ingrese su nombre completo",
+        "fr": "Entrez votre nom complet"
+      },
+      "required": "yes",
+      "_languages": ["en", "es", "fr"]
+    },
+    {
+      "type": "integer",
+      "name": "age",
+      "label": {
+        "en": "How old are you?",
+        "es": "¿Cuántos años tienes?",
+        "fr": "Quel âge avez-vous?"
+      },
+      "hint": {
+        "en": "Enter your age in years",
+        "es": "Ingrese su edad en años",
+        "fr": "Entrez votre âge en années"
+      },
+      "required": "yes",
+      "_languages": ["en", "es", "fr"]
+    },
+    {
+      "type": "select_one gender",
+      "name": "gender",
+      "label": {
+        "en": "What is your gender?",
+        "es": "¿Cuál es tu género?",
+        "fr": "Quel est votre genre?"
+      },
+      "required": "yes",
+      "_languages": ["en", "es", "fr"]
+    },
+    {
+      "type": "note",
+      "name": "thank_you",
+      "label": {
+        "en": "Thank you for participating!",
+        "es": "¡Gracias por participar!",
+        "fr": "Merci d'avoir participé!"
+      },
+      "_languages": ["en", "es", "fr"]
+    }
+  ],
+  "choices": [
+    {
+      "list_name": "gender",
+      "name": "male",
+      "label": {
+        "en": "Male",
+        "es": "Masculino",
+        "fr": "Homme"
+      },
+      "_languages": ["en", "es", "fr"]
+    },
+    {
+      "list_name": "gender",
+      "name": "female",
+      "label": {
+        "en": "Female",
+        "es": "Femenino",
+        "fr": "Femme"
+      },
+      "_languages": ["en", "es", "fr"]
+    },
+    {
+      "list_name": "gender",
+      "name": "other",
+      "label": {
+        "en": "Other",
+        "es": "Otro",
+        "fr": "Autre"
+      },
+      "_languages": ["en", "es", "fr"]
+    }
+  ],
+  "settings": [
+    {
+      "form_title": {
+        "en": "Multilingual Survey",
+        "es": "Encuesta multilingüe",
+        "fr": "Enquête multilingue"
+      },
+      "form_id": "multilanguage_survey",
+      "default_language": "English (en)"
+    }
+  ]
+}

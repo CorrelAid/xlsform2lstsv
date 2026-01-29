@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest';
-import { convertAndParse, findRowByName, findRowsByClass } from './helpers';
+import { convertAndParse, findRowByName, findRowsByClass } from '../helpers';
 
-describe('Text Question Types', () => {
+describe('Text Question Type', () => {
 	test('converts basic text question', () => {
 		const survey = [
 			{ type: 'text', name: 'name', label: 'What is your name?' }
@@ -21,14 +21,14 @@ describe('Text Question Types', () => {
 		const survey = [
 			{
 				type: 'text',
-				name: 'address',
+				name: 'addr',
 				label: 'Address',
 				hint: 'Enter your full address'
 			}
 		];
 
 		const rows = convertAndParse(survey);
-		const question = findRowByName(rows, 'address');
+		const question = findRowByName(rows, 'addr');
 
 		expect(question?.help).toBe('Enter your full address');
 	});
@@ -46,11 +46,11 @@ describe('Text Question Types', () => {
 
 	test('converts text question with default value', () => {
 		const survey = [
-			{ type: 'text', name: 'country', label: 'Country', default: 'USA' }
+			{ type: 'text', name: 'cnt', label: 'Country', default: 'USA' }
 		];
 
 		const rows = convertAndParse(survey);
-		const question = findRowByName(rows, 'country');
+		const question = findRowByName(rows, 'cnt');
 
 		expect(question?.default).toBe('USA');
 	});

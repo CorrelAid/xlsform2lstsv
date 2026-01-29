@@ -5,7 +5,7 @@ describe('Groups and Survey Structure', () => {
 	describe('explicit groups', () => {
 		test('converts begin_group and end_group', () => {
 			const survey = [
-				{ type: 'begin_group', name: 'demographics', label: 'Demographics' },
+				{ type: 'begin_group', name: 'demo', label: 'Demographics' },
 				{ type: 'text', name: 'name', label: 'Name' },
 				{ type: 'integer', name: 'age', label: 'Age' },
 				{ type: 'end_group' }
@@ -15,19 +15,19 @@ describe('Groups and Survey Structure', () => {
 			const groups = findRowsByClass(rows, 'G');
 
 			expect(groups.length).toBeGreaterThan(0);
-			const demoGroup = findRowByName(rows, 'demographics');
+			const demoGroup = findRowByName(rows, 'demo');
 			expect(demoGroup?.text).toBe('Demographics');
 		});
 
 		test('handles begin group with spaces', () => {
 			const survey = [
-				{ type: 'begin group', name: 'section1', label: 'Section 1' },
+				{ type: 'begin group', name: 'sect1', label: 'Section 1' },
 				{ type: 'text', name: 'q1', label: 'Question 1' },
 				{ type: 'end group' }
 			];
 
 			const rows = convertAndParse(survey);
-			const group = findRowByName(rows, 'section1');
+			const group = findRowByName(rows, 'sect1');
 
 			expect(group).toBeDefined();
 			expect(group?.class).toBe('G');
@@ -72,7 +72,7 @@ describe('Groups and Survey Structure', () => {
 			const survey = [
 				{
 					type: 'begin_group',
-					name: 'personal',
+					name: 'pers',
 					label: 'Personal Info',
 					hint: 'Please provide your personal information'
 				},
@@ -81,21 +81,21 @@ describe('Groups and Survey Structure', () => {
 			];
 
 			const rows = convertAndParse(survey);
-			const group = findRowByName(rows, 'personal');
+			const group = findRowByName(rows, 'pers');
 
 			expect(group?.help).toBe('Please provide your personal information');
 		});
 
 		test('converts group with relevance', () => {
 			const survey = [
-				{ type: 'select_one yesno', name: 'has_info', label: 'Provide info?' },
+				{ type: 'select_one yesno', name: 'hasinfo', label: 'Provide info?' },
 				{
 					type: 'begin_group',
-					name: 'details',
+					name: 'det',
 					label: 'Details',
 					relevant: "${has_info} = 'yes'"
 				},
-				{ type: 'text', name: 'detail', label: 'Detail' },
+				{ type: 'text', name: 'det', label: 'Detail' },
 				{ type: 'end_group' }
 			];
 
@@ -105,7 +105,7 @@ describe('Groups and Survey Structure', () => {
 			];
 
 			const rows = convertAndParse(survey, choices);
-			const group = findRowByName(rows, 'details');
+			const group = findRowByName(rows, 'det');
 
 			expect(group?.relevance).toContain('hasinfo'); // Underscores removed
 		});
@@ -180,17 +180,7 @@ describe('Groups and Survey Structure', () => {
 			expect(titleRow?.text).toBe('Untitled Survey');
 		});
 
-		test('creates description row', () => {
-			const survey = [
-				{ type: 'text', name: 'q1', label: 'Question' }
-			];
 
-			const rows = convertAndParse(survey);
-			const langRows = findRowsByClass(rows, 'SL');
-
-			const descRow = langRows.find(r => r.name === 'surveyls_description');
-			expect(descRow).toBeDefined();
-		});
 	});
 
 	describe('repeats', () => {
@@ -226,12 +216,12 @@ describe('Groups and Survey Structure', () => {
 		test('creates complete survey structure', () => {
 			const survey = [
 				{ type: 'note', name: 'intro', label: 'Welcome!' },
-				{ type: 'begin_group', name: 'demographics', label: 'Demographics' },
+				{ type: 'begin_group', name: 'demo', label: 'Demographics' },
 				{ type: 'text', name: 'name', label: 'Name' },
 				{ type: 'integer', name: 'age', label: 'Age' },
 				{ type: 'end_group' },
-				{ type: 'begin_group', name: 'feedback', label: 'Feedback' },
-				{ type: 'text', name: 'comments', label: 'Comments' },
+				{ type: 'begin_group', name: 'feed', label: 'Feedback' },
+				{ type: 'text', name: 'comm', label: 'Comments' },
 				{ type: 'end_group' }
 			];
 

@@ -102,33 +102,15 @@ function getVersionsToTest(): string[] {
     return specificVersions.split(',').map(v => v.trim());
   }
   
-  // Otherwise test the configured compatible range
-  const startVersion = VERSION_COMPATIBILITY.limeSurvey.min;
-  const endVersion = VERSION_COMPATIBILITY.limeSurvey.max;
-  
-  const versions: string[] = [];
-  
-  // Parse start and end versions
-  const [startMajor, startMinor] = startVersion.split('.').map(Number);
-  const [endMajor, endMinor] = endVersion.split('.').map(Number);
-  
-  // Generate version range
-  for (let major = startMajor; major <= endMajor; major++) {
-    const startMin = major === startMajor ? startMinor : 0;
-    const endMin = major === endMajor ? endMinor : 10;
-    
-    for (let minor = startMin; minor <= endMin; minor++) {
-      versions.push(`${major}.${minor.toString().padStart(2, '0')}.0`);
-    }
+  // Use the tested versions array (simplified approach)
+  if (!VERSION_COMPATIBILITY.limeSurvey.tested || VERSION_COMPATIBILITY.limeSurvey.tested.length === 0) {
+    throw new Error(
+      'No tested versions configured. Please specify versions in VERSION_COMPATIBILITY.limeSurvey.tested'
+    );
   }
-  
-  // Also include any specifically tested versions
-  VERSION_COMPATIBILITY.limeSurvey.tested.forEach(v => {
-    if (!versions.includes(v)) {
-      versions.push(v);
-    }
-  });
-  
+
+  const versions = [...VERSION_COMPATIBILITY.limeSurvey.tested];
+
   return versions.sort(compareVersions);
 }
 
@@ -168,31 +150,6 @@ function generateCompatibilityReport(results: TestResult[]) {
       console.log(`   ${r.version} - ${r.error}`);
     });
   }
-  
-  // Write report to file
-  const report = `
-# Compatibility Test Report
-
-## Summary
-- **xform2lstsv Version**: ${VERSION_COMPATIBILITY.xform2lstsv}
-- **Test Date**: ${new Date().toISOString()}
-- **Total Versions Tested**: ${results.length}
-- **Compatible**: ${compatible.length}
-- **Incompatible**: ${incompatible.length}
-
-## Compatible Versions
-${compatible.map(r => `- ${r.version} (${r.duration}s)`).join('\n')}
-
-## Incompatible Versions
-${incompatible.map(r => `- ${r.version}: ${r.error}`).join('\n')}
-
-## Test Details
-- **Test Duration**: ${results.reduce((sum, r) => sum + (r.duration || 0), 0)} seconds total
-- **Average Test Time**: ${Math.round(results.reduce((sum, r) => sum + (r.duration || 0), 0) / results.length)} seconds per version
-`;
-  
-  writeFileSync('COMPATIBILITY_REPORT.md', report);
-  console.log(`\n📝 Report saved to COMPATIBILITY_REPORT.md`);
 }
 
 function checkVersionCompatibility(results: TestResult[]) {

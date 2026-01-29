@@ -16,7 +16,7 @@
     "fixtures:generate": "npm run build && node dist/generateFixtures.js",
     "fixtures:clean": "rm -rf tests/integration/output/*.tsv",
     "test:integration": "cd tests/integration && uv run pytest",
-    "test:integration:generated": "cd tests/integration && uv run pytest test_generated_surveys.py",
+    "test:integration:generated": "cd tests/integration && uv run pytest",
     "test:integration:setup": "cd tests/integration && docker-compose up -d && echo 'Waiting for LimeSurvey to start...' && sleep 15",
     "test:integration:teardown": "cd tests/integration && docker-compose down -v",
     "test:integration:full": "npm run fixtures:generate && npm run test:integration:generated",
@@ -42,10 +42,17 @@
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
   "files": [
     "dist",
     "README.md"
   ],
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  },
   "devDependencies": {
     "@commitlint/cli": "^19.5.0",
     "@commitlint/config-conventional": "^19.5.0",

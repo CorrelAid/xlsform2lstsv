@@ -53,12 +53,7 @@ export function convertAndParse(
 	settingsData: SettingsRow[] = [{ form_title: 'Test Survey', default_language: 'en' }],
 	config: any = null
 ): TSVRow[] {
-	const converter = new XLSFormToTSVConverter(config || {
-		sanitization: {
-			maxAnswerCodeLength: 100, // Don't truncate for testing
-			truncateStrategy: 'silent'
-		}
-	});
+	const converter = new XLSFormToTSVConverter(config || {});
 	const tsv = converter.convert(surveyData, choicesData, settingsData);
 	return parseTSV(tsv);
 }

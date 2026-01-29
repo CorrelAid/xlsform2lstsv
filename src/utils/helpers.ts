@@ -27,37 +27,21 @@ function isObject(item: any): boolean {
 }
 
 /**
- * Sanitize field names according to configuration
+ * Sanitize field names for LimeSurvey compatibility
+ * Removes underscores and truncates to 20 characters (LimeSurvey question title limit)
  */
-export function sanitizeFieldName(
-  name: string,
-  config: {
-    removeUnderscores: boolean;
-    maxLength?: number;
-    truncateStrategy?: 'warn' | 'error' | 'silent';
-  }
-): string {
+export function sanitizeFieldName(name: string): string {
   let result = name;
   
-  // Remove underscores if configured
-  if (config.removeUnderscores) {
-    result = result.replace(/_/g, '');
-  }
+  // Always remove underscores (LimeSurvey removes them automatically)
+  result = result.replace(/_/g, '');
   
-  // Apply length limit if specified
-  if (config.maxLength && result.length > config.maxLength) {
-    const truncated = result.substring(0, config.maxLength);
-    
-    switch (config.truncateStrategy) {
-      case 'error':
-        throw new Error(`Field name "${name}" exceeds maximum length of ${config.maxLength} characters`);
-      case 'warn':
-        console.warn(`Field name "${name}" exceeds maximum length of ${config.maxLength} characters and will be truncated to "${truncated}"`);
-        return truncated;
-      case 'silent':
-      default:
-        return truncated;
-    }
+  // Limit to 20 characters (LimeSurvey questions.title field limit)
+  const maxLength = 20;
+  if (result.length > maxLength) {
+    const truncated = result.substring(0, maxLength);
+    console.warn(`Field name "${name}" exceeds maximum length of ${maxLength} characters and will be truncated to "${truncated}"`);
+    return truncated;
   }
   
   return result;

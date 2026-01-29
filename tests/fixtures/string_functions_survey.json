@@ -1,0 +1,54 @@
+{
+  "survey": [
+    {
+      "type": "begin_group",
+      "name": "personal_info",
+      "label": "Personal Information"
+    },
+    {
+      "type": "text",
+      "name": "first_name",
+      "label": "First Name"
+    },
+    {
+      "type": "text",
+      "name": "last_name",
+      "label": "Last Name"
+    },
+    {
+      "type": "text",
+      "name": "full_name",
+      "label": "Full Name",
+      "calculation": "concat(${first_name}, ' ', ${last_name})"
+    },
+    {
+      "type": "text",
+      "name": "first_initial",
+      "label": "First Initial",
+      "calculation": "substring(${first_name}, 1, 1)"
+    },
+    {
+      "type": "text",
+      "name": "name_length",
+      "label": "Name Length",
+      "calculation": "string-length(${first_name})"
+    },
+    {
+      "type": "text",
+      "name": "starts_with_a",
+      "label": "Starts with A?",
+      "calculation": "starts-with(${first_name}, 'A')"
+    },
+    {
+      "type": "end_group"
+    }
+  ],
+  "choices": [],
+  "settings": [
+    {
+      "form_title": "String Functions Survey",
+      "form_id": "string_functions_survey",
+      "default_language": "en"
+    }
+  ]
+}

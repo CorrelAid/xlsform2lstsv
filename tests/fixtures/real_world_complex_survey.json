@@ -1,0 +1,64 @@
+{
+  "survey": [
+    {
+      "type": "begin_group",
+      "name": "demographics",
+      "label": "Demographic Information"
+    },
+    {
+      "type": "text",
+      "name": "consent_given",
+      "label": "Consent Given"
+    },
+    {
+      "type": "integer",
+      "name": "age",
+      "label": "Age"
+    },
+    {
+      "type": "text",
+      "name": "gender",
+      "label": "Gender"
+    },
+    {
+      "type": "text",
+      "name": "country",
+      "label": "Country"
+    },
+    {
+      "type": "text",
+      "name": "eligible_female",
+      "label": "Eligible Female Participant",
+      "relevant": "${consent_given} = 'yes' and ${age} >= 18 and ${age} <= 45 and ${gender} = 'female'"
+    },
+    {
+      "type": "text",
+      "name": "senior_participant",
+      "label": "Senior Participant",
+      "relevant": "${age} >= 65 and (${country} = 'USA' or ${country} = 'Canada' or ${country} = 'UK')"
+    },
+    {
+      "type": "text",
+      "name": "age_group",
+      "label": "Age Group",
+      "calculation": "if(${age} < 18, 'minor', if(${age} < 65, 'adult', 'senior'))"
+    },
+    {
+      "type": "text",
+      "name": "complex_eligibility",
+      "label": "Complex Eligibility Check",
+      "relevant": "(${consent_given} = 'yes' and ${age} >= 18) or (${country} = 'USA' and ${gender} = 'male')"
+    },
+    {
+      "type": "end_group"
+    }
+  ],
+  "choices": [],
+  "settings": [
+    {
+      "form_title": "Real World Complex Survey",
+      "form_id": "real_world_complex_survey",
+      "default_language": "en"
+    }
+  ]
+}

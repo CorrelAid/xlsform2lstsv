@@ -1,19 +1,27 @@
 import { sanitizeFieldName } from '../utils/helpers';
 
 export class FieldSanitizer {
-  constructor(
-    private config: {
-      removeUnderscores: boolean;
-      maxLength?: number;
-      truncateStrategy?: 'warn' | 'error' | 'silent';
-    }
-  ) {}
+  constructor() {}
 
   sanitizeName(name: string): string {
-    return sanitizeFieldName(name, this.config);
+    return sanitizeFieldName(name);
   }
 
   sanitizeAnswerCode(code: string): string {
-    return this.sanitizeName(code);
+    // Answer codes in LimeSurvey have a 5-character limit
+    let result = code;
+    
+    // Always remove underscores (LimeSurvey removes them automatically)
+    result = result.replace(/_/g, '');
+    
+    // Limit to 5 characters (LimeSurvey answer codes limit)
+    const maxLength = 5;
+    if (result.length > maxLength) {
+      const truncated = result.substring(0, maxLength);
+      console.warn(`Answer code "${code}" exceeds maximum length of ${maxLength} characters and will be truncated to "${truncated}"`);
+      return truncated;
+    }
+    
+    return result;
   }
 }

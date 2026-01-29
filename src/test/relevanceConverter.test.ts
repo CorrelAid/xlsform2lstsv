@@ -155,6 +155,56 @@ describe('RelevanceConverter', () => {
 		});
 	});
 
+	describe('edge cases and constraints', () => {
+		test('converts nested if() expressions', () => {
+			const result = converter.convert(
+				"if(${age} < 18, 'minor', if(${age} < 65, 'adult', 'senior'))"
+			);
+			expect(result).toContain('if(');
+			expect(result).toContain('age');
+			expect(result).not.toContain('{age}');
+		});
+
+		test('converts complex nested boolean logic', () => {
+			const result = converter.convert(
+				"(${consent} = 'yes' and ${age} >= 18) or (${country} = 'USA' and ${gender} = 'male')"
+			);
+			expect(result).toContain('consent');
+			expect(result).toContain('age');
+			expect(result).toContain('country');
+			expect(result).toContain('gender');
+			expect(result).toContain(' and ');
+			expect(result).toContain(' or ');
+		});
+
+		test('handles multiple parentheses levels', () => {
+			const result = converter.convert(
+				"(((${field1} != '') and (${field2} != '')) or (${field3} = 'test'))"
+			);
+			expect(result).toContain('field1');
+			expect(result).toContain('field2');
+			expect(result).toContain('field3');
+		});
+
+		test('converts constraint with range validation', () => {
+			const result = converter.convertConstraint('. >= 5 and . <= 100');
+			expect(result).toContain('/^');
+			expect(result).toContain('$/');
+		});
+
+		test('converts constraint with min validation', () => {
+			const result = converter.convertConstraint('. >= 18');
+			expect(result).toContain('/^');
+			expect(result).toContain('$/');
+		});
+
+		test('converts constraint with max validation', () => {
+			const result = converter.convertConstraint('. <= 100');
+			expect(result).toContain('/^');
+			expect(result).toContain('$/');
+		});
+	});
+
 	describe('convertConstraint', () => {
 		test('converts empty constraint to empty string', () => {
 			expect(converter.convertConstraint('')).toBe('');

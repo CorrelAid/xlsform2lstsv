@@ -1,21 +1,65 @@
+/**
+ * Represents a row in the survey section of an XLSForm
+ */
+export interface SurveyRow {
+  type?: string;
+  name?: string;
+  label?: string | Record<string, string>;
+  hint?: string | Record<string, string>;
+  required?: string;
+  relevant?: string;
+  constraint?: string;
+  constraint_message?: string;
+  calculation?: string;
+  default?: string;
+  _languages?: string[];
+  [key: string]: any;
+}
+
+/**
+ * Represents a row in the choices section of an XLSForm
+ */
+export interface ChoiceRow {
+  list_name?: string;
+  name?: string;
+  label?: string | Record<string, string>;
+  filter?: string;
+  _languages?: string[];
+  [key: string]: any;
+}
+
+/**
+ * Represents a row in the settings section of an XLSForm
+ */
+export interface SettingsRow {
+  form_title?: string;
+  form_id?: string;
+  default_language?: string;
+  [key: string]: any;
+}
+
+/**
+ * Result type returned by XLS/XLSX loaders
+ */
+export interface XLSFormData {
+  surveyData: SurveyRow[];
+  choicesData: ChoiceRow[];
+  settingsData: SettingsRow[];
+  hasSurveySheet: boolean;
+  hasChoicesSheet: boolean;
+  hasSettingsSheet: boolean;
+}
+
 export interface ConversionConfig {
   /**
-   * Type mapping configuration for XLSForm to LimeSurvey type conversion
+   * How to handle repeats: 'warn', 'error', or 'ignore' (default: 'warn')
    */
-  typeMappings: Record<string, {
-    limeSurveyType: string;
-    supportsOther?: boolean;
-    answerClass?: 'A' | 'SQ'; // For select types: 'A' for answers, 'SQ' for subquestions
-  }>;
+  handleRepeats?: 'warn' | 'error' | 'ignore';
 
   /**
-   * Field name sanitization configuration
+   * Enable debug logging (default: false)
    */
-  sanitization: {
-    removeUnderscores: boolean;
-    maxAnswerCodeLength: number;
-    truncateStrategy: 'warn' | 'error' | 'silent';
-  };
+  debugLogging?: boolean;
 
   /**
    * Default values for survey elements
@@ -26,73 +70,19 @@ export interface ConversionConfig {
     surveyTitle: string;
     description: string;
   };
-
-  /**
-   * Advanced conversion options
-   */
-  advanced: {
-    autoCreateGroups: boolean;
-    handleRepeats: 'warn' | 'error' | 'ignore';
-    debugLogging: boolean;
-  };
 }
 
 /**
  * Default configuration with sensible defaults
  */
 export const defaultConfig: ConversionConfig = {
-  typeMappings: {
-    // Text types
-    text: { limeSurveyType: 'S' },
-    string: { limeSurveyType: 'S' },
-
-    // Numeric types
-    integer: { limeSurveyType: 'N' },
-    int: { limeSurveyType: 'N' },
-    decimal: { limeSurveyType: 'N' },
-    range: { limeSurveyType: 'N' },
-
-    // Date/time
-    date: { limeSurveyType: 'D' },
-    time: { limeSurveyType: 'D' },
-    datetime: { limeSurveyType: 'D' },
-
-    // Select types
-    select_one: { limeSurveyType: 'L', supportsOther: true, answerClass: 'A' },
-    select_multiple: { limeSurveyType: 'M', supportsOther: true, answerClass: 'SQ' },
-
-    // Other types
-    note: { limeSurveyType: 'X' },
-    calculate: { limeSurveyType: '*' },
-    hidden: { limeSurveyType: '*' },
-    geopoint: { limeSurveyType: 'S' },
-    geotrace: { limeSurveyType: 'T' },
-    geoshape: { limeSurveyType: 'T' },
-    image: { limeSurveyType: '|' },
-    audio: { limeSurveyType: '|' },
-    video: { limeSurveyType: '|' },
-    file: { limeSurveyType: '|' },
-    barcode: { limeSurveyType: 'S' },
-    acknowledge: { limeSurveyType: 'X' },
-    rank: { limeSurveyType: 'R' }
-  },
-
-  sanitization: {
-    removeUnderscores: true,
-    maxAnswerCodeLength: 5,
-    truncateStrategy: 'warn'
-  },
+  handleRepeats: 'warn',
+  debugLogging: false,
 
   defaults: {
     language: 'en',
     groupName: 'Questions',
     surveyTitle: 'Untitled Survey',
     description: ''
-  },
-
-  advanced: {
-    autoCreateGroups: true,
-    handleRepeats: 'warn',
-    debugLogging: false
   }
 };

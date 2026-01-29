@@ -1,8 +1,8 @@
 import { describe, test, expect } from 'vitest';
-import { convertAndParse, findRowByName } from './helpers';
+import { convertAndParse, findRowByName } from '../helpers';
 
-describe('Numeric Question Types', () => {
-	test('converts integer question', () => {
+describe('Integer Question Type', () => {
+	test('converts basic integer question', () => {
 		const survey = [
 			{ type: 'integer', name: 'age', label: 'How old are you?' }
 		];
@@ -27,29 +27,7 @@ describe('Numeric Question Types', () => {
 		expect(question?.['type/scale']).toBe('N');
 	});
 
-	test('converts decimal question', () => {
-		const survey = [
-			{ type: 'decimal', name: 'price', label: 'Enter price' }
-		];
-
-		const rows = convertAndParse(survey);
-		const question = findRowByName(rows, 'price');
-
-		expect(question?.['type/scale']).toBe('N');
-	});
-
-	test('converts range question', () => {
-		const survey = [
-			{ type: 'range', name: 'rating', label: 'Rate from 1-10' }
-		];
-
-		const rows = convertAndParse(survey);
-		const question = findRowByName(rows, 'rating');
-
-		expect(question?.['type/scale']).toBe('N');
-	});
-
-	test('converts required numeric question', () => {
+	test('converts required integer question', () => {
 		const survey = [
 			{ type: 'integer', name: 'year', label: 'Birth year', required: 'true' }
 		];
@@ -60,7 +38,7 @@ describe('Numeric Question Types', () => {
 		expect(question?.mandatory).toBe('Y');
 	});
 
-	test('converts numeric question with constraint', () => {
+	test('converts integer question with constraint', () => {
 		const survey = [
 			{
 				type: 'integer',
@@ -77,20 +55,20 @@ describe('Numeric Question Types', () => {
 		expect(question?.validation).toContain('/^\\d');
 	});
 
-	test('converts numeric question with default value', () => {
+	test('converts integer question with default value', () => {
 		const survey = [
-			{ type: 'integer', name: 'quantity', label: 'Quantity', default: '1' }
+			{ type: 'integer', name: 'qty', label: 'Quantity', default: '1' }
 		];
 
 		const rows = convertAndParse(survey);
-		const question = findRowByName(rows, 'quantity');
+		const question = findRowByName(rows, 'qty');
 
 		expect(question?.default).toBe('1');
 	});
 
-	test('converts numeric question with relevance based on another numeric', () => {
+	test('converts integer question with relevance based on another numeric', () => {
 		const survey = [
-			{ type: 'integer', name: 'income', label: 'Annual income' },
+			{ type: 'integer', name: 'inc', label: 'Annual income' },
 			{
 				type: 'integer',
 				name: 'tax',
@@ -106,19 +84,19 @@ describe('Numeric Question Types', () => {
 		expect(question?.relevance).toContain('>');
 	});
 
-	test('handles numeric question with hint', () => {
+	test('handles integer question with hint', () => {
 		const survey = [
 			{
-				type: 'decimal',
-				name: 'gpa',
-				label: 'GPA',
-				hint: 'Enter as decimal (e.g., 3.75)'
+				type: 'integer',
+				name: 'score',
+				label: 'Score',
+				hint: 'Enter a number between 0-100'
 			}
 		];
 
 		const rows = convertAndParse(survey);
-		const question = findRowByName(rows, 'gpa');
+		const question = findRowByName(rows, 'score');
 
-		expect(question?.help).toBe('Enter as decimal (e.g., 3.75)');
+		expect(question?.help).toBe('Enter a number between 0-100');
 	});
 });

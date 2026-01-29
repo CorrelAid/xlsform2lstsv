@@ -113,6 +113,13 @@ export class RelevanceConverter {
 			return `/^\\d{1,${maxDigits}}$/`;
 		}
 
+		// For regex-like patterns that start/end with regex anchors, pass them through directly
+		// This handles patterns like .+@.+\..+ which are clearly regex patterns
+		if ((expr.startsWith('^') || expr.startsWith('.') || expr.startsWith('[')) &&
+			(expr.endsWith('$') || expr.includes('*') || expr.includes('+') || expr.includes('?'))) {
+			return expr;
+		}
+
 		// For other constraints, return empty (not supported as regex)
 		// These would need to be handled differently in LimeSurvey
 		return '';
