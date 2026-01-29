@@ -1,5 +1,5 @@
 """
-Multilingual tests for xform2lstsv-generated TSV files.
+Multilingual tests for xlsform2lstsv-generated TSV files.
 Tests language handling, translation preservation, and multilingual survey functionality.
 """
 import pytest

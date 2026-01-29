@@ -1,7 +1,7 @@
 [project]
-name = "xform2lstsv-integration-tests"
+name = "xlsform2lstsv-integration-tests"
 version = "0.1.0"
-description = "Integration tests for xform2lstsv with LimeSurvey"
+description = "Integration tests for xlsform2lstsv with LimeSurvey"
 requires-python = ">=3.9"
 dependencies = [
     "pytest>=8.0.0",

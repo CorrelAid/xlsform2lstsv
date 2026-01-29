@@ -618,7 +618,7 @@ wheels = [
 ]
 
 [[package]]
-name = "xform2lstsv-integration-tests"
+name = "xlsform2lstsv-integration-tests"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

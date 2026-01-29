@@ -1,5 +1,5 @@
 """
-Comprehensive survey integration tests for xform2lstsv-generated TSV files.
+Comprehensive survey integration tests for xlsform2lstsv-generated TSV files.
 Tests that the comprehensive survey can be imported into LimeSurvey and verifies structure using API.
 """
 import pytest

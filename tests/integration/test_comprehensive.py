@@ -1,5 +1,5 @@
 """
-Comprehensive tests for xform2lstsv-generated TSV files.
+Comprehensive tests for xlsform2lstsv-generated TSV files.
 Tests that all generated TSV files can be imported without errors.
 """
 import pytest

@@ -1,5 +1,5 @@
 """
-Survey structure tests for xform2lstsv-generated TSV files.
+Survey structure tests for xlsform2lstsv-generated TSV files.
 Tests groups, questions, subquestions, and answer structure validation.
 """
 import pytest

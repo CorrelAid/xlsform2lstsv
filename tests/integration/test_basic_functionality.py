@@ -1,5 +1,5 @@
 """
-Basic functionality tests for xform2lstsv-generated TSV files.
+Basic functionality tests for xlsform2lstsv-generated TSV files.
 Tests file generation and basic import capabilities.
 """
 import pytest

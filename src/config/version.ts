@@ -1,5 +1,5 @@
 export interface VersionCompatibility {
-  xform2lstsv: string;
+  xlsform2lstsv: string;
   limeSurvey: {
     min: string;
     max: string;
@@ -9,7 +9,7 @@ export interface VersionCompatibility {
 }
 
 export const VERSION_COMPATIBILITY: VersionCompatibility = {
-  xform2lstsv: "1.0.0", // This will be updated automatically
+  xlsform2lstsv: "1.0.0", // This will be updated automatically
   limeSurvey: {
     min: "6.16.0",
     max: "6.16.5",

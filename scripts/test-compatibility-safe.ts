@@ -12,7 +12,7 @@ async function testLimeSurveyCompatibilitySafe() {
   const versionsToTest = getVersionsToTest();
   const results: TestResult[] = [];
   
-  console.log(`🔍 Testing xform2lstsv v${VERSION_COMPATIBILITY.xform2lstsv} compatibility`);
+  console.log(`🔍 Testing xlsform2lstsv v${VERSION_COMPATIBILITY.xlsform2lstsv} compatibility`);
   console.log(`📋 Testing ${versionsToTest.length} LimeSurvey versions...
 `);
   
@@ -166,7 +166,7 @@ function checkVersionCompatibility(results: TestResult[]) {
     process.exit(1);
   } else {
     console.log('\n✅ ALL TESTED VERSIONS ARE COMPATIBLE');
-    console.log('All specified LimeSurvey versions work correctly with xform2lstsv.');
+    console.log('All specified LimeSurvey versions work correctly with xlsform2lstsv.');
   }
 }
 

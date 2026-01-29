@@ -1,5 +1,5 @@
 """
-Shared test helpers for xform2lstsv integration tests.
+Shared test helpers for xlsform2lstsv integration tests.
 Contains common fixtures, utilities, and validation functions.
 """
 import time

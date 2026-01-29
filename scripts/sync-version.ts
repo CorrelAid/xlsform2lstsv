@@ -11,8 +11,8 @@ function syncVersion() {
     
     // Update version in version.ts
     const updatedVersionTs = versionTs.replace(
-      /xform2lstsv: "[^"]+"/,
-      `xform2lstsv: "${currentVersion}"`
+      /xlsform2lstsv: "[^"]+"/,
+      `xlsform2lstsv: "${currentVersion}"`
     );
     
     writeFileSync('src/config/version.ts', updatedVersionTs, 'utf-8');

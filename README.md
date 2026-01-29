@@ -1,8 +1,8 @@
-[![CI Status](https://github.com/your-repo/xform2lstsv/actions/workflows/ci.yml/badge.svg)](https://github.com/your-repo/xform2lstsv/actions)
-[![npm version](https://badge.fury.io/js/xform2lstsv.svg)](https://badge.fury.io/js/xform2lstsv)
-[![Code Coverage](https://img.shields.io/codecov/c/github/your-repo/xform2lstsv)](https://codecov.io/gh/your-repo/xform2lstsv)
+[![CI Status](https://github.com/your-repo/xlsform2lstsv/actions/workflows/ci.yml/badge.svg)](https://github.com/your-repo/xlsform2lstsv/actions)
+[![npm version](https://badge.fury.io/js/xlsform2lstsv.svg)](https://badge.fury.io/js/xlsform2lstsv)
+[![Code Coverage](https://img.shields.io/codecov/c/github/your-repo/xlsform2lstsv)](https://codecov.io/gh/your-repo/xlsform2lstsv)
 
-# xform2lstsv
+# xlsform2lstsv
 
 Convert XLSForm surveys to LimeSurvey TSV format. 
 
@@ -27,9 +27,11 @@ Convert XLSForm surveys to LimeSurvey TSV format.
 
 - `label` and `hint` translations ✅
 
-- expressions (xpath functions to expressionscript)
-  - constraint -> validation  ✅
-  - relevant -> relevance ✅
+
+- constraint/relevant (XPath) -> validation/relevance (ExpressionScript/EM) 🟡
+  - XPath Paths -> Question Codes
+  - XPath Operators ->
+  - XPath Functions
 
 - XLSForms Calculation ❌
 - XLSForms Trigger ❌
@@ -45,7 +47,7 @@ Convert XLSForm surveys to LimeSurvey TSV format.
 ## Installation
 
 ```bash
-npm install xform2lstsv
+npm install xlsform2lstsv
 ```
 
 ## Quick Start
@@ -53,7 +55,7 @@ npm install xform2lstsv
 The XFormParser provides direct XLS/XLSX file support:
 
 ```typescript
-import { XFormParser } from 'xform2lstsv';
+import { XFormParser } from 'xlsform2lstsv';
 
 // Parse XLS/XLSX file and convert to TSV
 const tsv = await XFormParser.convertXLSFileToTSV('path/to/survey.xlsx');
@@ -74,7 +76,7 @@ const tsv = await XFormParser.convertXLSDataToTSV(xlsxData);
 A different entry point accepts XLSForm data as JavaScript arrays:
 
 ```typescript
-import { XLSFormToTSVConverter } from 'xform2lstsv';
+import { XLSFormToTSVConverter } from 'xlsform2lstsv';
 
 const converter = new XLSFormToTSVConverter();
 const tsv = converter.convert(surveyData, choicesData, settingsData);
@@ -99,8 +101,8 @@ const tsv = converter.convert(surveyData, choicesData, settingsData);
 
 ```bash
 # Clone repository
-git clone https://github.com/your-repo/xform2lstsv.git
-cd xform2lstsv
+git clone https://github.com/your-repo/xlsform2lstsv.git
+cd xlsform2lstsv
 
 # Install Node.js dependencies
 npm install
@@ -185,16 +187,16 @@ SPECIFIC_VERSIONS="6.16.4,6.17.0" npm run test-compatibility
 Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 
-## Conversion Logic
-
-
-
 
 ## Limesurvey Resources
 
 - Limesurvey TSV Import Code: https://github.com/LimeSurvey/LimeSurvey/blob/50870a0767a3b132344a195bcaa354be82eecddf/application/helpers/admin/import_helper.php#L3836
 - Limesurvey DB Structure: https://github.com/LimeSurvey/LimeSurvey/blob/master/installer/create-database.php
-- LimeSurvey Expressions: https://github.com/LimeSurvey/LimeSurvey/blob/master/assets/packages/expressions/em_javascript.js
+- LimeSurvey Expressions: 
+    - https://github.com/LimeSurvey/LimeSurvey/blob/master/assets/packages/expressions/em_javascript.js
+    - https://www.limesurvey.org/manual/ExpressionScript_-_Presentation
+    - https://www.limesurvey.org/manual/Expression_Manager
+    - https://www.limesurvey.org/manual/ExpressionScript_for_developers
 - https://www.limesurvey.org/manual/Expression_Manager#Access_to_Variables
 - https://www.limesurvey.org/manual/ExpressionScript_-_Presentation
 - https://www.limesurvey.org/blog/tutorials/creating-limesurvey-questionnaires-in-micorsoft-excel

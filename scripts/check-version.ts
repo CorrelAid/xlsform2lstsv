@@ -8,15 +8,15 @@ async function checkLimeSurveyVersion() {
     const packageJson = JSON.parse(readFileSync('package.json', 'utf-8'));
     const currentVersion = packageJson.version;
     
-    console.log(`📦 xform2lstsv version: ${currentVersion}`);
+    console.log(`📦 xlsform2lstsv version: ${currentVersion}`);
     console.log(`✅ Tested LimeSurvey versions: ${VERSION_COMPATIBILITY.limeSurvey.tested.join(', ')}`);
     console.log(`📝 Notes: ${VERSION_COMPATIBILITY.notes || 'None'}`);
     
     // Check if we need to update the version in version.ts
-    if (currentVersion !== VERSION_COMPATIBILITY.xform2lstsv) {
+    if (currentVersion !== VERSION_COMPATIBILITY.xlsform2lstsv) {
       console.log(`⚠️  Version mismatch detected!`);
       console.log(`   package.json: ${currentVersion}`);
-      console.log(`   version.ts: ${VERSION_COMPATIBILITY.xform2lstsv}`);
+      console.log(`   version.ts: ${VERSION_COMPATIBILITY.xlsform2lstsv}`);
       console.log(`   Run 'npm run sync-version' to update.`);
     }
     

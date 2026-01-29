@@ -17,8 +17,8 @@ function updateVersionFiles() {
     // Update version.ts
     let versionTs = readFileSync('src/config/version.ts', 'utf-8');
     const updatedVersionTs = versionTs.replace(
-      /xform2lstsv: "[^"]+"/,
-      `xform2lstsv: "${currentVersion}"`
+      /xlsform2lstsv: "[^"]+"/,
+      `xlsform2lstsv: "${currentVersion}"`
     );
     
     writeFileSync('src/config/version.ts', updatedVersionTs, 'utf-8');
@@ -28,8 +28,8 @@ function updateVersionFiles() {
     try {
       let readme = readFileSync('README.md', 'utf-8');
       const readmeUpdated = readme.replace(
-        /xform2lstsv v?[0-9]+\.[0-9]+\.[0-9]+/g,
-        `xform2lstsv v${currentVersion}`
+        /xlsform2lstsv v?[0-9]+\.[0-9]+\.[0-9]+/g,
+        `xlsform2lstsv v${currentVersion}`
       );
       
       if (readme !== readmeUpdated) {
