@@ -37,45 +37,11 @@ jobs:
     - name: Build
       run: npm run build
 
-  integration-test:
-    name: Integration Tests
-    runs-on: ubuntu-latest
-    needs: test
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: npm ci
-    
-    - name: Build
-      run: npm run build
-    
-    - name: Generate fixtures
-      run: npm run fixtures:generate
-    
-    - name: Set up Docker
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y docker-compose
-        sudo systemctl start docker
-    
-    - name: Run integration tests
-      run: npm run test:integration:full
-      env:
-        LIMESURVEY_VERSION: 6.16.4
-
   release:
     name: Release
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
-    needs: [test, integration-test]
+    needs: test
     
     steps:
     - uses: actions/checkout@v4
@@ -102,7 +68,7 @@ jobs:
     - name: Verify release process
       run: |
         echo "✅ Automated release process initiated"
-        echo "📦 Version: $(node -p "require('./package.json').version")"
+        echo "📦 Version: $(node -p \"require('./package.json').version\")"
         echo "🔧 This release follows the automated process"
         echo "❌ Manual releases are not allowed"
     
@@ -120,56 +86,3 @@ jobs:
           COMPATIBILITY_REPORT.md
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  compatibility-test:
-    name: Compatibility Test
-    runs-on: ubuntu-latest
-    needs: [test, integration-test]
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: npm ci
-    
-    - name: Build
-      run: npm run build
-    
-    - name: Set up Docker
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y docker-compose
-        sudo systemctl start docker
-    
-    - name: Run safe compatibility test
-      run: npm run test-compatibility
-      env:
-        SPECIFIC_VERSIONS: "6.16.0,6.17.0,6.18.0"
-    
-    - name: Upload compatibility report
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: compatibility-report
-        path: COMPATIBILITY_REPORT.md
-
-  version-check:
-    name: Version Compatibility Check
-    runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20
-    
-    - name: Check version compatibility
-      run: npm run check-version

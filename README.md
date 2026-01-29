@@ -42,6 +42,7 @@ Convert XLSForm surveys to LimeSurvey TSV format.
         - `contains()` 
   - relevant -> relevance
 
+- constraint_message ❌
 - XLSForms Calculation ❌
 - XLSForms Trigger ❌
 - Repeats ❌
