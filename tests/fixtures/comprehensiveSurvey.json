@@ -66,44 +66,15 @@
     },
     
 
-    {
-    },
+
     
     {
       "type": "rank",
       "name": "priorities",
       "label": "Rank your priorities (1 = most important)"
-    },
-    
-    {
-      "type": "start",
-      "name": "survey_start",
-      "label": "Survey start timestamp"
-    },
-    
-    {
-      "type": "end",
-      "name": "survey_end",
-      "label": "Survey end timestamp"
-    },
-    
-    {
-      "type": "today",
-      "name": "survey_date",
-      "label": "Survey date"
-    },
-    
-    {
-      "type": "deviceid",
-      "name": "device_id",
-      "label": "Device identifier"
-    },
-    
-    {
-      "type": "username",
-      "name": "user_name",
-      "label": "Username"
     }
+    
+
   ],
   
   "choices": [

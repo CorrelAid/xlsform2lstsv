@@ -32,12 +32,7 @@ export const TYPE_MAPPINGS: Record<string, {
   note: { limeSurveyType: 'X' },
   rank: { limeSurveyType: 'R', answerClass: 'A', supportsOther: true },
   
-  // System variables - treated as equations
-  start: { limeSurveyType: '*' },
-  end: { limeSurveyType: '*' },
-  today: { limeSurveyType: '*' },
-  deviceid: { limeSurveyType: '*' },
-  username: { limeSurveyType: '*' }
+
 };
 
 export interface TypeInfo {

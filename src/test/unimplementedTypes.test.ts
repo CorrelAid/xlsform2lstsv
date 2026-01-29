@@ -138,6 +138,58 @@ describe('Unimplemented XLSForm Types Validation', () => {
 		});
 	});
 
+	describe('Record Types', () => {
+		test('throws error for unimplemented start type', () => {
+			const survey = [
+				{ type: 'start', name: 'start_time', label: 'Start time' }
+			];
+
+			expect(() => convertAndParse(survey)).toThrow(
+				'Unimplemented XLSForm type: \'start\'. This type is not currently supported.'
+			);
+		});
+
+		test('throws error for unimplemented end type', () => {
+			const survey = [
+				{ type: 'end', name: 'end_time', label: 'End time' }
+			];
+
+			expect(() => convertAndParse(survey)).toThrow(
+				'Unimplemented XLSForm type: \'end\'. This type is not currently supported.'
+			);
+		});
+
+		test('throws error for unimplemented today type', () => {
+			const survey = [
+				{ type: 'today', name: 'today_date', label: 'Today date' }
+			];
+
+			expect(() => convertAndParse(survey)).toThrow(
+				'Unimplemented XLSForm type: \'today\'. This type is not currently supported.'
+			);
+		});
+
+		test('throws error for unimplemented deviceid type', () => {
+			const survey = [
+				{ type: 'deviceid', name: 'device_id', label: 'Device ID' }
+			];
+
+			expect(() => convertAndParse(survey)).toThrow(
+				'Unimplemented XLSForm type: \'deviceid\'. This type is not currently supported.'
+			);
+		});
+
+		test('throws error for unimplemented username type', () => {
+			const survey = [
+				{ type: 'username', name: 'user_name', label: 'Username' }
+			];
+
+			expect(() => convertAndParse(survey)).toThrow(
+				'Unimplemented XLSForm type: \'username\'. This type is not currently supported.'
+			);
+		});
+	});
+
 	describe('Other Types', () => {
 		test('throws error for unimplemented audit type', () => {
 			const survey = [

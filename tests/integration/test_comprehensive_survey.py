@@ -43,7 +43,7 @@ def test_comprehensive_survey_import_and_structure_verification(limesurvey_clien
 
     try:
         # Verify the survey was imported
-        verify_survey_import(limesurvey_client, survey_id, expected_question_count=22)
+        verify_survey_import(limesurvey_client, survey_id, expected_question_count=17)
 
         # Get questions and groups for further verification
         questions = limesurvey_client.list_questions(survey_id)
@@ -53,8 +53,7 @@ def test_comprehensive_survey_import_and_structure_verification(limesurvey_clien
         expected_questions = [
             'welcome', 'fullname', 'age', 'height',
             'birthdate', 'surveytime', 'wakeuptime', 'gender', 'interests',
-            'section2', 'priorities',
-            'surveystart', 'surveyend', 'surveydate', 'deviceid', 'username'
+            'section2', 'priorities'
         ]
 
         verify_question_exists(limesurvey_client, survey_id, expected_questions)
@@ -82,7 +81,6 @@ def test_comprehensive_survey_import_and_structure_verification(limesurvey_clien
         assert type_counts['D'] >= 3, f"Expected at least 3 date questions, got {type_counts['D']}"  # birthdate, surveytime, wakeuptime
         assert type_counts['L'] >= 1, f"Expected at least 1 list question, got {type_counts['L']}"  # gender
         assert type_counts['M'] >= 7, f"Expected at least 7 multiple choice questions, got {type_counts['M']}"  # interests + 6 sub-questions
-        assert type_counts['*'] >= 5, f"Expected at least 5 equation questions, got {type_counts['*']}"  # surveystart, surveyend, surveydate, deviceid, username
         assert type_counts['R'] >= 1, f"Expected at least 1 ranking question, got {type_counts['R']}"  # priorities
 
         # Verify survey properties using API

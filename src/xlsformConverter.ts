@@ -1,4 +1,4 @@
-import { RelevanceConverter } from './relevanceConverter';
+import { ExpressionConverter } from './converters/ExpressionConverter';
 import { ConfigManager, ConversionConfig } from './config/ConfigManager';
 import { FieldSanitizer } from './processors/FieldSanitizer';
 import { TypeMapper, TypeInfo, LSType } from './processors/TypeMapper';
@@ -18,11 +18,19 @@ const UNIMPLEMENTED_TYPES = [
 	'range', // Range questions don't exist in LimeSurvey
 	'select_one_from_file', // External file loading not supported in LimeSurvey TSV import
 	'select_multiple_from_file', // External file loading not supported in LimeSurvey TSV import
-	'acknowledge' // Acknowledge type not supported in LimeSurvey TSV import
+	'acknowledge', // Acknowledge type not supported in LimeSurvey TSV import
+	'start', 'end', 'today', 'deviceid', 'username', // Record types not supported
+	'begin_repeat',
+	'end_repeat'
 ];
 
+// Naming convention:
+// - xfType: XLSForm type (string from row.type)
+// - xfTypeInfo: Parsed XLSForm type information (TypeInfo interface)
+// - lsType: LimeSurvey type information (LSType interface)
+
 export class XLSFormToTSVConverter {
-	private relevanceConverter: RelevanceConverter;
+	private xpathConverter: ExpressionConverter;
 	private configManager: ConfigManager;
 	private fieldSanitizer: FieldSanitizer;
 	private typeMapper: TypeMapper;
@@ -43,7 +51,7 @@ export class XLSFormToTSVConverter {
 		this.fieldSanitizer = new FieldSanitizer();
 		
 		this.typeMapper = new TypeMapper();
-		this.relevanceConverter = new RelevanceConverter();
+		this.xpathConverter = new ExpressionConverter();
 		this.tsvGenerator = new TSVGenerator();
 		this.choicesMap = new Map();
 		this.currentGroup = null;
@@ -97,8 +105,8 @@ export class XLSFormToTSVConverter {
 
 		// Check if we need a default group (if no groups are defined)
 		const hasGroups = surveyData.some(row => {
-			const type = (row.type || '').trim();
-			return type === 'begin_group' || type === 'begin group';
+			const xfType = (row.type || '').trim();
+			return xfType === 'begin_group';
 		});
 
 		// If no groups, add a default group
@@ -144,7 +152,7 @@ export class XLSFormToTSVConverter {
 			}
 		}
 
-		// If no language-specific columns detected, use single language mode (backward compatibility)
+		// If no language-specific columns detected, use single language mode 
 		// Only use multiple languages if we actually have language-specific data
 		const hasLanguageSpecificData = surveyData.some(row => 
 			row._languages || 
@@ -298,45 +306,29 @@ export class XLSFormToTSVConverter {
 	}
 
 	private processRow(row: SurveyRow): void {
-		const type = (row.type || '').trim();
+		const xfType = (row.type || '').trim();
 
-		if (!type) return;
+		if (!xfType) return;
 
 		// Check for unimplemented types (extract base type first, before any spaces)
-		const baseType = type.split(/\s+/)[0];
+		const baseType = xfType.split(/\s+/)[0];
+		
+		// Other unimplemented types throw errors
 		if (UNIMPLEMENTED_TYPES.includes(baseType)) {
 			throw new Error(`Unimplemented XLSForm type: '${baseType}'. This type is not currently supported.`);
 		}
 
-		// Handle groups
-		if (type === 'begin_group' || type === 'begin group') {
+		if (xfType === 'begin_group' || xfType === 'begin group') {
 			this.addGroup(row);
 			return;
 		}
-		if (type === 'end_group' || type === 'end group') {
+		if (xfType === 'end_group' || xfType === 'end group') {
 			this.currentGroup = null;
 			return;
 		}
 
-		// Skip repeats (not fully supported)
-		if (type === 'begin_repeat' || type === 'end_repeat' || type === 'begin repeat' || type === 'end repeat') {
-			console.warn('Repeats not fully supported:', row.name);
-			return;
-		}
 
-		// Handle notes
-		if (type === 'note') {
-			this.addNote(row);
-			return;
-		}
-
-		// Handle system variables as calculations
-		if (type === 'start' || type === 'end' || type === 'today' || type === 'deviceid' || type === 'username') {
-			this.addCalculation(row);
-			return;
-		}
-
-		// Handle questions
+		// Handle notes and questions
 		this.addQuestion(row);
 	}
 
@@ -380,6 +372,7 @@ export class XLSFormToTSVConverter {
 		this.groupSeq++;
 		this.currentGroup = groupName;
 
+		// Groups support relevance but not validation
 		// Add group for each language
 		for (const lang of this.availableLanguages) {
 			const defaults = this.configManager.getDefaults();
@@ -400,62 +393,6 @@ export class XLSFormToTSVConverter {
 		}
 	}
 
-	private addNote(row: SurveyRow): void {
-		// Auto-generate name if missing (matches LimeSurvey behavior)
-		const questionName = row.name && row.name.trim() !== ''
-			? this.sanitizeName(row.name.trim())
-			: `Q${this.questionSeq}`;
-
-		this.questionSeq++;
-
-		// Add note for each language
-		for (const lang of this.availableLanguages) {
-			const defaults = this.configManager.getDefaults();
-			this.tsvGenerator.addRow({
-				class: 'Q',
-				'type/scale': 'X', // Boilerplate/display text
-				name: questionName,
-				relevance: this.convertRelevance(row.relevant),
-				text: this.getLanguageSpecificValue(row.label, lang) || questionName,
-				help: this.getLanguageSpecificValue(row.hint, lang) || '',
-				language: lang,
-				validation: '',
-				mandatory: '',
-				other: '',
-				default: '',
-				same_default: ''
-			});
-		}
-	}
-
-	private addCalculation(row: SurveyRow): void {
-		// Auto-generate name if missing (matches LimeSurvey behavior)
-		const questionName = row.name && row.name.trim() !== ''
-			? this.sanitizeName(row.name.trim())
-			: `Q${this.questionSeq}`;
-
-		this.questionSeq++;
-
-		// Add calculation for each language
-		for (const lang of this.availableLanguages) {
-			const defaults = this.configManager.getDefaults();
-			this.tsvGenerator.addRow({
-				class: 'Q',
-				'type/scale': '*', // Equation
-				name: questionName,
-				relevance: this.convertRelevance(row.relevant),
-				text: this.getLanguageSpecificValue(row.label, lang) || questionName,
-				help: '',
-				language: lang,
-				validation: this.relevanceConverter.convertCalculation(row.calculation || ''),
-				mandatory: '',
-				other: '',
-				default: row.default || '',
-				same_default: ''
-			});
-		}
-	}
-
 	private addQuestion(row: SurveyRow): void {
 		// Auto-generate name if missing (matches LimeSurvey behavior)
 		const questionName = row.name && row.name.trim() !== ''
@@ -464,24 +401,27 @@ export class XLSFormToTSVConverter {
 
 		this.questionSeq++;
 
-		const typeInfo = this.parseType(row.type || '');
-		const lsType = this.mapType(typeInfo);
+		const xfTypeInfo = this.parseType(row.type || '');
+		const lsType = this.mapType(xfTypeInfo);
+
+		// Notes have special handling
+		const isNote = xfTypeInfo.base === 'note';
 
 		// Add main question for each language
 		for (const lang of this.availableLanguages) {
 			const defaults = this.configManager.getDefaults();
 			this.tsvGenerator.addRow({
 				class: 'Q',
-				'type/scale': lsType.type,
+				'type/scale': isNote ? 'X' : lsType.type,
 				name: questionName,
 				relevance: this.convertRelevance(row.relevant),
 				text: this.getLanguageSpecificValue(row.label, lang) || questionName,
 				help: this.getLanguageSpecificValue(row.hint, lang) || '',
 				language: lang,
-				validation: this.relevanceConverter.convertConstraint(row.constraint || ''),
-				mandatory: row.required === 'yes' || row.required === 'true' ? 'Y' : '',
-				other: lsType.other ? 'Y' : '',
-				default: row.default || '',
+				validation: isNote ? '' : this.xpathConverter.convertConstraint(row.constraint || ''),
+				mandatory: isNote ? '' : (row.required === 'yes' || row.required === 'true' ? 'Y' : ''),
+				other: isNote ? '' : (lsType.other ? 'Y' : ''),
+				default: isNote ? '' : (row.default || ''),
 				same_default: ''
 			});
 		}
@@ -490,9 +430,9 @@ export class XLSFormToTSVConverter {
 		this.answerSeq = 0;
 		this.subquestionSeq = 0;
 
-		// Add answers/subquestions for select types
-		if (typeInfo.listName) {
-			this.addAnswers(typeInfo, lsType);
+		// Add answers/subquestions for select types (notes don't have answers)
+		if (!isNote && xfTypeInfo.listName) {
+			this.addAnswers(xfTypeInfo, lsType);
 		}
 	}
 
@@ -500,19 +440,19 @@ export class XLSFormToTSVConverter {
 		return this.typeMapper.parseType(typeStr);
 	}
 
-	private mapType(typeInfo: TypeInfo): LSType {
-		return this.typeMapper.mapType(typeInfo);
+	private mapType(xfTypeInfo: TypeInfo): LSType {
+		return this.typeMapper.mapType(xfTypeInfo);
 	}
 
-	private addAnswers(typeInfo: TypeInfo, lsType: LSType): void {
-		const choices = this.choicesMap.get(typeInfo.listName!);
+	private addAnswers(xfTypeInfo: TypeInfo, lsType: LSType): void {
+		const choices = this.choicesMap.get(xfTypeInfo.listName!);
 		if (!choices) {
-			console.warn(`Choice list not found: ${typeInfo.listName}`);
+			console.warn(`Choice list not found: ${xfTypeInfo.listName}`);
 			return;
 		}
 
 		// Use the answer class from the type mapping
-		const answerClass = lsType.answerClass || (typeInfo.base === 'select_multiple' ? 'SQ' : 'A');
+		const answerClass = lsType.answerClass || (xfTypeInfo.base === 'select_multiple' ? 'SQ' : 'A');
 
 		for (const choice of choices) {
 			// Auto-generate name if missing (matches LimeSurvey behavior)
@@ -545,7 +485,7 @@ export class XLSFormToTSVConverter {
 
 	private convertRelevance(relevant?: string): string {
 		if (!relevant) return '1';
-		return this.relevanceConverter.convert(relevant);
+		return this.xpathConverter.convertRelevance(relevant);
 	}
 
 

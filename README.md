@@ -17,21 +17,30 @@ Convert XLSForm surveys to LimeSurvey TSV format.
 
 - Question Types and Choices (see `src/processors/TypeMapper.ts` for how this library maps XLSForm types to LimeSurvey types)
   - everything but the types specified in `UNIMPLEMENTED_TYPES` in `src/xlsformConverter.ts`
+  - record types ❌ (start, end, today, device_id, username, phonenumber, email)
 
 - Settings sheet 
   - -> LS Survey Global Parameters (only name of survey)  ✅
   - -> Survey Language-Specific Parameters (default language is first row, other rows are extracted from label translations)  ✅
 
 - Question Groups  ✅
+  - Group level relevance ✅
+
 - Hints (normal) ✅
 
 - `label` and `hint` translations ✅
 
-
-- constraint/relevant (XPath) -> validation/relevance (ExpressionScript/EM) 🟡
-  - XPath Paths -> Question Codes
-  - XPath Operators ->
-  - XPath Functions
+- XPath -> ExpressionScript/EM 🟡
+  - xlsform constraint -> limesurvey validation
+    - can only contain self-references (".", no variables) 
+    - all xpath operators mentioned [here](https://getodk.github.io/xforms-spec/#xpath-operators)
+    - xpath functions: 
+      - boolean:
+        - `regex()`, 
+        - `not()`
+      - string:
+        - `contains()` 
+  - relevant -> relevance
 
 - XLSForms Calculation ❌
 - XLSForms Trigger ❌
@@ -194,6 +203,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 - Limesurvey DB Structure: https://github.com/LimeSurvey/LimeSurvey/blob/master/installer/create-database.php
 - LimeSurvey Expressions: 
     - https://github.com/LimeSurvey/LimeSurvey/blob/master/assets/packages/expressions/em_javascript.js
+    - https://www.limesurvey.org/manual/ExpressionScript_examples
     - https://www.limesurvey.org/manual/ExpressionScript_-_Presentation
     - https://www.limesurvey.org/manual/Expression_Manager
     - https://www.limesurvey.org/manual/ExpressionScript_for_developers

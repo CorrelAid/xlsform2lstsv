@@ -19,19 +19,7 @@ describe('Groups and Survey Structure', () => {
 			expect(demoGroup?.text).toBe('Demographics');
 		});
 
-		test('handles begin group with spaces', () => {
-			const survey = [
-				{ type: 'begin group', name: 'sect1', label: 'Section 1' },
-				{ type: 'text', name: 'q1', label: 'Question 1' },
-				{ type: 'end group' }
-			];
-
-			const rows = convertAndParse(survey);
-			const group = findRowByName(rows, 'sect1');
-
-			expect(group).toBeDefined();
-			expect(group?.class).toBe('G');
-		});
+		
 
 		test('auto-generates group name if missing', () => {
 			const survey = [
@@ -181,35 +169,6 @@ describe('Groups and Survey Structure', () => {
 		});
 
 
-	});
-
-	describe('repeats', () => {
-		test('logs warning for repeats but continues', () => {
-			const survey = [
-				{ type: 'begin_repeat', name: 'rep1', label: 'Repeat' },
-				{ type: 'text', name: 'q1', label: 'Question' },
-				{ type: 'end_repeat' }
-			];
-
-			// Should not throw error
-			const rows = convertAndParse(survey);
-
-		// Converter continues processing
-		expect(rows).toBeDefined();
-		expect(rows.length).toBeGreaterThan(0);
-		});
-
-		test('handles begin repeat with spaces', () => {
-			const survey = [
-				{ type: 'begin repeat', name: 'rep1', label: 'Repeat' },
-				{ type: 'text', name: 'q1', label: 'Question' },
-				{ type: 'end repeat' }
-			];
-
-			// Should not throw error
-			const rows = convertAndParse(survey);
-			expect(rows).toBeDefined();
-		});
 	});
 
 	describe('overall structure', () => {

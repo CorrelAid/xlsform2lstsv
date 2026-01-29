@@ -1,5 +1,5 @@
 export { XLSFormToTSVConverter } from './xlsformConverter';
-export { RelevanceConverter } from './relevanceConverter';
+export { ExpressionConverter } from './converters/ExpressionConverter';
 export { ConfigManager, ConversionConfig } from './config/ConfigManager';
 export { defaultConfig } from './config/types';
 export { FieldSanitizer } from './processors/FieldSanitizer';

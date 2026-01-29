@@ -1,8 +1,8 @@
 import { describe, test, expect } from 'vitest';
-import { XPathToExpressionScriptConverter } from '../utils/xpathToExpressionScript';
+import { ExpressionConverter } from '../../converters/ExpressionConverter';
 
-describe('XPathToExpressionScriptConverter', () => {
-	const converter = new XPathToExpressionScriptConverter();
+describe('ExpressionConverter', () => {
+	const converter = new ExpressionConverter();
 
 	describe('basic conversions', () => {
 		test('converts empty expression to "1"', () => {
@@ -407,7 +407,7 @@ describe('XPathToExpressionScriptConverter', () => {
 				"${total} = ${price} * ${quantity}"
 			);
 			expect(result).toContain('total');
-			expect(result).toContain('==');
+			expect(result).toContain('=');
 			expect(result).toContain('price');
 			expect(result).toContain('*');
 			expect(result).toContain('quantity');

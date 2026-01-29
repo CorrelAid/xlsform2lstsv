@@ -20,6 +20,7 @@ export class TSVGenerator {
     this.rows.push(row);
   }
 
+  // https://www.limesurvey.org/manual/Tab_Separated_Value_survey_structure
   generateTSV(): string {
     const headers = [
       'class',

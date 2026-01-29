@@ -29,60 +29,55 @@ describe('Special Question Types', () => {
 		});
 	});
 
-	describe('system variables', () => {
-		test('converts start as equation', () => {
-			const survey = [
-				{ type: 'start', name: 'start_time', label: 'Start time' }
-			];
+	// describe('system variables (record types)', () => {
+	// 	test('throws error for unimplemented start type', () => {
+	// 		const survey = [
+	// 			{ type: 'start', name: 'start_time', label: 'Start time' }
+	// 		];
 
-			const rows = convertAndParse(survey);
-			const question = findRowByName(rows, 'starttime'); // Underscores removed
+	// 		expect(() => convertAndParse(survey)).toThrow(
+	// 			'Unimplemented XLSForm type: \'start\'. This type is not currently supported.'
+	// 		);
+	// 	});
 
-			expect(question?.['type/scale']).toBe('*'); // Equation in LimeSurvey
-		});
+	// 	test('throws error for unimplemented end type', () => {
+	// 		const survey = [
+	// 			{ type: 'end', name: 'end_time', label: 'End time' }
+	// 		];
 
-		test('converts end as equation', () => {
-			const survey = [
-				{ type: 'end', name: 'end_time', label: 'End time' }
-			];
+	// 		expect(() => convertAndParse(survey)).toThrow(
+	// 			'Unimplemented XLSForm type: \'end\'. This type is not currently supported.'
+	// 		);
+	// 	});
 
-			const rows = convertAndParse(survey);
-			const question = findRowByName(rows, 'endtime'); // Underscores removed
+	// 	test('throws error for unimplemented today type', () => {
+	// 		const survey = [
+	// 			{ type: 'today', name: 'today_date', label: 'Today date' }
+	// 		];
 
-			expect(question?.['type/scale']).toBe('*'); // Equation in LimeSurvey
-		});
+	// 		expect(() => convertAndParse(survey)).toThrow(
+	// 			'Unimplemented XLSForm type: \'today\'. This type is not currently supported.'
+	// 		);
+	// 	});
 
-		test('converts today as equation', () => {
-			const survey = [
-				{ type: 'today', name: 'today_date', label: 'Today date' }
-			];
+	// 	test('throws error for unimplemented deviceid type', () => {
+	// 		const survey = [
+	// 			{ type: 'deviceid', name: 'device_id', label: 'Device ID' }
+	// 		];
 
-			const rows = convertAndParse(survey);
-			const question = findRowByName(rows, 'todaydate'); // Underscores removed
+	// 		expect(() => convertAndParse(survey)).toThrow(
+	// 			'Unimplemented XLSForm type: \'deviceid\'. This type is not currently supported.'
+	// 		);
+	// 	});
 
-			expect(question?.['type/scale']).toBe('*'); // Equation in LimeSurvey
-		});
+	// 	test('throws error for unimplemented username type', () => {
+	// 		const survey = [
+	// 			{ type: 'username', name: 'user_name', label: 'Username' }
+	// 		];
 
-		test('converts deviceid as equation', () => {
-			const survey = [
-				{ type: 'deviceid', name: 'device_id', label: 'Device ID' }
-			];
-
-			const rows = convertAndParse(survey);
-			const question = findRowByName(rows, 'deviceid'); // Underscores removed
-
-			expect(question?.['type/scale']).toBe('*'); // Equation in LimeSurvey
-		});
-
-		test('converts username as equation', () => {
-			const survey = [
-				{ type: 'username', name: 'user_name', label: 'Username' }
-			];
-
-			const rows = convertAndParse(survey);
-			const question = findRowByName(rows, 'username'); // Underscores removed
-
-			expect(question?.['type/scale']).toBe('*'); // Equation in LimeSurvey
-		});
-	});
+	// 		expect(() => convertAndParse(survey)).toThrow(
+	// 			'Unimplemented XLSForm type: \'username\'. This type is not currently supported.'
+	// 		);
+	// 	});
+	// });
 });

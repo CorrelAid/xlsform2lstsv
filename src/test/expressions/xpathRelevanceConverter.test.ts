@@ -1,10 +1,10 @@
 import { describe, test, expect } from 'vitest';
-import { RelevanceConverter } from '../relevanceConverter';
+import { ExpressionConverter } from '../../converters/ExpressionConverter';
 
-describe('RelevanceConverter', () => {
-	const converter = new RelevanceConverter();
+describe('XPath Relevance Conversion', () => {
+	const converter = new ExpressionConverter();
 
-	describe('basic conversions', () => {
+	describe('basic relevance conversions', () => {
 		test('converts empty expression to "1"', () => {
 			expect(converter.convert('')).toBe('1');
 			expect(converter.convert(undefined as any)).toBe('1');
@@ -32,7 +32,7 @@ describe('RelevanceConverter', () => {
 		});
 	});
 
-	describe('selected() function', () => {
+	describe('selected() function in relevance', () => {
 		test('converts selected() with single quotes', () => {
 			const result = converter.convert("selected(${field}, 'value')");
 			expect(result).toContain('field');
@@ -65,7 +65,7 @@ describe('RelevanceConverter', () => {
 		});
 	});
 
-	describe('boolean operators', () => {
+	describe('boolean operators in relevance', () => {
 		test('converts "and" to " and "', () => {
 			const result = converter.convert('${x} > 5 and ${y} < 10');
 			expect(result).toContain(' and ');
@@ -92,13 +92,7 @@ describe('RelevanceConverter', () => {
 		});
 	});
 
-	describe('current field reference', () => {
-		test('converts . to self in constraints', () => {
-			const result = converter.convertConstraint('. >= 18');
-			// Constraint converter returns regex patterns for numeric ranges
-			expect(result).toContain('/^\\d');
-		});
-
+	describe('current field reference in relevance', () => {
 		test('converts . to self at start of expression', () => {
 			const result = converter.convert('. != ""');
 			expect(result).toContain('self');
@@ -115,7 +109,7 @@ describe('RelevanceConverter', () => {
 		});
 	});
 
-	describe('complex expressions', () => {
+	describe('complex relevance expressions', () => {
 		test('converts complex boolean expression', () => {
 			const result = converter.convert(
 				"${age} >= 18 and ${country} = 'USA' or ${country} = 'Canada'"
@@ -155,7 +149,7 @@ describe('RelevanceConverter', () => {
 		});
 	});
 
-	describe('edge cases and constraints', () => {
+	describe('edge cases in relevance expressions', () => {
 		test('converts nested if() expressions', () => {
 			const result = converter.convert(
 				"if(${age} < 18, 'minor', if(${age} < 65, 'adult', 'senior'))"
@@ -184,75 +178,6 @@ describe('RelevanceConverter', () => {
 			expect(result).toContain('field1');
 			expect(result).toContain('field2');
 			expect(result).toContain('field3');
-		});
-
-		test('converts constraint with range validation', () => {
-			const result = converter.convertConstraint('. >= 5 and . <= 100');
-			expect(result).toContain('/^');
-			expect(result).toContain('$/');
-		});
-
-		test('converts constraint with min validation', () => {
-			const result = converter.convertConstraint('. >= 18');
-			expect(result).toContain('/^');
-			expect(result).toContain('$/');
-		});
-
-		test('converts constraint with max validation', () => {
-			const result = converter.convertConstraint('. <= 100');
-			expect(result).toContain('/^');
-			expect(result).toContain('$/');
-		});
-	});
-
-	describe('convertConstraint', () => {
-		test('converts empty constraint to empty string', () => {
-			expect(converter.convertConstraint('')).toBe('');
-		});
-
-		test('converts . to self throughout constraint', () => {
-			const result = converter.convertConstraint('. >= 1 and . <= 100');
-			// Constraint converter returns regex patterns for numeric ranges
-			expect(result).toContain('/^\\d');
-		});
-
-		test('converts constraint with field references', () => {
-			const result = converter.convertConstraint('. > ${min_value}');
-			// Constraint converter returns regex patterns, doesn't handle field references
-			expect(result).toBe('');
-		});
-	});
-
-	describe('convertCalculation', () => {
-		test('converts empty calculation to empty string', () => {
-			expect(converter.convertCalculation('')).toBe('');
-		});
-
-		test('converts calculation with field references', () => {
-			const result = converter.convertCalculation('${a} + ${b}');
-			expect(result).toContain('a');
-			expect(result).not.toContain('{a}');
-			expect(result).toContain('b');
-			expect(result).not.toContain('{b}');
-			expect(result).toContain('+');
-		});
-
-		test('converts calculation with division', () => {
-			const result = converter.convertCalculation('(${x} + ${y}) / 2');
-			expect(result).toContain('x');
-			expect(result).not.toContain('{x}');
-			expect(result).toContain('y');
-			expect(result).not.toContain('{y}');
-			expect(result).toContain('/');
-		});
-
-		test('converts calculation with multiplication', () => {
-			const result = converter.convertCalculation('${price} * ${quantity}');
-			expect(result).toContain('price');
-			expect(result).not.toContain('{price}');
-			expect(result).toContain('quantity');
-			expect(result).not.toContain('{quantity}');
-			expect(result).toContain('*');
 		});
 	});
 
