@@ -9,8 +9,7 @@ async function checkLimeSurveyVersion() {
     const currentVersion = packageJson.version;
     
     console.log(`📦 xform2lstsv version: ${currentVersion}`);
-    console.log(`🔧 LimeSurvey compatibility: ${VERSION_COMPATIBILITY.limeSurvey.min} - ${VERSION_COMPATIBILITY.limeSurvey.max}`);
-    console.log(`✅ Tested versions: ${VERSION_COMPATIBILITY.limeSurvey.tested.join(', ')}`);
+    console.log(`✅ Tested LimeSurvey versions: ${VERSION_COMPATIBILITY.limeSurvey.tested.join(', ')}`);
     console.log(`📝 Notes: ${VERSION_COMPATIBILITY.notes || 'None'}`);
     
     // Check if we need to update the version in version.ts
