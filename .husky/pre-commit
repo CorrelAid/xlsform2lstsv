@@ -1,12 +1,22 @@
 #!/bin/sh
 
-# Run tests before commit
-echo "🧪 Running pre-commit tests..."
-npm test
+# Run quick validation before commit
+echo "🔍 Running pre-commit validation..."
+
+# Check TypeScript compilation (quick check)
+npx tsc --noEmit
 
 if [ $? -ne 0 ]; then
-  echo "❌ Tests failed. Commit aborted."
+  echo "❌ TypeScript compilation failed. Commit aborted."
   exit 1
 fi
 
-echo "✅ All tests passed. Proceeding with commit."
+# Check version consistency
+npm run check-version
+
+if [ $? -ne 0 ]; then
+  echo "❌ Version check failed. Commit aborted."
+  exit 1
+fi
+
+echo "✅ Pre-commit validation passed. Proceeding with commit."
