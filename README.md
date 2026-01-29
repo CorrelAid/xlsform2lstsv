@@ -1,6 +1,6 @@
-[![CI Status](https://github.com/your-repo/xlsform2lstsv/actions/workflows/ci.yml/badge.svg)](https://github.com/your-repo/xlsform2lstsv/actions)
+[![CI Status](https://github.com/CorrelAid/xlsform2lstsv/actions/workflows/ci.yml/badge.svg)](https://github.com/CorrelAid/xlsform2lstsv/actions)
 [![npm version](https://badge.fury.io/js/xlsform2lstsv.svg)](https://badge.fury.io/js/xlsform2lstsv)
-[![Code Coverage](https://img.shields.io/codecov/c/github/your-repo/xlsform2lstsv)](https://codecov.io/gh/your-repo/xlsform2lstsv)
+[![Code Coverage](https://img.shields.io/codecov/c/github/CorrelAid/xlsform2lstsv)](https://codecov.io/gh/CorrelAid/xlsform2lstsv)
 
 # xlsform2lstsv
 
@@ -111,7 +111,7 @@ const tsv = converter.convert(surveyData, choicesData, settingsData);
 
 ```bash
 # Clone repository
-git clone https://github.com/your-repo/xlsform2lstsv.git
+git clone https://github.com/CorrelAid/xlsform2lstsv.git
 cd xlsform2lstsv
 
 # Install Node.js dependencies
