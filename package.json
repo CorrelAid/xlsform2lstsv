@@ -51,7 +51,8 @@
     "README.md"
   ],
   "dependencies": {
-    "xlsx": "^0.18.5"
+    "js-xpath": "^0.0.4",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.5.0",

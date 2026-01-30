@@ -136,27 +136,7 @@ describe('Variable Name Transformation - XPath to LimeSurvey Question Codes', ()
 		});
 	});
 
-	describe('Calculation expressions with variable transformation', () => {
-		test('converts simple calculation with field references', () => {
-			const result = converter.convertCalculation('${a} + ${b}');
-			expect(result).toBe('a + b');
-		});
 
-		test('converts calculation with parentheses', () => {
-			const result = converter.convertCalculation('(${x} + ${y}) / 2');
-			expect(result).toBe('(x + y) / 2');
-		});
-
-		test('converts calculation with multiple operators', () => {
-			const result = converter.convertCalculation('${price} * ${quantity} + ${tax}');
-			expect(result).toBe('price * quantity + tax');
-		});
-
-		test('handles calculation with field references and numbers', () => {
-			const result = converter.convertCalculation('${total} = ${price} * ${quantity}');
-			expect(result).toBe('total = price * quantity');
-		});
-	});
 
 	describe('Edge cases and error handling', () => {
 		test('handles empty expressions', () => {
@@ -216,12 +196,7 @@ describe('Variable Name Transformation - XPath to LimeSurvey Question Codes', ()
 			expect(result).toContain('/^\\d');
 		});
 
-		test('converts calculation expression', () => {
-			const result = converter.convertCalculation(
-				"${total} = ${price} * ${quantity}"
-			);
-			expect(result).toBe('total = price * quantity');
-		});
+		
 
 		test('handles complex nested expression', () => {
 			const result = converter.convert(
@@ -275,13 +250,6 @@ describe('Variable Name Transformation - XPath to LimeSurvey Question Codes', ()
 			expect(relevanceResult).toContain('/^\\d');
 		});
 
-		test('both converters handle calculation expressions similarly', () => {
-			const relevanceResult = converter.convertCalculation('${a} + ${b}');
-			const xpathResult = xpathConverter.convertCalculation('${a} + ${b}');
-			
-			// Both should produce the same result for calculations
-			expect(relevanceResult).toBe(xpathResult);
-				expect(relevanceResult).toBe('a + b');
-		});
+	
 	});
 });

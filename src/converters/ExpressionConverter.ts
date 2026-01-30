@@ -432,25 +432,6 @@ export class ExpressionConverter {
         return result.trim();
     }
 
-    /**
-     * Convert XPath calculation to EM equation
-     */
-    convertCalculation(calculation: string): string {
-        if (!calculation) return '';
-        
-        let result = calculation;
-        
-        // For calculations, we need to handle functions and field references
-        result = this.convertStringFunctions(result);
-        result = this.convertNumberFunctions(result);
-        result = this.convertMathFunctions(result);
-        result = this.convertFieldReferences(result);
-        result = this.convertComparisonOperators(result, true, true); // Use = instead of == for calculations
-        result = this.convertBooleanOperators(result, true);
-        result = this.convertCurrentFieldReferences(result);
-        
-        return result.trim();
-    }
 
     /**
      * Convert XPath relevance expression to LimeSurvey Expression Manager syntax

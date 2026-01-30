@@ -296,45 +296,6 @@ describe('ExpressionConverter', () => {
 		});
 	});
 
-	describe('convertCalculation', () => {
-		test('converts empty calculation to empty string', () => {
-			expect(converter.convertCalculation('')).toBe('');
-		});
-
-		test('converts calculation with field references', () => {
-			const result = converter.convertCalculation('${a} + ${b}');
-			expect(result).toContain('a');
-			expect(result).not.toContain('{a}');
-			expect(result).toContain('b');
-			expect(result).not.toContain('{b}');
-			expect(result).toContain('+');
-		});
-
-		test('converts calculation with division', () => {
-			const result = converter.convertCalculation('(${x} + ${y}) / 2');
-			expect(result).toContain('x');
-			expect(result).not.toContain('{x}');
-			expect(result).toContain('y');
-			expect(result).not.toContain('{y}');
-			expect(result).toContain('/');
-		});
-
-		test('converts calculation with multiplication', () => {
-			const result = converter.convertCalculation('${price} * ${quantity}');
-			expect(result).toContain('price');
-			expect(result).not.toContain('{price}');
-			expect(result).toContain('quantity');
-			expect(result).not.toContain('{quantity}');
-			expect(result).toContain('*');
-		});
-
-		test('converts calculation with string functions', () => {
-			const result = converter.convertCalculation('concat(${first}, " ", ${last})');
-			expect(result).toContain('first');
-			expect(result).toContain('+');
-			expect(result).toContain('last');
-		});
-	});
 
 	describe('edge cases', () => {
 		test('handles expressions with numbers', () => {
@@ -402,15 +363,5 @@ describe('ExpressionConverter', () => {
 			expect(result).toContain('/^\\d');
 		});
 
-		test('converts ODK calculation expression', () => {
-			const result = converter.convertCalculation(
-				"${total} = ${price} * ${quantity}"
-			);
-			expect(result).toContain('total');
-			expect(result).toContain('=');
-			expect(result).toContain('price');
-			expect(result).toContain('*');
-			expect(result).toContain('quantity');
-		});
 	});
 });
