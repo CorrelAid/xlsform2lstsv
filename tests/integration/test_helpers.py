@@ -800,3 +800,48 @@ def import_all_surveys_from_directory(
             failed_imports.append((tsv_path.name, str(e)))
     
     return imported_successfully, failed_imports
+
+
+def count_mandatory_fields_in_tsv(tsv_path: Path) -> int:
+    """
+    Count mandatory fields in a TSV file by parsing the mandatory column.
+    
+    Args:
+        tsv_path: Path to TSV file
+        
+    Returns:
+        Number of questions with mandatory='Y'
+    """
+    if not tsv_path.exists():
+        return 0
+        
+    mandatory_count = 0
+    
+    with open(tsv_path, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+        
+        # Find the header line to get column indices
+        header_line = None
+        for line in lines:
+            if line.startswith('class'):
+                header_line = line
+                break
+                
+        if not header_line:
+            return 0
+            
+        # Parse header to find mandatory column index
+        headers = header_line.strip().split('\t')
+        try:
+            mandatory_index = headers.index('mandatory')
+        except ValueError:
+            return 0
+            
+        # Count lines where mandatory='Y' and class='Q' (questions)
+        for line in lines:
+            if line.startswith('Q\t'):  # Question lines
+                parts = line.strip().split('\t')
+                if len(parts) > mandatory_index and parts[mandatory_index] == 'Y':
+                    mandatory_count += 1
+                    
+    return mandatory_count

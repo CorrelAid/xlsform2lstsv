@@ -1,4 +1,4 @@
-import { ExpressionConverter } from './converters/ExpressionConverter';
+import { convertRelevance, convertConstraint } from './converters/xpathTranspiler';
 import { ConfigManager, ConversionConfig } from './config/ConfigManager';
 import { FieldSanitizer } from './processors/FieldSanitizer';
 import { TypeMapper, TypeInfo, LSType } from './processors/TypeMapper';
@@ -30,7 +30,7 @@ const UNIMPLEMENTED_TYPES = [
 // - lsType: LimeSurvey type information (LSType interface)
 
 export class XLSFormToTSVConverter {
-	private xpathConverter: ExpressionConverter;
+
 	private configManager: ConfigManager;
 	private fieldSanitizer: FieldSanitizer;
 	private typeMapper: TypeMapper;
@@ -51,7 +51,7 @@ export class XLSFormToTSVConverter {
 		this.fieldSanitizer = new FieldSanitizer();
 		
 		this.typeMapper = new TypeMapper();
-		this.xpathConverter = new ExpressionConverter();
+
 		this.tsvGenerator = new TSVGenerator();
 		this.choicesMap = new Map();
 		this.currentGroup = null;
@@ -205,6 +205,7 @@ export class XLSFormToTSVConverter {
 			help: '',
 			language: defaults.language,
 			validation: '',
+			em_validation_q: '',
 			mandatory: '',
 			other: '',
 			default: '',
@@ -232,6 +233,7 @@ export class XLSFormToTSVConverter {
 			help: '',
 			language: this.baseLanguage,
 			validation: '',
+			em_validation_q: '',
 			mandatory: '',
 			other: '',
 			default: '',
@@ -251,6 +253,7 @@ export class XLSFormToTSVConverter {
 				help: '',
 				language: this.baseLanguage,
 				validation: '',
+				em_validation_q: '',
 				mandatory: '',
 				other: '',
 				default: '',
@@ -272,6 +275,7 @@ export class XLSFormToTSVConverter {
 			help: '',
 			language: defaultLanguage,
 			validation: '',
+			em_validation_q: '',
 			mandatory: '',
 			other: '',
 			default: '',
@@ -295,6 +299,7 @@ export class XLSFormToTSVConverter {
 				help: '',
 				language: lang,
 				validation: '',
+					em_validation_q: "",
 				mandatory: '',
 				other: '',
 				default: '',
@@ -385,6 +390,7 @@ export class XLSFormToTSVConverter {
 				help: this.getLanguageSpecificValue(row.hint, lang) || '',
 				language: lang,
 				validation: '',
+				em_validation_q: "",
 				mandatory: '',
 				other: '',
 				default: '',
@@ -418,7 +424,8 @@ export class XLSFormToTSVConverter {
 				text: this.getLanguageSpecificValue(row.label, lang) || questionName,
 				help: this.getLanguageSpecificValue(row.hint, lang) || '',
 				language: lang,
-				validation: isNote ? '' : this.xpathConverter.convertConstraint(row.constraint || ''),
+				validation: "",
+				em_validation_q: isNote ? "" : convertConstraint(row.constraint || ""),
 				mandatory: isNote ? '' : (row.required === 'yes' || row.required === 'true' ? 'Y' : ''),
 				other: isNote ? '' : (lsType.other ? 'Y' : ''),
 				default: isNote ? '' : (row.default || ''),
@@ -474,6 +481,7 @@ export class XLSFormToTSVConverter {
 					help: '',
 					language: lang,
 					validation: '',
+					em_validation_q: '',
 					mandatory: '',
 					other: '',
 					default: '',
@@ -485,7 +493,7 @@ export class XLSFormToTSVConverter {
 
 	private convertRelevance(relevant?: string): string {
 		if (!relevant) return '1';
-		return this.xpathConverter.convertRelevance(relevant);
+		return convertRelevance(relevant);
 	}
 
 

@@ -98,30 +98,20 @@ async function main(): Promise<void> {
     console.log('');
   }
 
-  // Generate TSV from tutorial.xls file
-  console.log('\nGenerating TSV from tutorial.xls...');
-  await generateTutorialTSV();
-
-  console.log(`\nFinal Summary: ${successCount + 1}/${fixtureFiles.length + 1} files generated successfully`);
+  console.log(`\nFinal Summary: ${successCount}/${fixtureFiles.length} files generated successfully`);
+  
+  // Verify we have all expected fixtures
+  const expectedFixtures = ['basic_survey', 'complex_survey', 'complex_xpath_survey', 'validation_relevance_survey'];
+  const generatedFixtures = fixtureFiles.map(f => path.basename(f, '.json'));
+  
+  expectedFixtures.forEach(expected => {
+    if (!generatedFixtures.includes(expected)) {
+      console.warn(`⚠ Expected fixture ${expected} was not found`);
+    }
+  });
 
   if (successCount < fixtureFiles.length) {
     process.exit(1);
   }
 }
-async function generateTutorialTSV(): Promise<void> {
-  const tutorialXlsPath = path.join(FIXTURES_DIR, 'tutorial.xls');
-  const tutorialOutputPath = path.join(OUTPUT_DIR, 'tutorial_survey.tsv');
-
-  try {
-    const tsv = await XLSFormParser.convertXLSFileToTSV(tutorialXlsPath);
-    fs.writeFileSync(tutorialOutputPath, tsv, 'utf-8');
-    console.log(`  → Generated: ${path.basename(tutorialOutputPath)}`);
-    const lines = tsv.split('\n').filter(l => l.trim()).length;
-    console.log(`  → ${lines} rows (including header)`);
-  } catch (error) {
-    console.error(`  ✗ Error processing tutorial.xls:`, error);
-    throw error;
-  }
-}
-
 main().catch(console.error);

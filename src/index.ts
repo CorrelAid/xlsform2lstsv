@@ -1,5 +1,5 @@
 export { XLSFormToTSVConverter } from './xlsformConverter';
-export { ExpressionConverter } from './converters/ExpressionConverter';
+export { convertRelevance, convertConstraint, xpathToLimeSurvey } from './converters/xpathTranspiler';
 export { ConfigManager, ConversionConfig } from './config/ConfigManager';
 export { defaultConfig } from './config/types';
 export { FieldSanitizer } from './processors/FieldSanitizer';

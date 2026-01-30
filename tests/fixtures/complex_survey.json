@@ -44,6 +44,11 @@
       "label": "How satisfied are you?"
     },
     {
+      "type": "rank priorities",
+      "name": "life_priorities",
+      "label": "Rank your life priorities (1 = most important)"
+    },
+    {
       "type": "text",
       "name": "other_comments",
       "label": "Any other comments?",
@@ -104,6 +109,26 @@
       "list_name": "satisfaction",
       "name": "unhp",
       "label": "Unhappy"
+    },
+    {
+      "list_name": "priorities",
+      "name": "family",
+      "label": "Family"
+    },
+    {
+      "list_name": "priorities",
+      "name": "career",
+      "label": "Career"
+    },
+    {
+      "list_name": "priorities",
+      "name": "health",
+      "label": "Health"
+    },
+    {
+      "list_name": "priorities",
+      "name": "friends",
+      "label": "Friends"
     }
   ],
   "settings": [

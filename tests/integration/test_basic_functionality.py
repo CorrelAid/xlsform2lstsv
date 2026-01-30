@@ -14,7 +14,8 @@ from test_helpers import (
     import_survey_from_tsv,
     verify_survey_import,
     verify_question_exists,
-    cleanup_survey
+    cleanup_survey,
+    count_mandatory_fields_in_tsv
 )
 
 
@@ -42,8 +43,8 @@ def test_basic_survey_import(limesurvey_client: Client, generated_files_dir: Pat
     )
 
     try:
-        # Verify the survey was imported
-        verify_survey_import(limesurvey_client, survey_id, expected_question_count=4)
+        # Verify the survey was imported with questions and choices
+        verify_survey_import(limesurvey_client, survey_id, expected_question_count=4, expected_choice_count=2)
 
         # Check questions
         verify_question_exists(limesurvey_client, survey_id, [
@@ -54,15 +55,40 @@ def test_basic_survey_import(limesurvey_client: Client, generated_files_dir: Pat
 
         print(f"\n✓ Basic survey imported successfully")
         print(f"  - Questions: 4")
+        print(f"  - Choices: 2")
 
     finally:
         # Cleanup
         cleanup_survey(limesurvey_client, survey_id)
 
 
-def test_tutorial_survey_import(limesurvey_client: Client, generated_files_dir: Path):
-    """Test import of tutorial_survey.tsv generated from XLS file"""
-    tsv_path = generated_files_dir / "tutorial_survey.tsv"
+def test_mandatory_fields_in_generated_tsv(generated_files_dir: Path):
+    """Test that mandatory fields are correctly set in generated TSV files"""
+    
+    # Test basic survey - should have 3 mandatory questions
+    basic_tsv = generated_files_dir / "basic_survey.tsv"
+    if basic_tsv.exists():
+        mandatory_count = count_mandatory_fields_in_tsv(basic_tsv)
+        expected_count = 3  # respondent_name, age, consent
+        assert mandatory_count == expected_count, \
+            f"Expected {expected_count} mandatory questions in basic_survey.tsv, got {mandatory_count}"
+        print(f"✓ basic_survey.tsv: {mandatory_count} mandatory questions (expected {expected_count})")
+    
+    # Test complex survey - should have 1 mandatory question
+    complex_tsv = generated_files_dir / "complex_survey.tsv"
+    if complex_tsv.exists():
+        mandatory_count = count_mandatory_fields_in_tsv(complex_tsv)
+        expected_count = 1  # full_name only
+        assert mandatory_count == expected_count, \
+            f"Expected {expected_count} mandatory questions in complex_survey.tsv, got {mandatory_count}"
+        print(f"✓ complex_survey.tsv: {mandatory_count} mandatory questions (expected {expected_count})")
+    
+    print("✓ Mandatory field handling validated successfully")
+
+
+def test_xpath_survey_import(limesurvey_client: Client, generated_files_dir: Path):
+    """Test import of complex_xpath_survey.tsv with relevance expressions"""
+    tsv_path = generated_files_dir / "complex_xpath_survey.tsv"
 
     if not tsv_path.exists():
         pytest.skip(f"TSV file not found: {tsv_path}")
@@ -71,31 +97,61 @@ def test_tutorial_survey_import(limesurvey_client: Client, generated_files_dir: 
     survey_id = import_survey_from_tsv(
         limesurvey_client,
         tsv_path,
-        "Tutorial Survey Test"
+        "XPath Survey Test"
     )
 
     try:
         # Verify the survey was imported
         verify_survey_import(limesurvey_client, survey_id)
 
-        # Check questions - these are from the XLSForm tutorial
+        # Check that questions with relevance expressions were imported
         verify_question_exists(limesurvey_client, survey_id, [
-            "name",
-            "relationshiptohouseh",  # truncated to 20 chars
-            "sex"
+            "consent",
+            "age", 
+            "country"
         ])
 
-        # Get questions to check count
-        questions = limesurvey_client.list_questions(survey_id)
-        question_names = [q.get('title') if isinstance(q, dict) else q.title for q in questions]
-        
-        # Validate we have the expected number of questions from the tutorial
-        assert len(questions) >= 5, f"Expected at least 5 questions, got {len(questions)}"
-
-        print(f"\n✓ Tutorial survey imported successfully")
-        print(f"  - Questions: {len(questions)}")
-        print(f"  - Question names: {question_names}")
+        print(f"\n✓ XPath survey imported successfully")
+        print(f"  - Survey with relevance expressions imported")
 
     finally:
         # Cleanup
         cleanup_survey(limesurvey_client, survey_id)
+
+
+def test_validation_relevance_survey_import(limesurvey_client: Client, generated_files_dir: Path):
+    """Test import of validation_relevance_survey.tsv with comprehensive validation and relevance"""
+    tsv_path = generated_files_dir / "validation_relevance_survey.tsv"
+
+    if not tsv_path.exists():
+        pytest.skip(f"TSV file not found: {tsv_path}")
+
+    # Import the survey
+    survey_id = import_survey_from_tsv(
+        limesurvey_client,
+        tsv_path,
+        "Validation Relevance Test"
+    )
+
+    try:
+        # Verify the survey was imported
+        verify_survey_import(limesurvey_client, survey_id)
+
+        # Check that questions with validation and relevance were imported
+        # Note: Field names are sanitized (underscores removed)
+        verify_question_exists(limesurvey_client, survey_id, [
+            "username",
+            "age", 
+            "consent",
+            "adultinfo",
+            "complexrelevance"
+        ])
+
+        print(f"\n✓ Validation/Relevance survey imported successfully")
+        print(f"  - Survey with comprehensive validation and relevance imported")
+
+    finally:
+        # Cleanup
+        cleanup_survey(limesurvey_client, survey_id)
+
+

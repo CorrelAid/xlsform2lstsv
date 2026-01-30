@@ -7,6 +7,7 @@ interface TSVRow {
   help: string;
   language: string;
   validation: string;
+  em_validation_q: string;
   mandatory: string;
   other: string;
   default: string;
@@ -31,6 +32,7 @@ export class TSVGenerator {
       'help',
       'language',
       'validation',
+      'em_validation_q',
       'mandatory',
       'other',
       'default',

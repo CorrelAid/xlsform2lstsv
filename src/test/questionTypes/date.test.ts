@@ -40,8 +40,8 @@ describe('Date Question Type', () => {
 		const rows = convertAndParse(survey);
 		const question = findRowByName(rows, 'future');
 
-		// Constraint converter returns empty for non-numeric constraints
-		expect(question?.validation).toBe('');
+		// AST-based converter converts date constraints to expressions
+		expect(question?.em_validation_q).toBe('self > today()');
 	});
 
 	test('converts date question with default value', () => {

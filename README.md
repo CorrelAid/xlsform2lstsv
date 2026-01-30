@@ -31,16 +31,8 @@ Convert XLSForm surveys to LimeSurvey TSV format.
 - `label` and `hint` translations ✅
 
 - XPath -> ExpressionScript/EM 🟡
-  - xlsform constraint -> limesurvey validation
-    - can only contain self-references (".", no variables) 
-    - all xpath operators mentioned [here](https://getodk.github.io/xforms-spec/#xpath-operators)
-    - xpath functions: 
-      - boolean:
-        - `regex()`, 
-        - `not()`
-      - string:
-        - `contains()` 
-  - relevant -> relevance
+  - see src/converters/xpathTranspiler.ts for how operators and functions are mapped
+  - its a complex task to ensure the transpiler covers everything and we currently cannot guarantee error free/complete transpiling 
 
 - constraint_message ❌
 - XLSForms Calculation ❌

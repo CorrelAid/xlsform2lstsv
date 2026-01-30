@@ -40,8 +40,8 @@ describe('Decimal Question Type', () => {
 		const rows = convertAndParse(survey);
 		const question = findRowByName(rows, 'score');
 
-		// Constraint converter returns regex patterns for numeric ranges
-		expect(question?.validation).toContain('/^\\d');
+		// AST-based converter returns LimeSurvey expressions for numeric ranges
+		expect(question?.em_validation_q).toBe('self >= 0 and self <= 100');
 	});
 
 	test('converts decimal question with default value', () => {

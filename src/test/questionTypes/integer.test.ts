@@ -51,8 +51,8 @@ describe('Integer Question Type', () => {
 		const rows = convertAndParse(survey);
 		const question = findRowByName(rows, 'age');
 
-		// Constraint converter returns regex patterns for numeric ranges
-		expect(question?.validation).toContain('/^\\d');
+		// AST-based converter returns LimeSurvey expressions for numeric ranges
+		expect(question?.em_validation_q).toBe('self >= 18 and self <= 100');
 	});
 
 	test('converts integer question with default value', () => {
