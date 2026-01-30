@@ -82,7 +82,7 @@ jobs:
       run: npm run check-version && npm run sync-version
     
     - name: Attest build artifact
-      uses: actions/attest-build@v2
+      uses: actions/attest@v1
       with:
         subject-path: |
           dist/**
