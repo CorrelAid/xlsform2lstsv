@@ -86,6 +86,7 @@ jobs:
       with:
         subject-path: |
           dist/**
+        predicate-type: https://slsa.dev/provenance/v1
     
     - name: Publish to npm
       run: npm publish --access public --provenance=always
