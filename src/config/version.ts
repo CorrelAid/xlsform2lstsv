@@ -9,7 +9,7 @@ export interface VersionCompatibility {
 }
 
 export const VERSION_COMPATIBILITY: VersionCompatibility = {
-  xlsform2lstsv: "1.2.3", // This will be updated automatically
+  xlsform2lstsv: "1.2.4", // This will be updated automatically
   limeSurvey: {
     min: "6.16.0",
     max: "6.16.5",

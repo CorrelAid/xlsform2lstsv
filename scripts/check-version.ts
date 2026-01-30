@@ -14,10 +14,11 @@ async function checkLimeSurveyVersion() {
     
     // Check if we need to update the version in version.ts
     if (currentVersion !== VERSION_COMPATIBILITY.xlsform2lstsv) {
-      console.log(`⚠️  Version mismatch detected!`);
-      console.log(`   package.json: ${currentVersion}`);
-      console.log(`   version.ts: ${VERSION_COMPATIBILITY.xlsform2lstsv}`);
-      console.log(`   Run 'npm run sync-version' to update.`);
+      console.error(`❌ Version mismatch detected!`);
+      console.error(`   package.json: ${currentVersion}`);
+      console.error(`   version.ts: ${VERSION_COMPATIBILITY.xlsform2lstsv}`);
+      console.error(`   Run 'npm run sync-version' to update.`);
+      process.exit(1);
     }
     
   } catch (error) {
