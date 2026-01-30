@@ -1,7 +1,9 @@
 import * as XLSX from 'xlsx';
+
 import { SurveyRow, ChoiceRow, SettingsRow, XLSFormData } from '../config/types';
-import { XLSValidator } from './XLSValidator';
 import { extractBaseColumnName, extractLanguageCode, getLanguageCodesFromHeaders, validateLanguageCodes, isValidLanguageCode } from '../utils/languageUtils';
+
+import { XLSValidator } from './XLSValidator';
 
 export class XLSLoader {
 	/**

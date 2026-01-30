@@ -1,5 +1,6 @@
-import { ConversionConfig, defaultConfig } from './types';
 import { deepMerge } from '../utils/helpers';
+
+import { ConversionConfig, defaultConfig } from './types';
 
 export { ConversionConfig } from './types';
 

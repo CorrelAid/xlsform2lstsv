@@ -29,6 +29,8 @@
     "update-version": "npx ts-node --project tsconfig.json scripts/update-version.ts",
     "test-compatibility": "npx ts-node --project tsconfig.json scripts/test-compatibility-safe.ts",
     "prepare": "husky install",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
     "lint:commits": "commitlint --from HEAD~1"
   },
   "keywords": [
@@ -57,7 +59,12 @@
     "@commitlint/cli": "^19.5.0",
     "@commitlint/config-conventional": "^19.5.0",
     "@types/node": "^25.0.10",
+    "@typescript-eslint/eslint-plugin": "^8.54.0",
+    "@typescript-eslint/parser": "^8.54.0",
     "@vitest/ui": "^4.0.18",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
     "husky": "^9.1.6",
     "standard-version": "^9.5.0",
     "ts-node": "^10.9.2",

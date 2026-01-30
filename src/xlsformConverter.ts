@@ -1,9 +1,9 @@
-import { convertRelevance, convertConstraint } from './converters/xpathTranspiler';
 import { ConfigManager, ConversionConfig } from './config/ConfigManager';
-import { FieldSanitizer } from './processors/FieldSanitizer';
-import { TypeMapper, TypeInfo, LSType } from './processors/TypeMapper';
-import { TSVGenerator } from './processors/TSVGenerator';
 import { SurveyRow, ChoiceRow, SettingsRow } from './config/types';
+import { convertRelevance, convertConstraint } from './converters/xpathTranspiler';
+import { FieldSanitizer } from './processors/FieldSanitizer';
+import { TSVGenerator } from './processors/TSVGenerator';
+import { TypeMapper, TypeInfo, LSType } from './processors/TypeMapper';
 import { getBaseLanguage, getLanguageSpecificValue, getAllLanguageValues } from './utils/languageUtils';
 
 // Unimplemented XLSForm types that should raise an error

@@ -8,9 +8,10 @@
  * 3. Saves output to tests/integration/output/
  */
 
-import { XLSFormToTSVConverter, XLSFormParser } from './index';
 import * as fs from 'fs';
 import * as path from 'path';
+
+import { XLSFormToTSVConverter, XLSFormParser } from './index';
 
 interface XLSFormFixture {
   survey: any[];
