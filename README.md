@@ -171,14 +171,14 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 ## Releasing
 
-This project uses automated releases via GitHub Actions and `standard-version`.
+This project uses automated releases via GitHub Actions.
 
 ### Release Process
 
-1. **Version Bumping**: Use `npm run release` to automatically:
-   - Bump version based on commit messages (Conventional Commits)
-   - Update CHANGELOG.md
-   - Create git tag
+1. **Version Bumping**: Use the appropriate version bump scripts:
+   - `npm run version:major` - Major version bump
+   - `npm run version:minor` - Minor version bump  
+   - `npm run version:patch` - Patch version bump
 
 2. **Publishing**: Push the tag to trigger CI:
    ```bash
@@ -189,14 +189,6 @@ This project uses automated releases via GitHub Actions and `standard-version`.
    - Run tests and linting
    - Build the package
    - Publish to npm with provenance
-   - Create GitHub release with changelog
-
-### Manual Version Control
-
-For manual version control, use:
-- `npm run version:major` - Major version bump
-- `npm run version:minor` - Minor version bump  
-- `npm run version:patch` - Patch version bump
 
 ## Limesurvey Resources
 

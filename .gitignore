@@ -6,5 +6,10 @@ dist/
 
 .claude/*
 
+# Coverage files
+coverage/
+.coverage
+*.lcov
+
 # Integration test outputs
 tests/integration/output/*.tsv
