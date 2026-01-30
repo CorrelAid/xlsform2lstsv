@@ -1,4 +1,5 @@
-import { SurveyRow, ChoiceRow, SettingsRow } from '../config/types';
+
+import { SurveyRow, ChoiceRow } from '../config/types';
 
 export class XLSValidator {
 	/**
@@ -23,7 +24,7 @@ export class XLSValidator {
 	 * @param sheetName Name of the survey sheet
 	 * @throws Error if required columns are missing
 	 */
-	static validateSurveySheetColumns(data: any[], sheetName: string): void {
+	static validateSurveySheetColumns(data: SurveyRow[], sheetName: string): void {
 		if (data.length === 0) {
 			console.warn(`Warning: Survey sheet "${sheetName}" is empty.`);
 			return;
@@ -60,7 +61,7 @@ export class XLSValidator {
 	 * @param sheetName Name of the choices sheet
 	 * @throws Error if required columns are missing
 	 */
-	static validateChoicesSheetColumns(data: any[], sheetName: string): void {
+	static validateChoicesSheetColumns(data: ChoiceRow[], sheetName: string): void {
 		if (data.length === 0) {
 			console.warn(`Warning: Choices sheet "${sheetName}" is empty.`);
 			return;
@@ -107,8 +108,8 @@ export class XLSValidator {
 	 * @param choicesSheetName Name of the choices sheet
 	 */
 	static validateAll(
-		surveyData: any[],
-		choicesData: any[],
+		surveyData: SurveyRow[],
+		choicesData: ChoiceRow[],
 		hasSurveySheet: boolean,
 		hasChoicesSheet: boolean,
 		surveySheetName: string = 'survey',

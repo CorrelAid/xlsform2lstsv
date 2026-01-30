@@ -165,30 +165,38 @@ SPECIFIC_VERSIONS="6.16.4,6.17.0" npm run test-compatibility
 ```
 
 
-### Pull Request Process
-
-1. **Before creating PR**:
-   - Ensure all tests pass: `npm run test:all`
-   - Run full validation: `npm run validate`
-   - Update documentation if needed
-
-2. **Create PR**:
-   - Target `main` branch
-   - Use descriptive title following Conventional Commits
-   - Include screenshots for UI changes
-   - Reference related issues
-
-3. **CI Checks**:
-   - All tests must pass
-   - Code coverage maintained
-   - No linting errors
-   - Commit messages valid
-
 ### Commit Message Format
 
 Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
+## Releasing
 
+This project uses automated releases via GitHub Actions and `standard-version`.
+
+### Release Process
+
+1. **Version Bumping**: Use `npm run release` to automatically:
+   - Bump version based on commit messages (Conventional Commits)
+   - Update CHANGELOG.md
+   - Create git tag
+
+2. **Publishing**: Push the tag to trigger CI:
+   ```bash
+   git push --follow-tags
+   ```
+
+3. **CI Automation**: The GitHub Actions workflow will:
+   - Run tests and linting
+   - Build the package
+   - Publish to npm with provenance
+   - Create GitHub release with changelog
+
+### Manual Version Control
+
+For manual version control, use:
+- `npm run version:major` - Major version bump
+- `npm run version:minor` - Minor version bump  
+- `npm run version:patch` - Patch version bump
 
 ## Limesurvey Resources
 

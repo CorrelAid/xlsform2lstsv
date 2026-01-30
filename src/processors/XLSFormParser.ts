@@ -2,6 +2,8 @@
  * @file Main entrypoint of this library.
  */
 
+import { ConversionConfig } from '../config/ConfigManager';
+
 import { XLSLoader } from './XLSLoader';
 
 export class XLSFormParser {
@@ -14,7 +16,7 @@ export class XLSFormParser {
 	 */
 	static async convertXLSFileToTSV(
 		filePath: string,
-		config?: any
+		config?: Partial<ConversionConfig>
 	): Promise<string> {
 		const { XLSFormToTSVConverter } = await import('../xlsformConverter');
 		
@@ -33,7 +35,7 @@ export class XLSFormParser {
 	 */
 	static async convertXLSDataToTSV(
 		data: Buffer | ArrayBuffer,
-		config?: any
+		config?: Partial<ConversionConfig>
 	): Promise<string> {
 		const { XLSFormToTSVConverter } = await import('../xlsformConverter');
 		

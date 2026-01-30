@@ -11,12 +11,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { XLSFormToTSVConverter, XLSFormParser } from './index';
+import { SurveyRow, ChoiceRow, SettingsRow } from './config/types';
+import { XLSFormToTSVConverter } from './xlsformConverter';
 
 interface XLSFormFixture {
-  survey: any[];
-  choices: any[];
-  settings: any[];
+  survey: SurveyRow[];
+  choices: ChoiceRow[];
+  settings: SettingsRow[];
 }
 
 const FIXTURES_DIR = path.join(__dirname, '../tests/fixtures');
@@ -45,7 +46,7 @@ function generateTSVFromFixture(fixturePath: string, outputPath: string): void {
 
   // Read fixture
   const fixtureContent = fs.readFileSync(fixturePath, 'utf-8');
-  const fixture: XLSFormFixture = JSON.parse(fixtureContent);
+  const fixture: XLSFormFixture = JSON.parse(fixtureContent) as XLSFormFixture;
 
   // Convert to TSV with configuration that removes underscores but doesn't truncate field names
   // This matches LimeSurvey's behavior (removes underscores but allows longer field names)
@@ -66,7 +67,7 @@ function generateTSVFromFixture(fixturePath: string, outputPath: string): void {
   console.log(`  → ${lines} rows (including header)`);
 }
 
-async function main(): Promise<void> {
+function main(): void {
   console.log('Generating TSV files from XLSForm fixtures...\n');
 
   // Ensure output directory exists and clean old files
@@ -115,4 +116,4 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 }
-main().catch(console.error);
+main();

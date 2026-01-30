@@ -13,7 +13,7 @@ export interface SurveyRow {
   calculation?: string;
   default?: string;
   _languages?: string[];
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**
@@ -25,7 +25,7 @@ export interface ChoiceRow {
   label?: string | Record<string, string>;
   filter?: string;
   _languages?: string[];
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**
@@ -35,7 +35,7 @@ export interface SettingsRow {
   form_title?: string;
   form_id?: string;
   default_language?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**

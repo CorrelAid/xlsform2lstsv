@@ -5,6 +5,8 @@ import { extractBaseColumnName, extractLanguageCode, getLanguageCodesFromHeaders
 
 import { XLSValidator } from './XLSValidator';
 
+type RowData = Record<string, unknown>;
+
 export class XLSLoader {
 	/**
 	 * Parse XLS/XLSX file and extract survey data with validation
@@ -58,7 +60,7 @@ export class XLSLoader {
 
 			// Convert to objects with proper headers
 			const headers = jsonData[0] as string[];
-			const rows = jsonData.slice(1) as any[][];
+			const rows = jsonData.slice(1) as unknown[][];
 
 			// Detect language codes from headers
 			const languageCodes = getLanguageCodesFromHeaders(headers);
@@ -70,7 +72,7 @@ export class XLSLoader {
 			}
 
 			const sheetData = rows.map(row => {
-				const obj: any = {};
+				const obj: RowData = {};
 				headers.forEach((header, index) => {
 					if (header && row[index] !== undefined) {
 						const baseColumn = extractBaseColumnName(header);
@@ -83,7 +85,7 @@ export class XLSLoader {
 								if (!obj[baseColumn]) {
 									obj[baseColumn] = {};
 								}
-								obj[baseColumn][langCode] = row[index];
+								(obj[baseColumn] as Record<string, unknown>)[langCode] = row[index];
 							}
 						} else {
 							// Regular column

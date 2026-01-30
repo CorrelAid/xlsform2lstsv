@@ -4,7 +4,7 @@ import { convertRelevance, convertConstraint } from './converters/xpathTranspile
 import { FieldSanitizer } from './processors/FieldSanitizer';
 import { TSVGenerator } from './processors/TSVGenerator';
 import { TypeMapper, TypeInfo, LSType } from './processors/TypeMapper';
-import { getBaseLanguage, getLanguageSpecificValue, getAllLanguageValues } from './utils/languageUtils';
+import { getBaseLanguage } from './utils/languageUtils';
 
 // Unimplemented XLSForm types that should raise an error
 const UNIMPLEMENTED_TYPES = [
@@ -143,10 +143,10 @@ export class XLSFormToTSVConverter {
 		
 		// Check settings data for language-specific fields
 		const settings = settingsData[0] || {};
-		for (const [key, value] of Object.entries(settings)) {
+		for (const [, value] of Object.entries(settings)) {
 			if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
 				// This looks like a language-specific field (e.g., {en: '...', es: '...'})
-				for (const lang of Object.keys(value)) {
+				for (const lang of Object.keys(value as Record<string, unknown>)) {
 					languageCodes.add(lang);
 				}
 			}
@@ -221,7 +221,6 @@ export class XLSFormToTSVConverter {
 
 		const defaults = this.configManager.getDefaults();
 		const surveyTitle = settings.form_title || defaults.surveyTitle;
-		const surveyLanguage = settings.default_language || defaults.language;
 
 		// Add base language (class S - survey settings)
 		this.tsvGenerator.addRow({
@@ -337,7 +336,7 @@ export class XLSFormToTSVConverter {
 		this.addQuestion(row);
 	}
 
-	private getLanguageSpecificValue(value: any, languageCode: string): string | undefined {
+	private getLanguageSpecificValue(value: unknown, languageCode: string): string | undefined {
 		if (!value) return undefined;
 		
 		// If it's already a string, return it
@@ -346,14 +345,15 @@ export class XLSFormToTSVConverter {
 		}
 		
 		// If it's an object with language codes, get the specific language
-		if (typeof value === 'object' && value[languageCode]) {
-			return value[languageCode];
-		}
-		
-		// If it's an object but doesn't have the specific language, try to get any available language
-		if (typeof value === 'object') {
+		if (typeof value === 'object' && value !== null) {
+			const valueObj = value as Record<string, unknown>;
+			if (languageCode in valueObj) {
+				return valueObj[languageCode] as string;
+			}
+			
+			// If it doesn't have the specific language, try to get any available language
 			for (const lang of this.availableLanguages) {
-				if (value[lang]) return value[lang];
+				if (lang in valueObj) return valueObj[lang] as string;
 			}
 		}
 		
@@ -380,7 +380,6 @@ export class XLSFormToTSVConverter {
 		// Groups support relevance but not validation
 		// Add group for each language
 		for (const lang of this.availableLanguages) {
-			const defaults = this.configManager.getDefaults();
 			this.tsvGenerator.addRow({
 				class: 'G',
 				'type/scale': '',
@@ -415,7 +414,6 @@ export class XLSFormToTSVConverter {
 
 		// Add main question for each language
 		for (const lang of this.availableLanguages) {
-			const defaults = this.configManager.getDefaults();
 			this.tsvGenerator.addRow({
 				class: 'Q',
 				'type/scale': isNote ? 'X' : lsType.type,
@@ -469,7 +467,6 @@ export class XLSFormToTSVConverter {
 
 			// Add answer for each language
 			for (const lang of this.availableLanguages) {
-				const defaults = this.configManager.getDefaults();
 				this.tsvGenerator.addRow({
 					class: answerClass,
 					'type/scale': '',

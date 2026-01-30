@@ -13,9 +13,9 @@ import xpath from 'js-xpath';
 interface XPathNode {
   id?: string;
   type?: string;
-  args?: any[];
-  left?: any;
-  right?: any;
+  args?: unknown[];
+  left?: unknown;
+  right?: unknown;
   steps?: Array<{
     name?: string;
     axis?: string;
@@ -61,22 +61,22 @@ function transpile(node: XPathNode): string {
   if (node.id) {
     switch (node.id) {
       case 'count':
-        return `count(${node.args?.map(arg => transpile(arg)).join(', ') || ''})`;
+        return `count(${node.args?.map(arg => transpile(arg as XPathNode)).join(', ') || ''})`;
       case 'concat':
-        return node.args?.map(arg => transpile(arg)).join(' + ') || '';
+        return node.args?.map(arg => transpile(arg as XPathNode)).join(' + ') || '';
       case 'regex':
-        return `regexMatch(${node.args?.map(arg => transpile(arg)).join(', ') || ''})`;
+        return `regexMatch(${node.args?.map(arg => transpile(arg as XPathNode)).join(', ') || ''})`;
       case 'contains':
         // Custom handling for contains
         if (node.args?.length === 2) {
-          return `contains(${transpile(node.args[0])}, ${transpile(node.args[1])})`;
+          return `contains(${transpile(node.args[0] as XPathNode)}, ${transpile(node.args[1] as XPathNode)})`;
         }
         break;
       case 'selected':
         // Handle selected(${field}, 'value') -> (field=="value")
         if (node.args?.length === 2) {
-          const fieldArg = node.args[0];
-          const valueArg = node.args[1];
+          const fieldArg = node.args[0] as XPathNode;
+          const valueArg = node.args[1] as XPathNode;
           const fieldName = transpile(fieldArg);
           let value = transpile(valueArg);
           // Remove any existing quotes and use double quotes
@@ -87,66 +87,66 @@ function transpile(node: XPathNode): string {
       case 'string':
         // string() function - just return the argument
         if (node.args?.length === 1) {
-          return transpile(node.args[0]);
+          return transpile(node.args[0] as XPathNode);
         }
         break;
       case 'number':
         // number() function - just return the argument
         if (node.args?.length === 1) {
-          return transpile(node.args[0]);
+          return transpile(node.args[0] as XPathNode);
         }
         break;
       case 'floor':
         if (node.args?.length === 1) {
-          return `floor(${transpile(node.args[0])})`;
+          return `floor(${transpile(node.args[0] as XPathNode)})`;
         }
         break;
       case 'ceiling':
         if (node.args?.length === 1) {
-          return `ceil(${transpile(node.args[0])})`;
+          return `ceil(${transpile(node.args[0] as XPathNode)})`;
         }
         break;
       case 'round':
         if (node.args?.length === 1) {
-          return `round(${transpile(node.args[0])})`;
+          return `round(${transpile(node.args[0] as XPathNode)})`;
         }
         break;
       case 'sum':
         if (node.args?.length === 1) {
-          return `sum(${transpile(node.args[0])})`;
+          return `sum(${transpile(node.args[0] as XPathNode)})`;
         }
         break;
       case 'substring':
         if (node.args && node.args.length >= 2) {
-          const stringArg = transpile(node.args[0]);
-          const startArg = transpile(node.args[1]);
-          const lengthArg = node.args.length > 2 ? transpile(node.args[2]) : '';
+          const stringArg = transpile(node.args[0] as XPathNode);
+          const startArg = transpile(node.args[1] as XPathNode);
+          const lengthArg = node.args.length > 2 ? transpile(node.args[2] as XPathNode) : '';
           return `substr(${stringArg}, ${startArg}${lengthArg ? ', ' + lengthArg : ''})`;
         }
         break;
       case 'string-length':
         if (node.args?.length === 1) {
-          return `strlen(${transpile(node.args[0])})`;
+          return `strlen(${transpile(node.args[0] as XPathNode)})`;
         }
         break;
       case 'starts-with':
         if (node.args?.length === 2) {
-          return `startsWith(${transpile(node.args[0])}, ${transpile(node.args[1])})`;
+          return `startsWith(${transpile(node.args[0] as XPathNode)}, ${transpile(node.args[1] as XPathNode)})`;
         }
         break;
       case 'ends-with':
         if (node.args?.length === 2) {
-          return `endsWith(${transpile(node.args[0])}, ${transpile(node.args[1])})`;
+          return `endsWith(${transpile(node.args[0] as XPathNode)}, ${transpile(node.args[1] as XPathNode)})`;
         }
         break;
       case 'not':
         if (node.args?.length === 1) {
-          return `!(${transpile(node.args[0])})`;
+          return `!(${transpile(node.args[0] as XPathNode)})`;
         }
         break;
       case 'if':
         if (node.args?.length === 3) {
-          return `(${transpile(node.args[0])} ? ${transpile(node.args[1])} : ${transpile(node.args[2])})`;
+          return `(${transpile(node.args[0] as XPathNode)} ? ${transpile(node.args[1] as XPathNode)} : ${transpile(node.args[2] as XPathNode)})`;
         }
         break;
       case 'today':
@@ -164,36 +164,36 @@ function transpile(node: XPathNode): string {
     switch (node.type) {
       // Comparison operators
       case '<=':
-        return `${transpile(node.left)} <= ${transpile(node.right)}`;
+        return `${transpile(node.left as XPathNode)} <= ${transpile(node.right as XPathNode)}`;
       case '>=':
-        return `${transpile(node.left)} >= ${transpile(node.right)}`;
+        return `${transpile(node.left as XPathNode)} >= ${transpile(node.right as XPathNode)}`;
       case '=':
       case '==':
-        return `${transpile(node.left)} == ${transpile(node.right)}`;
+        return `${transpile(node.left as XPathNode)} == ${transpile(node.right as XPathNode)}`;
       case '!=':
-        return `${transpile(node.left)} != ${transpile(node.right)}`;
+        return `${transpile(node.left as XPathNode)} != ${transpile(node.right as XPathNode)}`;
       case '<':
-        return `${transpile(node.left)} < ${transpile(node.right)}`;
+        return `${transpile(node.left as XPathNode)} < ${transpile(node.right as XPathNode)}`;
       case '>':
-        return `${transpile(node.left)} > ${transpile(node.right)}`;
+        return `${transpile(node.left as XPathNode)} > ${transpile(node.right as XPathNode)}`;
 
       // Arithmetic operators
       case '+':
-        return `${transpile(node.left)} + ${transpile(node.right)}`;
+        return `${transpile(node.left as XPathNode)} + ${transpile(node.right as XPathNode)}`;
       case '-':
-        return `${transpile(node.left)} - ${transpile(node.right)}`;
+        return `${transpile(node.left as XPathNode)} - ${transpile(node.right as XPathNode)}`;
       case '*':
-        return `${transpile(node.left)} * ${transpile(node.right)}`;
+        return `${transpile(node.left as XPathNode)} * ${transpile(node.right as XPathNode)}`;
       case 'div':
-        return `${transpile(node.left)} / ${transpile(node.right)}`;
+        return `${transpile(node.left as XPathNode)} / ${transpile(node.right as XPathNode)}`;
       case 'mod':
-        return `${transpile(node.left)} % ${transpile(node.right)}`;
+        return `${transpile(node.left as XPathNode)} % ${transpile(node.right as XPathNode)}`;
 
       // Logical operators
       case 'and':
-        return `${transpile(node.left)} and ${transpile(node.right)}`;
+        return `${transpile(node.left as XPathNode)} and ${transpile(node.right as XPathNode)}`;
       case 'or':
-        return `${transpile(node.left)} or ${transpile(node.right)}`;
+        return `${transpile(node.left as XPathNode)} or ${transpile(node.right as XPathNode)}`;
 
       // Unsupported operators
       case '|':
@@ -259,23 +259,23 @@ export function xpathToLimeSurvey(xpathExpr: string): string {
   let processedExpr = xpathExpr;
 
   // Convert ${field} to field references
-  processedExpr = processedExpr.replace(/\$\{(\w+)\}/g, (match, fieldName) => {
+  processedExpr = processedExpr.replace(/\$\{(\w+)\}/g, (match: string, fieldName: string) => {
     return sanitizeName(fieldName);
   });
 
   // Convert selected(${field}, 'value') to selected(field, 'value')
   processedExpr = processedExpr.replace(
     /selected\(\s*\$\{(\w+)\}\s*,\s*['"]([^'"]+)['"]\s*\)/g,
-    (match, fieldName, value) => {
+    (match: string, fieldName: string, value: string) => {
       return `selected(${sanitizeName(fieldName)}, '${value}')`;
     }
   );
 
   try {
-    const parsed = xpath.parse(processedExpr);
+    const parsed = xpath.parse(processedExpr) as XPathNode;
     return transpile(parsed);
-  } catch (error: any) {
-    console.error(`Transpilation error: ${error.message}`);
+  } catch (error: unknown) {
+    console.error(`Transpilation error: ${(error as Error).message}`);
     return '1';
   }
 }
@@ -294,14 +294,14 @@ export function convertConstraint(constraint: string): string {
     let processedExpr = constraint;
 
     // Convert ${field} to field references
-    processedExpr = processedExpr.replace(/\$\{(\w+)\}/g, (match, fieldName) => {
+    processedExpr = processedExpr.replace(/\$\{(\w+)\}/g, (match: string, fieldName: string) => {
       return sanitizeName(fieldName);
     });
 
     // Convert selected(${field}, 'value') to selected(field, 'value')
     processedExpr = processedExpr.replace(
       /selected\(\s*\$\{(\w+)\}\s*,\s*['"]([^'"]+)['"]\s*\)/g,
-      (match, fieldName, value) => {
+      (match: string, fieldName: string, value: string) => {
         return `selected(${sanitizeName(fieldName)}, '${value}')`;
       }
     );
@@ -351,14 +351,14 @@ export function convertConstraint(constraint: string): string {
     }
 
     // Parse and transpile using AST
-    const parsed = xpath.parse(processedExpr);
+    const parsed = xpath.parse(processedExpr) as XPathNode;
     const converted = transpile(parsed);
 
     if (converted && converted !== '1') {
       return converted;
     }
-  } catch (error: any) {
-    console.debug(`AST transpilation failed for constraint: ${constraint}, error: ${error.message}`);
+  } catch (error: unknown) {
+    console.debug(`AST transpilation failed for constraint: ${constraint}, error: ${(error as Error).message}`);
     // Return empty string if AST transpilation fails
     return '';
   }
@@ -437,7 +437,7 @@ export function convertRelevance(xpath: string): string {
   if (result && result.includes('selected(')) {
     return result.replace(
       /selected\s*\(\s*\{(\w+)\}\s*,\s*["']([^'"]+)["']\s*\)/g,
-      (_match, fieldName, value) => {
+      (_match: string, fieldName: string, value: string) => {
         return `(${sanitizeName(fieldName)}="${value}")`;
       }
     );

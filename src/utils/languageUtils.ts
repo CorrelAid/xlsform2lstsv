@@ -75,7 +75,7 @@ export function getLanguageCodesFromHeaders(headers: string[]): string[] {
 /**
  * Get language-specific value from row for a given base column and language code
  */
-export function getLanguageSpecificValue(row: any, baseColumn: string, languageCode: string): string | undefined {
+export function getLanguageSpecificValue(row: Record<string, unknown>, baseColumn: string, languageCode: string): string | undefined {
   for (const [key, value] of Object.entries(row)) {
     const headerCode = extractLanguageCode(key);
     const headerBase = extractBaseColumnName(key);
@@ -90,7 +90,7 @@ export function getLanguageSpecificValue(row: any, baseColumn: string, languageC
 /**
  * Get all language-specific values for a base column
  */
-export function getAllLanguageValues(row: any, baseColumn: string): Record<string, string> {
+export function getAllLanguageValues(row: Record<string, unknown>, baseColumn: string): Record<string, string> {
   const result: Record<string, string> = {};
   
   for (const [key, value] of Object.entries(row)) {
@@ -145,15 +145,16 @@ export function validateLanguageCodes(languageCodes: string[]): string[] {
 /**
  * Get the base language from settings (fallback to 'en')
  */
-export function getBaseLanguage(settings: any): string {
-  if (settings.default_language) {
+export function getBaseLanguage(settings: Record<string, unknown>): string {
+  const defaultLanguage = settings.default_language;
+  if (defaultLanguage && typeof defaultLanguage === 'string') {
     // Try to extract language code from formats like "Spanish (es)" or "English (en)"
-    const match = settings.default_language.match(/\(([a-z]{2})\)/i);
+    const match = defaultLanguage.match(/\(([a-z]{2})\)/i);
     if (match && match[1]) {
       return match[1].toLowerCase();
     }
     // Fallback to extractLanguageCode for other formats
-    return extractLanguageCode(settings.default_language) || 'en';
+    return extractLanguageCode(defaultLanguage) || 'en';
   }
   return 'en';
 }

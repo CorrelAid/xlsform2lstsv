@@ -9,6 +9,9 @@ module.exports = [
     ignores: ['dist/', 'node_modules/', '*.d.ts', 'scripts/', 'eslint.config.*'],
   },
   {
+    ignores: ['src/test/**/*.ts', 'src/**/*.test.ts'],
+  },
+  {
     languageOptions: {
       parser: typescriptParser,
       parserOptions: {

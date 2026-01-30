@@ -1,7 +1,7 @@
 /**
  * Deep merge objects - merges properties from source into target recursively
  */
-export function deepMerge<T>(target: T, ...sources: Partial<T>[]): T {
+export function deepMerge<T extends object>(target: T, ...sources: Partial<T>[]): T {
   if (!sources.length) return target;
   
   const source = sources.shift();
@@ -10,11 +10,11 @@ export function deepMerge<T>(target: T, ...sources: Partial<T>[]): T {
     for (const key in source) {
       if (isObject(source[key])) {
         if (!target[key]) {
-          target[key] = {} as any;
+          target[key] = {} as T[Extract<keyof T, string>];
         }
-        deepMerge(target[key], source[key] as any);
+        deepMerge(target[key] as Record<string, unknown>, source[key] as Record<string, unknown>);
       } else {
-        target[key] = source[key] as any;
+        target[key] = source[key] as T[Extract<keyof T, string>];
       }
     }
   }
@@ -22,8 +22,8 @@ export function deepMerge<T>(target: T, ...sources: Partial<T>[]): T {
   return deepMerge(target, ...sources);
 }
 
-function isObject(item: any): boolean {
-  return (item && typeof item === 'object' && !Array.isArray(item));
+function isObject(item: unknown): item is object {
+  return item !== null && typeof item === 'object' && !Array.isArray(item);
 }
 
 /**
