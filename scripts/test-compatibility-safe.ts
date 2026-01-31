@@ -1,5 +1,5 @@
 import { execSync } from 'child_process';
-import { VERSION_COMPATIBILITY } from '../src/config/version';
+import { VERSION_COMPATIBILITY } from '../dist/config/version.js';
 
 interface TestResult {
   version: string;
@@ -171,7 +171,7 @@ function checkVersionCompatibility(results: TestResult[]) {
 }
 
 // Run the compatibility test
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   testLimeSurveyCompatibilitySafe().catch(error => {
     console.error('❌ Compatibility test failed:', error);
     process.exit(1);
