@@ -16,23 +16,13 @@ if (!scriptName) {
 }
 
 const scriptPath = resolve(__dirname, `${scriptName}.ts`);
-const outputPath = resolve(__dirname, `${scriptName}.js`);
 
 try {
-  // Compile the TypeScript file
-  console.log(`🔧 Compiling ${scriptName}.ts...`);
-  execSync(`npx tsc --esModuleInterop --moduleResolution node --module ES2020 --target ES2020 --outDir ${__dirname} ${scriptPath}`, {
+  // Run the TypeScript file directly using ts-node
+  console.log(`⚡ Running ${scriptName}.ts with ts-node...`);
+  execSync(`npx ts-node ${scriptPath}`, {
     stdio: 'inherit'
   });
-  
-  // Run the compiled JavaScript file
-  console.log(`⚡ Running ${scriptName}.js...`);
-  execSync(`node ${outputPath}`, {
-    stdio: 'inherit'
-  });
-  
-  // Clean up the compiled file
-  // execSync(`rm ${outputPath}`);
   
 } catch (error) {
   console.error('❌ Error running script:', error.message);

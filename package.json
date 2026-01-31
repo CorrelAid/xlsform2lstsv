@@ -12,7 +12,7 @@
     }
   },
   "scripts": {
-    "build": "tsc && node scripts/fix-esm-imports.js",
+    "build": "tsc",
     "watch": "tsc --watch",
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run clean && npm run build",
