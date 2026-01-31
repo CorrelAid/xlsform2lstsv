@@ -20,7 +20,7 @@ const scriptPath = resolve(__dirname, `${scriptName}.ts`);
 try {
   // Run the TypeScript file using ts-node with explicit ES module configuration
   console.log(`⚡ Running ${scriptName}.ts with ts-node...`);
-  execSync(`npx ts-node --esm --experimental-specifier-resolution=node --project tsconfig.json ${scriptPath}`, {
+  execSync(`npx tsx ${scriptPath}`, {
     stdio: 'inherit'
   });
   
