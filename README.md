@@ -194,8 +194,10 @@ The release process is fully automated and follows these steps:
 2. **Trigger Release**: Push the tag to trigger the GitHub Actions release workflow:
    ```bash
    git push origin vX.Y.Z
-   # OR to push all tags
+   # OR to push all tags, which also pushes the version bump commit
    git push --tags
+   # OR to push the current branch and its associated tags (like after npm version)
+   git push --follow-tags
    ```
 
 3. **Automated CI/CD Pipeline**: The GitHub Actions workflow (`.github/workflows/ci.yml`) will:
