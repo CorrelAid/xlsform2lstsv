@@ -10,6 +10,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
 
 import { SurveyRow, ChoiceRow, SettingsRow } from './config/types';
 import { XLSFormToTSVConverter } from './xlsformConverter';
@@ -20,6 +21,7 @@ interface XLSFormFixture {
   settings: SettingsRow[];
 }
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = path.join(__dirname, '../tests/fixtures');
 const OUTPUT_DIR = path.join(__dirname, '../tests/integration/output');
 
