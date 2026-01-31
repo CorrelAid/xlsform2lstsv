@@ -55,7 +55,7 @@
     "README.md"
   ],
   "dependencies": {
-    "js-xpath": "^0.0.4",
+    "js-xpath": "github:jstet/js-xpath",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
