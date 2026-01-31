@@ -1,0 +1,9 @@
+{
+  "esm": true,
+  "experimentalSpecifierResolution": "node",
+  "transpileOnly": true,
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ES2020"
+  }
+}
