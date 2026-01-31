@@ -1,4 +1,4 @@
-import { VERSION_COMPATIBILITY } from '../dist/config/version.js';
+import { VERSION_COMPATIBILITY } from '../src/config/version.ts';
 import { readFileSync } from 'fs';
 import { execSync } from 'child_process';
 

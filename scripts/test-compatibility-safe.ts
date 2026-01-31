@@ -1,5 +1,5 @@
 import { execSync } from 'child_process';
-import { VERSION_COMPATIBILITY } from '../dist/config/version.js';
+import { VERSION_COMPATIBILITY } from '../src/config/version.ts';
 
 interface TestResult {
   version: string;
