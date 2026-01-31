@@ -1,5 +1,5 @@
 [![CI Status](https://github.com/CorrelAid/xlsform2lstsv/actions/workflows/ci.yml/badge.svg)](https://github.com/CorrelAid/xlsform2lstsv/actions)
-[![npm version](https://badge.fury.io/js/xlsform2lstsv.svg)](https://badge.fury.io/js/xlsform2lstsv)
+[![npm version](https://img.shields.io/npm/v/xlsform2lstsv)](https://www.npmjs.com/package/xlsform2lstsv)
 
 
 # xlsform2lstsv
