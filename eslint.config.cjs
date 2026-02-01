@@ -5,13 +5,10 @@ const importPlugin = require('eslint-plugin-import');
 
 module.exports = [
   {
+    ignores: ['dist/', 'node_modules/', '*.d.ts', 'scripts/', 'eslint.config.*', 'src/test/**/*.ts', 'src/**/*.test.ts'],
+  },
+  {
     files: ['src/**/*.ts'],
-    ignores: ['dist/', 'node_modules/', '*.d.ts', 'scripts/', 'eslint.config.*'],
-  },
-  {
-    ignores: ['src/test/**/*.ts', 'src/**/*.test.ts'],
-  },
-  {
     languageOptions: {
       parser: typescriptParser,
       parserOptions: {
@@ -35,6 +32,7 @@ module.exports = [
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
+      '@typescript-eslint/no-unnecessary-type-assertion': 'off',
       'import/order': [
         'error',
         {

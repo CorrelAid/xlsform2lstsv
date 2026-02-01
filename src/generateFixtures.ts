@@ -118,6 +118,6 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 }
-(async () => {
+void (async () => {
   await main();
 })();

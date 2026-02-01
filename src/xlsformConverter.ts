@@ -112,7 +112,7 @@ export class XLSFormToTSVConverter {
 		// If no groups, add a default group
 		const advancedOptions = this.configManager.getAdvancedOptions();
 		if (!hasGroups && advancedOptions.autoCreateGroups) {
-			await this.addDefaultGroup();
+			this.addDefaultGroup();
 		}
 
 		// Process survey rows
@@ -146,7 +146,8 @@ export class XLSFormToTSVConverter {
 		for (const [, value] of Object.entries(settings)) {
 			if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
 				// This looks like a language-specific field (e.g., {en: '...', es: '...'})
-				for (const lang of Object.keys(value as Record<string, unknown>)) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+				for (const lang of Object.keys(value)) {
 					languageCodes.add(lang);
 				}
 			}
@@ -190,7 +191,7 @@ export class XLSFormToTSVConverter {
 		}
 	}
 
-	private async addDefaultGroup(): Promise<void> {
+	private addDefaultGroup(): void {
 		// Add a default group for surveys without explicit groups
 		const defaults = this.configManager.getDefaults();
 		const groupName = defaults.groupName;
@@ -346,9 +347,10 @@ export class XLSFormToTSVConverter {
 		
 		// If it's an object with language codes, get the specific language
 		if (typeof value === 'object' && value !== null) {
-			const valueObj = value as Record<string, unknown>;
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unnecessary-type-assertion
+			const valueObj: Record<string, unknown> = value as Record<string, unknown>;
 			if (languageCode in valueObj) {
-				return valueObj[languageCode] as string;
+				return valueObj[languageCode] as string; // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
 			}
 			
 			// If it doesn't have the specific language, try to get any available language

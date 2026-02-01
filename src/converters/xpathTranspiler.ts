@@ -272,9 +272,15 @@ export async function xpathToLimeSurvey(xpathExpr: string): Promise<string> {
   );
 
   try {
-    // Dynamic import of js-xpath
-    const JXpathModule = await import('js-xpath');
-    const parsed = (JXpathModule as any).default.parse(processedExpr) as XPathNode;
+    // Import js-xpath using dynamic import with CommonJS interop
+    const jxpathModule = await import('js-xpath');
+    const jxpath = jxpathModule.default || jxpathModule;
+    
+    if (!jxpath || !jxpath.parse) {
+      throw new Error('js-xpath module does not export parse function');
+    }
+    
+    const parsed = jxpath.parse(processedExpr) as XPathNode;
     return transpile(parsed);
   } catch (error: unknown) {
     console.error(`Transpilation error: ${(error as Error).message}`);
@@ -353,16 +359,22 @@ export async function convertConstraint(constraint: string): Promise<string> {
     }
 
     // Parse and transpile using AST
-    const JXpathModule = await import('js-xpath');
-    const parsed = (JXpathModule as any).default.parse(processedExpr) as XPathNode;
-    const converted = transpile(parsed);
-
-    if (converted && converted !== '1') {
-      return converted;
+    const jxpathModule = await import('js-xpath');
+    const jxpath = jxpathModule.default || jxpathModule;
+    
+    if (!jxpath || !jxpath.parse) {
+      throw new Error('js-xpath module does not export parse function');
     }
+    
+    const parsed = jxpath.parse(processedExpr) as XPathNode;
+    if (!parsed) {
+      // If parsing fails but doesn't throw, we handle it explicitly.
+      throw new Error(`jxpath.parse returned null/undefined for constraint: "${processedExpr}"`);
+    }
+    const converted = transpile(parsed);
+    return converted;
   } catch (error: unknown) {
-    console.debug(`AST transpilation failed for constraint: ${constraint}, error: ${(error as Error).message}`);
-    // Return empty string if AST transpilation fails
+    console.error(`Constraint conversion error: ${(error as Error).message}`);
     return '';
   }
 

@@ -15,9 +15,5 @@ declare module 'js-xpath' {
     valueDisplay?: string;
   }
 
-  interface JXpathModule {
-    parse(expression: string): XPathNode;
-  }
-
-  export default JXpathModule;
+  export function parse(expression: string): XPathNode;
 }
