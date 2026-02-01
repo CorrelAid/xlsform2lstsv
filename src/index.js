@@ -1,9 +1,9 @@
 export { XLSFormToTSVConverter } from './xlsformConverter.js';
 export { convertRelevance, convertConstraint, xpathToLimeSurvey } from './converters/xpathTranspiler.js';
-export { ConfigManager, ConversionConfig } from './config/ConfigManager.js';
+export { ConfigManager } from './config/ConfigManager.js';
 export { defaultConfig } from './config/types.js';
 export { FieldSanitizer } from './processors/FieldSanitizer.js';
-export { TypeMapper, TypeInfo, LSType, TYPE_MAPPINGS } from './processors/TypeMapper.js';
+export { TypeMapper, TYPE_MAPPINGS } from './processors/TypeMapper.js';
 export { TSVGenerator } from './processors/TSVGenerator.js';
 export { XLSFormParser } from './processors/XLSFormParser.js';
 export { XLSLoader } from './processors/XLSLoader.js';

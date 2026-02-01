@@ -19,19 +19,19 @@ export interface ExpressionTestCase {
  * @param testCase The test case to run
  * @returns The actual result for further assertions if needed
  */
-export function runCompleteExpressionTest(testCase: ExpressionTestCase): string {
+export async function runCompleteExpressionTest(testCase: ExpressionTestCase): Promise<string> {
     let result: string;
     
     switch (testCase.converter) {
         case 'direct':
-            result = xpathToLimeSurvey(testCase.input);
+            result = await xpathToLimeSurvey(testCase.input);
             break;
         case 'constraint':
-            result = convertConstraint(testCase.input);
+            result = await convertConstraint(testCase.input);
             break;
         case 'relevance':
         default:
-            result = convertRelevance(testCase.input);
+            result = await convertRelevance(testCase.input);
             break;
     }
     

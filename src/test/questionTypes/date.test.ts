@@ -2,12 +2,12 @@ import { describe, test, expect } from 'vitest';
 import { convertAndParse, findRowByName } from '../helpers';
 
 describe('Date Question Type', () => {
-	test('converts basic date question', () => {
+	test('converts basic date question', async () => {
 		const survey = [
 			{ type: 'date', name: 'birth', label: 'Date of birth' }
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'birth');
 
 		expect(question).toBeDefined();
@@ -16,18 +16,18 @@ describe('Date Question Type', () => {
 		expect(question?.text).toBe('Date of birth');
 	});
 
-	test('converts required date question', () => {
+	test('converts required date question', async () => {
 		const survey = [
 			{ type: 'date', name: 'start', label: 'Start date', required: 'yes' }
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'start');
 
 		expect(question?.mandatory).toBe('Y');
 	});
 
-	test('converts date question with constraint', () => {
+	test('converts date question with constraint', async () => {
 		const survey = [
 			{
 				type: 'date',
@@ -37,25 +37,25 @@ describe('Date Question Type', () => {
 			}
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'future');
 
 		// AST-based converter converts date constraints to expressions
 		expect(question?.em_validation_q).toBe('self > today()');
 	});
 
-	test('converts date question with default value', () => {
+	test('converts date question with default value', async () => {
 		const survey = [
 			{ type: 'date', name: 'defdate', label: 'Date', default: 'today()' }
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'defdate');
 
 		expect(question?.default).toBe('today()');
 	});
 
-	test('converts date question with relevance', () => {
+	test('converts date question with relevance', async () => {
 		const survey = [
 			{ type: 'select_one yesno', name: 'hasdate', label: 'Do you have a date?' },
 			{
@@ -71,13 +71,13 @@ describe('Date Question Type', () => {
 			{ list_name: 'yesno', name: 'no', label: 'No' }
 		];
 
-		const rows = convertAndParse(survey, choices);
+		const rows = await convertAndParse(survey, choices);
 		const question = findRowByName(rows, 'thedate');
 
 		expect(question?.relevance).toContain('hasdate'); // Underscores removed
 	});
 
-	test('converts date question with hint', () => {
+	test('converts date question with hint', async () => {
 		const survey = [
 			{
 				type: 'date',
@@ -87,7 +87,7 @@ describe('Date Question Type', () => {
 			}
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'event');
 
 		expect(question?.help).toBe('Format: YYYY-MM-DD');

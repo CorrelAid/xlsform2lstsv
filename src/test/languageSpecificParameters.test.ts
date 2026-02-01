@@ -3,7 +3,7 @@ import { convertAndParse, findRowsByClass, findRowByName } from './helpers';
 
 describe('Language-Specific Parameters', () => {
 	describe('Survey Language-Specific Parameters (SL class)', () => {
-		test('creates SL rows for each language with survey title', () => {
+		test('creates SL rows for each language with survey title', async () => {
 			const survey = [
 				{ type: 'text', name: 'q1', label: 'Question 1' }
 			];
@@ -17,7 +17,7 @@ describe('Language-Specific Parameters', () => {
 				default_language: 'en'
 			}];
 
-			const rows = convertAndParse(survey, [], settings);
+			const rows = await convertAndParse(survey, [], settings);
 			const slRows = findRowsByClass(rows, 'SL');
 
 			// Should have SL rows for each language
@@ -38,7 +38,7 @@ describe('Language-Specific Parameters', () => {
 
 
 
-		test('uses same ID for same field across languages', () => {
+		test('uses same ID for same field across languages', async () => {
 			const survey = [
 				{ type: 'text', name: 'q1', label: 'Question 1' }
 			];
@@ -51,7 +51,7 @@ describe('Language-Specific Parameters', () => {
 				default_language: 'en'
 			}];
 
-			const rows = convertAndParse(survey, [], settings);
+			const rows = await convertAndParse(survey, [], settings);
 			const slRows = findRowsByClass(rows, 'SL');
 
 			// All title rows should have the same name (field identifier)
@@ -62,7 +62,7 @@ describe('Language-Specific Parameters', () => {
 	});
 
 	describe('Groups (G class) with language-specific parameters', () => {
-		test('creates one group row per language', () => {
+		test('creates one group row per language', async () => {
 			const survey = [
 				{
 					type: 'begin_group',
@@ -78,7 +78,7 @@ describe('Language-Specific Parameters', () => {
 				{ type: 'end_group' }
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const groupRows = findRowsByClass(rows, 'G');
 
 			// Should have 3 group rows (one per language)
@@ -97,7 +97,7 @@ describe('Language-Specific Parameters', () => {
 			expect(frGroup?.text).toBe('Données démographiques');
 		});
 
-		test('uses same group ID across languages', () => {
+		test('uses same group ID across languages', async () => {
 			const survey = [
 				{
 					type: 'begin_group',
@@ -112,7 +112,7 @@ describe('Language-Specific Parameters', () => {
 				{ type: 'end_group' }
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const groupRows = findRowsByClass(rows, 'G');
 
 			// All group rows should have the same name (group identifier)
@@ -121,7 +121,7 @@ describe('Language-Specific Parameters', () => {
 			expect(demoGroups.every(r => r.name === 'demo')).toBe(true);
 		});
 
-		test('includes language-specific group descriptions', () => {
+		test('includes language-specific group descriptions', async () => {
 			const survey = [
 				{
 					type: 'begin_group',
@@ -140,7 +140,7 @@ describe('Language-Specific Parameters', () => {
 				{ type: 'end_group' }
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const groupRows = findRowsByClass(rows, 'G');
 
 			// Check English help text
@@ -152,7 +152,7 @@ describe('Language-Specific Parameters', () => {
 			expect(esGroup?.help).toBe('Por favor proporcione información demográfica');
 		});
 
-		test('includes group-level relevance for each language', () => {
+		test('includes group-level relevance for each language', async () => {
 			const survey = [
 				{
 					type: 'select_one yesno',
@@ -178,7 +178,7 @@ describe('Language-Specific Parameters', () => {
 				{ list_name: 'yesno', name: 'no', label: 'No' }
 			];
 
-			const rows = convertAndParse(survey, choices);
+			const rows = await convertAndParse(survey, choices);
 			const groupRows = findRowsByClass(rows, 'G');
 
 			// Both language versions should have the same relevance
@@ -191,7 +191,7 @@ describe('Language-Specific Parameters', () => {
 	});
 
 	describe('Questions (Q class) with language-specific parameters', () => {
-		test('creates one question row per language', () => {
+		test('creates one question row per language', async () => {
 			const survey = [
 				{
 					type: 'text',
@@ -205,7 +205,7 @@ describe('Language-Specific Parameters', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const questionRows = findRowsByClass(rows, 'Q');
 
 			// Should have 3 question rows (one per language)
@@ -224,7 +224,7 @@ describe('Language-Specific Parameters', () => {
 			expect(frQuestion?.text).toBe('Quel est votre nom?');
 		});
 
-		test('uses same question ID across languages', () => {
+		test('uses same question ID across languages', async () => {
 			const survey = [
 				{
 					type: 'text',
@@ -237,7 +237,7 @@ describe('Language-Specific Parameters', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const questionRows = findRowsByClass(rows, 'Q');
 
 			// All question rows should have the same name (question identifier)
@@ -246,7 +246,7 @@ describe('Language-Specific Parameters', () => {
 			expect(ageQuestions.every(r => r.name === 'age')).toBe(true);
 		});
 
-		test('includes language-specific help text', () => {
+		test('includes language-specific help text', async () => {
 			const survey = [
 				{
 					type: 'text',
@@ -263,7 +263,7 @@ describe('Language-Specific Parameters', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const questionRows = findRowsByClass(rows, 'Q');
 
 			// Check English help text
@@ -275,7 +275,7 @@ describe('Language-Specific Parameters', () => {
 			expect(esQuestion?.help).toBe('Por favor ingrese su correo electrónico válido');
 		});
 
-		test('includes question-level relevance for each language', () => {
+		test('includes question-level relevance for each language', async () => {
 			const survey = [
 				{
 					type: 'select_one yesno',
@@ -299,7 +299,7 @@ describe('Language-Specific Parameters', () => {
 				{ list_name: 'yesno', name: 'no', label: 'No' }
 			];
 
-			const rows = convertAndParse(survey, choices);
+			const rows = await convertAndParse(survey, choices);
 			const questionRows = findRowsByClass(rows, 'Q');
 
 			// Both language versions should have the same relevance
@@ -310,7 +310,7 @@ describe('Language-Specific Parameters', () => {
 			expect(esQuestion?.relevance).toContain('cons');
 		});
 
-		test('includes mandatory flag for each language', () => {
+		test('includes mandatory flag for each language', async () => {
 			const survey = [
 				{
 					type: 'text',
@@ -324,7 +324,7 @@ describe('Language-Specific Parameters', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const questionRows = findRowsByClass(rows, 'Q');
 
 			// Both language versions should be marked as mandatory
@@ -335,7 +335,7 @@ describe('Language-Specific Parameters', () => {
 			expect(esQuestion?.mandatory).toBe('Y');
 		});
 
-		test('includes validation for each language', () => {
+		test('includes validation for each language', async () => {
 			const survey = [
 				{
 					type: 'text',
@@ -349,7 +349,7 @@ describe('Language-Specific Parameters', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const questionRows = findRowsByClass(rows, 'Q');
 
 			// Both language versions should have the same validation
@@ -363,7 +363,7 @@ describe('Language-Specific Parameters', () => {
 	});
 
 	describe('Subquestions (SQ class) with language-specific parameters', () => {
-		test('creates one subquestion row per language', () => {
+		test('creates one subquestion row per language', async () => {
 			const survey = [
 				{
 					type: 'select_multiple options',
@@ -397,7 +397,7 @@ describe('Language-Specific Parameters', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey, choices);
+			const rows = await convertAndParse(survey, choices);
 			const subquestionRows = findRowsByClass(rows, 'SQ');
 
 			// Should have subquestion rows for each language
@@ -418,7 +418,7 @@ describe('Language-Specific Parameters', () => {
 			expect(esMusic?.text).toBe('Música');
 		});
 
-		test('uses same subquestion ID across languages', () => {
+		test('uses same subquestion ID across languages', async () => {
 			const survey = [
 				{
 					type: 'select_multiple options',
@@ -443,7 +443,7 @@ describe('Language-Specific Parameters', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey, choices);
+			const rows = await convertAndParse(survey, choices);
 			const subquestionRows = findRowsByClass(rows, 'SQ');
 
 			// All subquestion rows for 'red' should have the same name
@@ -452,7 +452,7 @@ describe('Language-Specific Parameters', () => {
 			expect(redSubquestions.every(r => r.name === 'red')).toBe(true);
 		});
 
-		test('includes subquestion-level validation for each language', () => {
+		test('includes subquestion-level validation for each language', async () => {
 			const survey = [
 				{
 					type: 'select_multiple options',
@@ -477,7 +477,7 @@ describe('Language-Specific Parameters', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey, choices);
+			const rows = await convertAndParse(survey, choices);
 			const subquestionRows = findRowsByClass(rows, 'SQ');
 
 			// Both language versions should have the same structure
@@ -490,7 +490,7 @@ describe('Language-Specific Parameters', () => {
 	});
 
 	describe('Answers (A class) with language-specific parameters', () => {
-		test('creates one answer row per language', () => {
+		test('creates one answer row per language', async () => {
 			const survey = [
 				{
 					type: 'select_one options',
@@ -527,7 +527,7 @@ describe('Language-Specific Parameters', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey, choices);
+			const rows = await convertAndParse(survey, choices);
 			const answerRows = findRowsByClass(rows, 'A');
 
 			// Should have answer rows for each language
@@ -555,7 +555,7 @@ describe('Language-Specific Parameters', () => {
 			expect(frFemale?.text).toBe('Femme');
 		});
 
-		test('uses same answer ID across languages', () => {
+		test('uses same answer ID across languages', async () => {
 			const survey = [
 				{
 					type: 'select_one options',
@@ -580,7 +580,7 @@ describe('Language-Specific Parameters', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey, choices);
+			const rows = await convertAndParse(survey, choices);
 			const answerRows = findRowsByClass(rows, 'A');
 
 			// All answer rows for 'red' should have the same name
@@ -589,7 +589,7 @@ describe('Language-Specific Parameters', () => {
 			expect(redAnswers.every(r => r.name === 'red')).toBe(true);
 		});
 
-		test('includes answer-level relevance for each language', () => {
+		test('includes answer-level relevance for each language', async () => {
 			const survey = [
 				{
 					type: 'select_one options',
@@ -615,7 +615,7 @@ describe('Language-Specific Parameters', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey, choices);
+			const rows = await convertAndParse(survey, choices);
 			const answerRows = findRowsByClass(rows, 'A');
 
 			// Both language versions should have the same relevance structure
@@ -626,7 +626,7 @@ describe('Language-Specific Parameters', () => {
 			expect(esAnswer?.relevance).toContain('us_only');
 		});
 
-		test('includes assessment values for each language', () => {
+		test('includes assessment values for each language', async () => {
 			const survey = [
 				{
 					type: 'select_one options',
@@ -652,7 +652,7 @@ describe('Language-Specific Parameters', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey, choices);
+			const rows = await convertAndParse(survey, choices);
 			const answerRows = findRowsByClass(rows, 'A');
 
 			// Both language versions should have the same assessment value
@@ -665,7 +665,7 @@ describe('Language-Specific Parameters', () => {
 	});
 
 	describe('Complete multilingual survey structure', () => {
-		test('creates complete structure with all language-specific elements', () => {
+		test('creates complete structure with all language-specific elements', async () => {
 			const survey = [
 				{
 					type: 'begin_group',
@@ -726,7 +726,7 @@ describe('Language-Specific Parameters', () => {
 				default_language: 'en'
 			}];
 
-			const rows = convertAndParse(survey, choices, settings);
+			const rows = await convertAndParse(survey, choices, settings);
 
 			// Should have all required row classes
 			expect(findRowsByClass(rows, 'S').length).toBeGreaterThan(0);
@@ -741,7 +741,7 @@ describe('Language-Specific Parameters', () => {
 			expect(languagesUsed.has('es')).toBe(true);
 		});
 
-		test('maintains consistent IDs across languages', () => {
+		test('maintains consistent IDs across languages', async () => {
 			const survey = [
 				{
 					type: 'begin_group',
@@ -764,7 +764,7 @@ describe('Language-Specific Parameters', () => {
 				{ type: 'end_group' }
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 
 			// Check that group IDs are consistent
 			const groupRows = findRowsByClass(rows, 'G');

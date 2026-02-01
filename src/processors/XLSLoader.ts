@@ -1,9 +1,9 @@
 import * as XLSX from 'xlsx';
 
-import { SurveyRow, ChoiceRow, SettingsRow, XLSFormData } from '../config/types';
-import { extractBaseColumnName, extractLanguageCode, getLanguageCodesFromHeaders, validateLanguageCodes, isValidLanguageCode } from '../utils/languageUtils';
+import { SurveyRow, ChoiceRow, SettingsRow, XLSFormData } from '../config/types.js';
+import { extractBaseColumnName, extractLanguageCode, getLanguageCodesFromHeaders, validateLanguageCodes, isValidLanguageCode } from '../utils/languageUtils.js';
 
-import { XLSValidator } from './XLSValidator';
+import { XLSValidator } from './XLSValidator.js';
 
 type RowData = Record<string, unknown>;
 

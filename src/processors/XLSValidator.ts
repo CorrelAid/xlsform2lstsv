@@ -1,5 +1,5 @@
 
-import { SurveyRow, ChoiceRow } from '../config/types';
+import { SurveyRow, ChoiceRow } from '../config/types.js';
 
 export class XLSValidator {
 	/**

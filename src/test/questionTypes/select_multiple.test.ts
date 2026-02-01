@@ -2,7 +2,7 @@ import { describe, test, expect } from 'vitest';
 import { convertAndParse, findRowByName, findRowsByClass, createChoices } from '../helpers';
 
 describe('Select Multiple Question Type', () => {
-	test('converts basic select_multiple question', () => {
+	test('converts basic select_multiple question', async () => {
 		const survey = [
 			{ type: 'select_multiple interests', name: 'hob', label: 'What are your hobbies?' }
 		];
@@ -13,14 +13,14 @@ describe('Select Multiple Question Type', () => {
 			{ name: 'read', label: 'Reading' }
 		]);
 
-		const rows = convertAndParse(survey, choices);
+		const rows = await convertAndParse(survey, choices);
 		const question = findRowByName(rows, 'hob');
 
 		expect(question?.class).toBe('Q');
 		expect(question?.['type/scale']).toBe('M'); // Multiple choice in LimeSurvey
 	});
 
-	test('creates subquestions for select_multiple', () => {
+	test('creates subquestions for select_multiple', async () => {
 		const survey = [
 			{ type: 'select_multiple pets', name: 'anim', label: 'Which pets do you have?' }
 		];
@@ -31,7 +31,7 @@ describe('Select Multiple Question Type', () => {
 			{ name: 'fish', label: 'Fish' }
 		]);
 
-		const rows = convertAndParse(survey, choices);
+		const rows = await convertAndParse(survey, choices);
 		const subquestions = findRowsByClass(rows, 'SQ');
 
 		expect(subquestions.length).toBeGreaterThanOrEqual(3);
@@ -40,7 +40,7 @@ describe('Select Multiple Question Type', () => {
 		expect(subquestions.map(sq => sq.name)).toContain('fish');
 	});
 
-	test('converts select_multiple with or_other', () => {
+	test('converts select_multiple with or_other', async () => {
 		const survey = [
 			{ type: 'select_multiple items or_other', name: 'stuff', label: 'Select items' }
 		];
@@ -50,13 +50,13 @@ describe('Select Multiple Question Type', () => {
 			{ name: 'item2', label: 'Item 2' }
 		]);
 
-		const rows = convertAndParse(survey, choices);
+		const rows = await convertAndParse(survey, choices);
 		const question = findRowByName(rows, 'stuff');
 
 		expect(question?.other).toBe('Y');
 	});
 
-	test('handles auto-generated subquestion names', () => {
+	test('handles auto-generated subquestion names', async () => {
 		const survey = [
 			{ type: 'select_multiple list1', name: 'q1', label: 'Question' }
 		];
@@ -66,7 +66,7 @@ describe('Select Multiple Question Type', () => {
 			{ list_name: 'list1', label: 'Choice 2' }  // No name
 		];
 
-		const rows = convertAndParse(survey, choices);
+		const rows = await convertAndParse(survey, choices);
 		const subquestions = findRowsByClass(rows, 'SQ');
 
 		// Should have auto-generated names like SQ0, SQ1
@@ -74,7 +74,7 @@ describe('Select Multiple Question Type', () => {
 		expect(subquestions.some(sq => sq.name.match(/^SQ\d+$/))).toBe(true);
 	});
 
-	test('converts select_multiple with required', () => {
+	test('converts select_multiple with required', async () => {
 		const survey = [
 			{
 				type: 'select_multiple options',
@@ -89,13 +89,13 @@ describe('Select Multiple Question Type', () => {
 			{ name: 'opt2', label: 'Option 2' }
 		]);
 
-		const rows = convertAndParse(survey, choices);
+		const rows = await convertAndParse(survey, choices);
 		const question = findRowByName(rows, 'reqmul');
 
 		expect(question?.mandatory).toBe('Y');
 	});
 
-	test('converts select_multiple with hint', () => {
+	test('converts select_multiple with hint', async () => {
 		const survey = [
 			{
 				type: 'select_multiple colors',
@@ -110,13 +110,13 @@ describe('Select Multiple Question Type', () => {
 			{ name: 'blue', label: 'Blue' }
 		]);
 
-		const rows = convertAndParse(survey, choices);
+		const rows = await convertAndParse(survey, choices);
 		const question = findRowByName(rows, 'cols');
 
 		expect(question?.help).toBe('Choose all that apply');
 	});
 
-	test('converts select_multiple with relevance', () => {
+	test('converts select_multiple with relevance', async () => {
 		const survey = [
 			{ type: 'select_one yesno', name: 'haspets', label: 'Do you have pets?' },
 			{
@@ -138,13 +138,13 @@ describe('Select Multiple Question Type', () => {
 			])
 		];
 
-		const rows = convertAndParse(survey, choices);
+		const rows = await convertAndParse(survey, choices);
 		const question = findRowByName(rows, 'pets');
 
 		expect(question?.relevance).toContain('haspets'); // Underscores removed
 	});
 
-	test('handles auto-generated subquestion names', () => {
+	test('handles auto-generated subquestion names', async () => {
 		const survey = [
 			{ type: 'select_multiple list1', name: 'q1', label: 'Question' }
 		];
@@ -154,7 +154,7 @@ describe('Select Multiple Question Type', () => {
 			{ list_name: 'list1', label: 'Choice 2' }  // No name
 		];
 
-		const rows = convertAndParse(survey, choices);
+		const rows = await convertAndParse(survey, choices);
 		const subquestions = findRowsByClass(rows, 'SQ');
 
 		// Should have auto-generated names like SQ0, SQ1
@@ -162,7 +162,7 @@ describe('Select Multiple Question Type', () => {
 		expect(subquestions.some(sq => sq.name.match(/^SQ\d+$/))).toBe(true);
 	});
 
-	test('converts select_multiple with required', () => {
+	test('converts select_multiple with required', async () => {
 		const survey = [
 			{
 				type: 'select_multiple options',
@@ -177,7 +177,7 @@ describe('Select Multiple Question Type', () => {
 			{ name: 'opt2', label: 'Option 2' }
 		]);
 
-		const rows = convertAndParse(survey, choices);
+		const rows = await convertAndParse(survey, choices);
 		const question = findRowByName(rows, 'reqmul');
 
 		expect(question?.mandatory).toBe('Y');

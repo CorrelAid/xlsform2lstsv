@@ -1,4 +1,4 @@
-import { sanitizeFieldName } from '../utils/helpers';
+import { sanitizeFieldName } from '../utils/helpers.js';
 
 export class FieldSanitizer {
   constructor() {}

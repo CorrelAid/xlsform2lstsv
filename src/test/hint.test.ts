@@ -3,7 +3,7 @@ import { convertAndParse, findRowByName, findRowsByClass } from './helpers';
 
 describe('Hint Functionality', () => {
 	describe('Basic Hint Support', () => {
-		test('converts question with simple hint', () => {
+		test('converts question with simple hint', async () => {
 			const survey = [
 				{
 					type: 'text',
@@ -13,14 +13,14 @@ describe('Hint Functionality', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const question = findRowByName(rows, 'q1');
 
 			expect(question).toBeDefined();
 			expect(question?.help).toBe('Please enter your full name');
 		});
 
-		test('handles question without hint', () => {
+		test('handles question without hint', async () => {
 			const survey = [
 				{
 					type: 'text',
@@ -29,14 +29,14 @@ describe('Hint Functionality', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const question = findRowByName(rows, 'q1');
 
 			expect(question).toBeDefined();
 			expect(question?.help).toBe('');
 		});
 
-		test('handles empty hint string', () => {
+		test('handles empty hint string', async () => {
 			const survey = [
 				{
 					type: 'text',
@@ -46,7 +46,7 @@ describe('Hint Functionality', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const question = findRowByName(rows, 'q1');
 
 			expect(question).toBeDefined();
@@ -55,7 +55,7 @@ describe('Hint Functionality', () => {
 	});
 
 	describe('Hint Support Across Question Types', () => {
-		test('converts text question with hint', () => {
+		test('converts text question with hint', async () => {
 			const survey = [
 				{
 					type: 'text',
@@ -65,13 +65,13 @@ describe('Hint Functionality', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const question = findRowByName(rows, 'name');
 
 			expect(question?.help).toBe('Enter your first and last name');
 		});
 
-		test('converts integer question with hint', () => {
+		test('converts integer question with hint', async () => {
 			const survey = [
 				{
 					type: 'integer',
@@ -81,13 +81,13 @@ describe('Hint Functionality', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const question = findRowByName(rows, 'age');
 
 			expect(question?.help).toBe('Enter your age in years');
 		});
 
-		test('converts decimal question with hint', () => {
+		test('converts decimal question with hint', async () => {
 			const survey = [
 				{
 					type: 'decimal',
@@ -97,13 +97,13 @@ describe('Hint Functionality', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const question = findRowByName(rows, 'height');
 
 			expect(question?.help).toBe('Enter as decimal (e.g., 1.75)');
 		});
 
-		test('converts date question with hint', () => {
+		test('converts date question with hint', async () => {
 			const survey = [
 				{
 					type: 'date',
@@ -113,13 +113,13 @@ describe('Hint Functionality', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const question = findRowByName(rows, 'birthdate');
 
 			expect(question?.help).toBe('Format: YYYY-MM-DD');
 		});
 
-		test('converts time question with hint', () => {
+		test('converts time question with hint', async () => {
 			const survey = [
 				{
 					type: 'time',
@@ -129,13 +129,13 @@ describe('Hint Functionality', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const question = findRowByName(rows, 'appointment');
 
 			expect(question?.help).toBe('Format: HH:MM:SS');
 		});
 
-		test('converts datetime question with hint', () => {
+		test('converts datetime question with hint', async () => {
 			const survey = [
 				{
 					type: 'datetime',
@@ -145,13 +145,13 @@ describe('Hint Functionality', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const question = findRowByName(rows, 'meeting');
 
 			expect(question?.help).toBe('Format: YYYY-MM-DD HH:MM');
 		});
 
-		test('converts select_one question with hint', () => {
+		test('converts select_one question with hint', async () => {
 			const survey = [
 				{
 					type: 'select_one gender',
@@ -167,13 +167,13 @@ describe('Hint Functionality', () => {
 				{ list_name: 'gender', name: 'other', label: 'Other' }
 			];
 
-			const rows = convertAndParse(survey, choices);
+			const rows = await convertAndParse(survey, choices);
 			const question = findRowByName(rows, 'gender');
 
 			expect(question?.help).toBe('Select your gender');
 		});
 
-		test('converts select_multiple question with hint', () => {
+		test('converts select_multiple question with hint', async () => {
 			const survey = [
 				{
 					type: 'select_multiple interests',
@@ -189,13 +189,13 @@ describe('Hint Functionality', () => {
 				{ list_name: 'interests', name: 'reading', label: 'Reading' }
 			];
 
-			const rows = convertAndParse(survey, choices);
+			const rows = await convertAndParse(survey, choices);
 			const question = findRowByName(rows, 'interests');
 
 			expect(question?.help).toBe('Select all that apply');
 		});
 
-		test('converts note with hint', () => {
+		test('converts note with hint', async () => {
 			const survey = [
 				{
 					type: 'note',
@@ -205,13 +205,13 @@ describe('Hint Functionality', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const note = findRowByName(rows, 'info');
 
 			expect(note?.help).toBe('Additional help text');
 		});
 
-		test('converts rank question with hint', () => {
+		test('converts rank question with hint', async () => {
 			const survey = [
 				{
 					type: 'rank',
@@ -227,7 +227,7 @@ describe('Hint Functionality', () => {
 				{ list_name: 'priority', name: 'item3', label: 'Item 3' }
 			];
 
-			const rows = convertAndParse(survey, choices);
+			const rows = await convertAndParse(survey, choices);
 			const question = findRowByName(rows, 'priority');
 
 			expect(question?.help).toBe('Drag and drop to rank from most to least important');
@@ -235,7 +235,7 @@ describe('Hint Functionality', () => {
 	});
 
 	describe('Group Hints', () => {
-		test('converts group with hint', () => {
+		test('converts group with hint', async () => {
 			const survey = [
 				{
 					type: 'begin_group',
@@ -247,7 +247,7 @@ describe('Hint Functionality', () => {
 				{ type: 'end_group' }
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const groupRows = findRowsByClass(rows, 'G');
 			const personalGroup = groupRows.find(r => r.name === 'personal');
 
@@ -255,7 +255,7 @@ describe('Hint Functionality', () => {
 			expect(personalGroup?.help).toBe('Please provide your personal details');
 		});
 
-		test('handles group without hint', () => {
+		test('handles group without hint', async () => {
 			const survey = [
 				{
 					type: 'begin_group',
@@ -266,7 +266,7 @@ describe('Hint Functionality', () => {
 				{ type: 'end_group' }
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const groupRows = findRowsByClass(rows, 'G');
 			const personalGroup = groupRows.find(r => r.name === 'personal');
 
@@ -276,7 +276,7 @@ describe('Hint Functionality', () => {
 	});
 
 	describe('Multilingual Hints', () => {
-		test('converts question with language-specific hints', () => {
+		test('converts question with language-specific hints', async () => {
 			const survey = [
 				{
 					type: 'text',
@@ -293,7 +293,7 @@ describe('Hint Functionality', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const englishQuestion = rows.find(r => r.name === 'name' && r.language === 'en');
 			const spanishQuestion = rows.find(r => r.name === 'name' && r.language === 'es');
 
@@ -301,7 +301,7 @@ describe('Hint Functionality', () => {
 			expect(spanishQuestion?.help).toBe('Ingresa tu nombre completo');
 		});
 
-		test('converts group with language-specific hints', () => {
+		test('converts group with language-specific hints', async () => {
 			const survey = [
 				{
 					type: 'begin_group',
@@ -320,7 +320,7 @@ describe('Hint Functionality', () => {
 				{ type: 'end_group' }
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const groupRows = findRowsByClass(rows, 'G');
 			const englishGroup = groupRows.find(r => r.name === 'demo' && r.language === 'en');
 			const spanishGroup = groupRows.find(r => r.name === 'demo' && r.language === 'es');
@@ -329,7 +329,7 @@ describe('Hint Functionality', () => {
 			expect(spanishGroup?.help).toBe('Por favor proporcione información demográfica');
 		});
 
-		test('handles missing hint in one language', () => {
+		test('handles missing hint in one language', async () => {
 			const survey = [
 				{
 					type: 'text',
@@ -346,7 +346,7 @@ describe('Hint Functionality', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const englishQuestion = rows.find(r => r.name === 'name' && r.language === 'en');
 			const spanishQuestion = rows.find(r => r.name === 'name' && r.language === 'es');
 
@@ -357,7 +357,7 @@ describe('Hint Functionality', () => {
 	});
 
 	describe('Hint Edge Cases', () => {
-		test('handles very long hint text', () => {
+		test('handles very long hint text', async () => {
 			const longHint = 'This is a very long hint text that contains a lot of information and guidance for the user. ' +
 				'It should be preserved exactly as provided without truncation or modification.';
 
@@ -370,13 +370,13 @@ describe('Hint Functionality', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const question = findRowByName(rows, 'q1');
 
 			expect(question?.help).toBe(longHint);
 		});
 
-		test('handles hint with special characters', () => {
+		test('handles hint with special characters', async () => {
 			const survey = [
 				{
 					type: 'text',
@@ -386,13 +386,13 @@ describe('Hint Functionality', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const question = findRowByName(rows, 'q1');
 
 			expect(question?.help).toBe('Special chars: <>&"\'NewlineTab');
 		});
 
-		test('handles hint with unicode characters', () => {
+		test('handles hint with unicode characters', async () => {
 			const survey = [
 				{
 					type: 'text',
@@ -402,13 +402,13 @@ describe('Hint Functionality', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const question = findRowByName(rows, 'q1');
 
 			expect(question?.help).toBe('Unicode: 你好世界 🌍 café naïve');
 		});
 
-		test('handles hint with HTML-like content', () => {
+		test('handles hint with HTML-like content', async () => {
 			const survey = [
 				{
 					type: 'text',
@@ -418,7 +418,7 @@ describe('Hint Functionality', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const question = findRowByName(rows, 'q1');
 
 			expect(question?.help).toBe('<b>Bold</b> and <i>italic</i> formatting');
@@ -426,7 +426,7 @@ describe('Hint Functionality', () => {
 	});
 
 	describe('Hint Validation and Error Handling', () => {
-		test('handles null hint gracefully', () => {
+		test('handles null hint gracefully', async () => {
 			const survey = [
 				{
 					type: 'text',
@@ -436,13 +436,13 @@ describe('Hint Functionality', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const question = findRowByName(rows, 'q1');
 
 			expect(question?.help).toBe('');
 		});
 
-		test('handles undefined hint gracefully', () => {
+		test('handles undefined hint gracefully', async () => {
 			const survey = [
 				{
 					type: 'text',
@@ -452,13 +452,13 @@ describe('Hint Functionality', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const question = findRowByName(rows, 'q1');
 
 			expect(question?.help).toBe('');
 		});
 
-		test('handles hint with only whitespace', () => {
+		test('handles hint with only whitespace', async () => {
 			const survey = [
 				{
 					type: 'text',
@@ -468,7 +468,7 @@ describe('Hint Functionality', () => {
 				}
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const question = findRowByName(rows, 'q1');
 
 			expect(question?.help).toBe('   ');

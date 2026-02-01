@@ -47,14 +47,14 @@ export interface TSVRow {
 /**
  * Helper to convert XLSForm data and parse TSV output into structured rows
  */
-export function convertAndParse(
+export async function convertAndParse(
 	surveyData: SurveyRow[],
 	choicesData: ChoiceRow[] = [],
 	settingsData: SettingsRow[] = [{ form_title: 'Test Survey', default_language: 'en' }],
 	config: any = null
 ): TSVRow[] {
 	const converter = new XLSFormToTSVConverter(config || {});
-	const tsv = converter.convert(surveyData, choicesData, settingsData);
+	const tsv = await converter.convert(surveyData, choicesData, settingsData);
 	return parseTSV(tsv);
 }
 

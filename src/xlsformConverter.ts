@@ -1,10 +1,10 @@
-import { ConfigManager, ConversionConfig } from './config/ConfigManager';
-import { SurveyRow, ChoiceRow, SettingsRow } from './config/types';
-import { convertRelevance, convertConstraint } from './converters/xpathTranspiler';
-import { FieldSanitizer } from './processors/FieldSanitizer';
-import { TSVGenerator } from './processors/TSVGenerator';
-import { TypeMapper, TypeInfo, LSType } from './processors/TypeMapper';
-import { getBaseLanguage } from './utils/languageUtils';
+import { ConfigManager, ConversionConfig } from './config/ConfigManager.js';
+import { SurveyRow, ChoiceRow, SettingsRow } from './config/types.js';
+import { convertRelevance, convertConstraint } from './converters/xpathTranspiler.js';
+import { FieldSanitizer } from './processors/FieldSanitizer.js';
+import { TSVGenerator } from './processors/TSVGenerator.js';
+import { TypeMapper, TypeInfo, LSType } from './processors/TypeMapper.js';
+import { getBaseLanguage } from './utils/languageUtils.js';
 
 // Unimplemented XLSForm types that should raise an error
 const UNIMPLEMENTED_TYPES = [
@@ -77,11 +77,11 @@ export class XLSFormToTSVConverter {
 		this.configManager.updateConfig(partialConfig);
 	}
 
-	convert(
+	async convert(
 		surveyData: SurveyRow[],
 		choicesData: ChoiceRow[],
 		settingsData: SettingsRow[]
-	): string {
+	): Promise<string> {
 		// Reset state
 		this.choicesMap.clear();
 		this.currentGroup = null;
@@ -112,12 +112,12 @@ export class XLSFormToTSVConverter {
 		// If no groups, add a default group
 		const advancedOptions = this.configManager.getAdvancedOptions();
 		if (!hasGroups && advancedOptions.autoCreateGroups) {
-			this.addDefaultGroup();
+			await this.addDefaultGroup();
 		}
 
 		// Process survey rows
 		for (const row of surveyData) {
-			this.processRow(row);
+			await this.processRow(row);
 		}
 
 		// Generate TSV
@@ -190,7 +190,7 @@ export class XLSFormToTSVConverter {
 		}
 	}
 
-	private addDefaultGroup(): void {
+	private async addDefaultGroup(): Promise<void> {
 		// Add a default group for surveys without explicit groups
 		const defaults = this.configManager.getDefaults();
 		const groupName = defaults.groupName;
@@ -309,7 +309,7 @@ export class XLSFormToTSVConverter {
 		}
 	}
 
-	private processRow(row: SurveyRow): void {
+	private async processRow(row: SurveyRow): Promise<void> {
 		const xfType = (row.type || '').trim();
 
 		if (!xfType) return;
@@ -323,7 +323,7 @@ export class XLSFormToTSVConverter {
 		}
 
 		if (xfType === 'begin_group' || xfType === 'begin group') {
-			this.addGroup(row);
+			await this.addGroup(row);
 			return;
 		}
 		if (xfType === 'end_group' || xfType === 'end group') {
@@ -333,7 +333,7 @@ export class XLSFormToTSVConverter {
 
 
 		// Handle notes and questions
-		this.addQuestion(row);
+		await this.addQuestion(row);
 	}
 
 	private getLanguageSpecificValue(value: unknown, languageCode: string): string | undefined {
@@ -368,7 +368,7 @@ export class XLSFormToTSVConverter {
 		return this.fieldSanitizer.sanitizeAnswerCode(code);
 	}
 
-	private addGroup(row: SurveyRow): void {
+	private async addGroup(row: SurveyRow): Promise<void> {
 		// Auto-generate name if missing (matches LimeSurvey behavior)
 		const groupName = row.name && row.name.trim() !== ''
 			? this.sanitizeName(row.name.trim())
@@ -384,7 +384,7 @@ export class XLSFormToTSVConverter {
 				class: 'G',
 				'type/scale': '',
 				name: groupName,
-				relevance: this.convertRelevance(row.relevant),
+				relevance: await this.convertRelevance(row.relevant),
 				text: this.getLanguageSpecificValue(row.label, lang) || groupName,
 				help: this.getLanguageSpecificValue(row.hint, lang) || '',
 				language: lang,
@@ -398,7 +398,7 @@ export class XLSFormToTSVConverter {
 		}
 	}
 
-	private addQuestion(row: SurveyRow): void {
+	private async addQuestion(row: SurveyRow): Promise<void> {
 		// Auto-generate name if missing (matches LimeSurvey behavior)
 		const questionName = row.name && row.name.trim() !== ''
 			? this.sanitizeName(row.name.trim())
@@ -418,12 +418,12 @@ export class XLSFormToTSVConverter {
 				class: 'Q',
 				'type/scale': isNote ? 'X' : lsType.type,
 				name: questionName,
-				relevance: this.convertRelevance(row.relevant),
+				relevance: await this.convertRelevance(row.relevant),
 				text: this.getLanguageSpecificValue(row.label, lang) || questionName,
 				help: this.getLanguageSpecificValue(row.hint, lang) || '',
 				language: lang,
 				validation: "",
-				em_validation_q: isNote ? "" : convertConstraint(row.constraint || ""),
+				em_validation_q: isNote ? "" : await convertConstraint(row.constraint || ""),
 				mandatory: isNote ? '' : (row.required === 'yes' || row.required === 'true' ? 'Y' : ''),
 				other: isNote ? '' : (lsType.other ? 'Y' : ''),
 				default: isNote ? '' : (row.default || ''),
@@ -488,9 +488,9 @@ export class XLSFormToTSVConverter {
 		}
 	}
 
-	private convertRelevance(relevant?: string): string {
+	private async convertRelevance(relevant?: string): Promise<string> {
 		if (!relevant) return '1';
-		return convertRelevance(relevant);
+		return await convertRelevance(relevant);
 	}
 
 

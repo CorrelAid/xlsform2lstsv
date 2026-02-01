@@ -2,12 +2,12 @@ import { describe, test, expect } from 'vitest';
 import { convertAndParse, findRowByName } from '../helpers';
 
 describe('Time Question Type', () => {
-	test('converts basic time question', () => {
+	test('converts basic time question', async () => {
 		const survey = [
 			{ type: 'time', name: 'meet', label: 'Meeting time' }
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'meet');
 
 		expect(question).toBeDefined();
@@ -17,29 +17,29 @@ describe('Time Question Type', () => {
 		expect(question?.text).toBe('Meeting time');
 	});
 
-	test('converts required time question', () => {
+	test('converts required time question', async () => {
 		const survey = [
 			{ type: 'time', name: 'start', label: 'Start time', required: 'yes' }
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'start');
 
 		expect(question?.mandatory).toBe('Y');
 	});
 
-	test('converts time question with default value', () => {
+	test('converts time question with default value', async () => {
 		const survey = [
 			{ type: 'time', name: 'def', label: 'Default time', default: '09:00:00' }
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'def');
 
 		expect(question?.default).toBe('09:00:00');
 	});
 
-	test('converts time question with relevance', () => {
+	test('converts time question with relevance', async () => {
 		const survey = [
 			{ type: 'select_one yesno', name: 'hastime', label: 'Do you have a time?' },
 			{
@@ -55,13 +55,13 @@ describe('Time Question Type', () => {
 			{ list_name: 'yesno', name: 'no', label: 'No' }
 		];
 
-		const rows = convertAndParse(survey, choices);
+		const rows = await convertAndParse(survey, choices);
 		const question = findRowByName(rows, 'thetime');
 
 		expect(question?.relevance).toContain('hastime'); // Underscores removed
 	});
 
-	test('converts time question with hint', () => {
+	test('converts time question with hint', async () => {
 		const survey = [
 			{
 				type: 'time',
@@ -71,7 +71,7 @@ describe('Time Question Type', () => {
 			}
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'event');
 
 		expect(question?.help).toBe('Format: HH:MM:SS');

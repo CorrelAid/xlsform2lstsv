@@ -3,7 +3,7 @@ import { convertAndParse, findRowsByClass, findRowByName } from './helpers';
 
 describe('Groups and Survey Structure', () => {
 	describe('explicit groups', () => {
-		test('converts begin_group and end_group', () => {
+		test('converts begin_group and end_group', async () => {
 			const survey = [
 				{ type: 'begin_group', name: 'demo', label: 'Demographics' },
 				{ type: 'text', name: 'name', label: 'Name' },
@@ -11,7 +11,7 @@ describe('Groups and Survey Structure', () => {
 				{ type: 'end_group' }
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const groups = findRowsByClass(rows, 'G');
 
 			expect(groups.length).toBeGreaterThan(0);
@@ -21,14 +21,14 @@ describe('Groups and Survey Structure', () => {
 
 		
 
-		test('auto-generates group name if missing', () => {
+		test('auto-generates group name if missing', async () => {
 			const survey = [
 				{ type: 'begin_group', label: 'Unnamed Group' },
 				{ type: 'text', name: 'q1', label: 'Question' },
 				{ type: 'end_group' }
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const groups = findRowsByClass(rows, 'G');
 
 			// Should have auto-generated group name
@@ -37,7 +37,7 @@ describe('Groups and Survey Structure', () => {
 			expect(autoGroup?.text).toBe('Unnamed Group');
 		});
 
-		test('handles multiple groups', () => {
+		test('handles multiple groups', async () => {
 			const survey = [
 				{ type: 'begin_group', name: 'g1', label: 'Group 1' },
 				{ type: 'text', name: 'q1', label: 'Q1' },
@@ -47,7 +47,7 @@ describe('Groups and Survey Structure', () => {
 				{ type: 'end_group' }
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const groups = findRowsByClass(rows, 'G');
 
 			// Should have at least 2 groups (plus possible default)
@@ -56,7 +56,7 @@ describe('Groups and Survey Structure', () => {
 			expect(findRowByName(rows, 'g2')).toBeDefined();
 		});
 
-		test('converts group with hint', () => {
+		test('converts group with hint', async () => {
 			const survey = [
 				{
 					type: 'begin_group',
@@ -68,13 +68,13 @@ describe('Groups and Survey Structure', () => {
 				{ type: 'end_group' }
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const group = findRowByName(rows, 'pers');
 
 			expect(group?.help).toBe('Please provide your personal information');
 		});
 
-		test('converts group with relevance', () => {
+		test('converts group with relevance', async () => {
 			const survey = [
 				{ type: 'select_one yesno', name: 'hasinfo', label: 'Provide info?' },
 				{
@@ -92,7 +92,7 @@ describe('Groups and Survey Structure', () => {
 				{ list_name: 'yesno', name: 'no', label: 'No' }
 			];
 
-			const rows = convertAndParse(survey, choices);
+			const rows = await convertAndParse(survey, choices);
 			const group = findRowByName(rows, 'det');
 
 			expect(group?.relevance).toContain('hasinfo'); // Underscores removed
@@ -100,13 +100,13 @@ describe('Groups and Survey Structure', () => {
 	});
 
 	describe('default group', () => {
-		test('creates default group when no groups defined', () => {
+		test('creates default group when no groups defined', async () => {
 			const survey = [
 				{ type: 'text', name: 'q1', label: 'Question 1' },
 				{ type: 'text', name: 'q2', label: 'Question 2' }
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const groups = findRowsByClass(rows, 'G');
 
 			// Should have a default group
@@ -114,14 +114,14 @@ describe('Groups and Survey Structure', () => {
 			expect(groups[0].text).toBe('Questions');
 		});
 
-		test('does not create default group when explicit groups exist', () => {
+		test('does not create default group when explicit groups exist', async () => {
 			const survey = [
 				{ type: 'begin_group', name: 'g1', label: 'Group 1' },
 				{ type: 'text', name: 'q1', label: 'Q1' },
 				{ type: 'end_group' }
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const groups = findRowsByClass(rows, 'G');
 
 			// Should not have a default "Questions" group
@@ -131,7 +131,7 @@ describe('Groups and Survey Structure', () => {
 	});
 
 	describe('survey settings', () => {
-		test('creates survey settings rows', () => {
+		test('creates survey settings rows', async () => {
 			const survey = [
 				{ type: 'text', name: 'q1', label: 'Question' }
 			];
@@ -140,7 +140,7 @@ describe('Groups and Survey Structure', () => {
 				{ form_title: 'My Test Survey', default_language: 'en' }
 			];
 
-			const rows = convertAndParse(survey, [], settings);
+			const rows = await convertAndParse(survey, [], settings);
 			const settingsRows = findRowsByClass(rows, 'S');
 			const langRows = findRowsByClass(rows, 'SL');
 
@@ -156,12 +156,12 @@ describe('Groups and Survey Structure', () => {
 			expect(langRow?.text).toBe('en');
 		});
 
-		test('uses default values for missing settings', () => {
+		test('uses default values for missing settings', async () => {
 			const survey = [
 				{ type: 'text', name: 'q1', label: 'Question' }
 			];
 
-			const rows = convertAndParse(survey, [], [{}]);
+			const rows = await convertAndParse(survey, [], [{}]);
 			const langRows = findRowsByClass(rows, 'SL');
 
 			const titleRow = langRows.find(r => r.name === 'surveyls_title');
@@ -172,7 +172,7 @@ describe('Groups and Survey Structure', () => {
 	});
 
 	describe('overall structure', () => {
-		test('creates complete survey structure', () => {
+		test('creates complete survey structure', async () => {
 			const survey = [
 				{ type: 'note', name: 'intro', label: 'Welcome!' },
 				{ type: 'begin_group', name: 'demo', label: 'Demographics' },
@@ -184,7 +184,7 @@ describe('Groups and Survey Structure', () => {
 				{ type: 'end_group' }
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 
 			// Should have S (settings), SL (language settings), G (groups), Q (questions)
 			expect(findRowsByClass(rows, 'S').length).toBeGreaterThan(0);
@@ -193,7 +193,7 @@ describe('Groups and Survey Structure', () => {
 			expect(findRowsByClass(rows, 'Q').length).toBeGreaterThanOrEqual(4);
 		});
 
-		test('preserves question order within groups', () => {
+		test('preserves question order within groups', async () => {
 			const survey = [
 				{ type: 'begin_group', name: 'g1', label: 'Group' },
 				{ type: 'text', name: 'q1', label: 'First' },
@@ -202,7 +202,7 @@ describe('Groups and Survey Structure', () => {
 				{ type: 'end_group' }
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const questions = findRowsByClass(rows, 'Q');
 
 			const q1Index = questions.findIndex(q => q.name === 'q1');

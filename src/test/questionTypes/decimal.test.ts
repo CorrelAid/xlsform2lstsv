@@ -2,12 +2,12 @@ import { describe, test, expect } from 'vitest';
 import { convertAndParse, findRowByName } from '../helpers';
 
 describe('Decimal Question Type', () => {
-	test('converts basic decimal question', () => {
+	test('converts basic decimal question', async () => {
 		const survey = [
 			{ type: 'decimal', name: 'price', label: 'Enter price' }
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'price');
 
 		expect(question).toBeDefined();
@@ -16,18 +16,18 @@ describe('Decimal Question Type', () => {
 		expect(question?.text).toBe('Enter price');
 	});
 
-	test('converts required decimal question', () => {
+	test('converts required decimal question', async () => {
 		const survey = [
 			{ type: 'decimal', name: 'gpa', label: 'GPA', required: 'yes' }
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'gpa');
 
 		expect(question?.mandatory).toBe('Y');
 	});
 
-	test('converts decimal question with constraint', () => {
+	test('converts decimal question with constraint', async () => {
 		const survey = [
 			{
 				type: 'decimal',
@@ -37,25 +37,25 @@ describe('Decimal Question Type', () => {
 			}
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'score');
 
 		// AST-based converter returns LimeSurvey expressions for numeric ranges
 		expect(question?.em_validation_q).toBe('self >= 0 and self <= 100');
 	});
 
-	test('converts decimal question with default value', () => {
+	test('converts decimal question with default value', async () => {
 		const survey = [
 			{ type: 'decimal', name: 'rate', label: 'Rate', default: '3.5' }
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'rate');
 
 		expect(question?.default).toBe('3.5');
 	});
 
-	test('handles decimal question with hint', () => {
+	test('handles decimal question with hint', async () => {
 		const survey = [
 			{
 				type: 'decimal',
@@ -65,13 +65,13 @@ describe('Decimal Question Type', () => {
 			}
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'gpa');
 
 		expect(question?.help).toBe('Enter as decimal (e.g., 3.75)');
 	});
 
-	test('converts decimal question with relevance', () => {
+	test('converts decimal question with relevance', async () => {
 		const survey = [
 			{ type: 'integer', name: 'total', label: 'Total amount' },
 			{
@@ -82,7 +82,7 @@ describe('Decimal Question Type', () => {
 			}
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'percent');
 
 		expect(question?.relevance).toContain('total');

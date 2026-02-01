@@ -2,12 +2,12 @@ import { describe, test, expect } from 'vitest';
 import { convertAndParse, findRowByName, findRowsByClass } from '../helpers';
 
 describe('Text Question Type', () => {
-	test('converts basic text question', () => {
+	test('converts basic text question', async () => {
 		const survey = [
 			{ type: 'text', name: 'name', label: 'What is your name?' }
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'name');
 
 		expect(question).toBeDefined();
@@ -17,7 +17,7 @@ describe('Text Question Type', () => {
 		expect(question?.name).toBe('name');
 	});
 
-	test('converts text question with hint', () => {
+	test('converts text question with hint', async () => {
 		const survey = [
 			{
 				type: 'text',
@@ -27,35 +27,35 @@ describe('Text Question Type', () => {
 			}
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'addr');
 
 		expect(question?.help).toBe('Enter your full address');
 	});
 
-	test('converts required text question', () => {
+	test('converts required text question', async () => {
 		const survey = [
 			{ type: 'text', name: 'email', label: 'Email', required: 'yes' }
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'email');
 
 		expect(question?.mandatory).toBe('Y');
 	});
 
-	test('converts text question with default value', () => {
+	test('converts text question with default value', async () => {
 		const survey = [
 			{ type: 'text', name: 'cnt', label: 'Country', default: 'USA' }
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'cnt');
 
 		expect(question?.default).toBe('USA');
 	});
 
-	test('converts text question with relevance', () => {
+	test('converts text question with relevance', async () => {
 		const survey = [
 			{ type: 'text', name: 'q1', label: 'First question' },
 			{
@@ -66,37 +66,37 @@ describe('Text Question Type', () => {
 			}
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'q2');
 
 		expect(question?.relevance).toContain('q1');
 		expect(question?.relevance).toContain('!=');
 	});
 
-	test('auto-generates name for text question without name', () => {
+	test('auto-generates name for text question without name', async () => {
 		const survey = [
 			{ type: 'text', label: 'Question without name' }
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const questions = findRowsByClass(rows, 'Q');
 
 		expect(questions.length).toBeGreaterThan(0);
 		expect(questions[questions.length - 1].name).toMatch(/^Q\d+$/);
 	});
 
-	test('converts string type as short text', () => {
+	test('converts string type as short text', async () => {
 		const survey = [
 			{ type: 'string', name: 'str', label: 'String input' }
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'str');
 
 		expect(question?.['type/scale']).toBe('S');
 	});
 
-	test('preserves exact label text', () => {
+	test('preserves exact label text', async () => {
 		const survey = [
 			{
 				type: 'text',
@@ -105,7 +105,7 @@ describe('Text Question Type', () => {
 			}
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'q1');
 
 		expect(question?.text).toBe('What is your name? (First and Last)');

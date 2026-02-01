@@ -5,23 +5,23 @@ describe('Special Question Types', () => {
 
 
 	describe('unknown types', () => {
-		test('handles unknown type as short text', () => {
+		test('handles unknown type as short text', async () => {
 			const survey = [
 				{ type: 'unknown_type', name: 'q1', label: 'Question' }
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const question = findRowByName(rows, 'q1');
 
 			expect(question?.['type/scale']).toBe('S'); // Default fallback
 		});
 
-		test('handles empty type as short text', () => {
+		test('handles empty type as short text', async () => {
 			const survey = [
 				{ type: '', name: 'q2', label: 'Empty type question' }
 			];
 
-			const rows = convertAndParse(survey);
+			const rows = await convertAndParse(survey);
 			const question = findRowByName(rows, 'q2');
 
 			// Empty types should be handled gracefully - they might not create questions

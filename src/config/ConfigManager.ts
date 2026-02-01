@@ -1,8 +1,8 @@
-import { deepMerge } from '../utils/helpers';
+import { deepMerge } from '../utils/helpers.js';
 
-import { ConversionConfig, defaultConfig } from './types';
+import { ConversionConfig, defaultConfig } from './types.js';
 
-export { ConversionConfig } from './types';
+export { ConversionConfig } from './types.js';
 
 export class ConfigManager {
   private config: ConversionConfig;

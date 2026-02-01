@@ -8,7 +8,7 @@
  * then recursively transforms the AST nodes to LimeSurvey-compatible syntax.
  */
 
-import xpath from 'js-xpath';
+
 
 interface XPathNode {
   id?: string;
@@ -250,7 +250,7 @@ function transpile(node: XPathNode): string {
  * @param xpathExpr - The XPath expression to convert
  * @returns LimeSurvey Expression Manager syntax, or null if conversion fails
  */
-export function xpathToLimeSurvey(xpathExpr: string): string {
+export async function xpathToLimeSurvey(xpathExpr: string): Promise<string> {
   if (!xpathExpr || xpathExpr.trim() === '') {
     return '1'; // Default relevance expression
   }
@@ -272,7 +272,9 @@ export function xpathToLimeSurvey(xpathExpr: string): string {
   );
 
   try {
-    const parsed = xpath.parse(processedExpr) as XPathNode;
+    // Dynamic import of js-xpath
+    const JXpathModule = await import('js-xpath');
+    const parsed = (JXpathModule as any).default.parse(processedExpr) as XPathNode;
     return transpile(parsed);
   } catch (error: unknown) {
     console.error(`Transpilation error: ${(error as Error).message}`);
@@ -286,7 +288,7 @@ export function xpathToLimeSurvey(xpathExpr: string): string {
  * @param constraint - The XPath constraint expression
  * @returns Validation pattern (regex or EM equation)
  */
-export function convertConstraint(constraint: string): string {
+export async function convertConstraint(constraint: string): Promise<string> {
   if (!constraint) return '';
 
   try {
@@ -351,7 +353,8 @@ export function convertConstraint(constraint: string): string {
     }
 
     // Parse and transpile using AST
-    const parsed = xpath.parse(processedExpr) as XPathNode;
+    const JXpathModule = await import('js-xpath');
+    const parsed = (JXpathModule as any).default.parse(processedExpr) as XPathNode;
     const converted = transpile(parsed);
 
     if (converted && converted !== '1') {
@@ -423,15 +426,15 @@ function parseRegexMatchArguments(argsString: string): string[] {
  * @param xpath - The XPath relevance expression
  * @returns LimeSurvey Expression Manager syntax
  */
-export function convertRelevance(xpath: string): string {
-  if (!xpath) return '1';
+export async function convertRelevance(xpathExpr: string): Promise<string> {
+  if (!xpathExpr) return '1';
 
   // Preprocess: normalize operators to lowercase for jsxpath compatibility
-  let normalizedXPath = xpath
+  let normalizedXPath = xpathExpr
     .replace(/\bAND\b/gi, 'and')
     .replace(/\bOR\b/gi, 'or');
 
-  const result = xpathToLimeSurvey(normalizedXPath);
+  const result = await xpathToLimeSurvey(normalizedXPath);
 
   // Handle edge case: selected() with just {field} (without $)
   if (result && result.includes('selected(')) {

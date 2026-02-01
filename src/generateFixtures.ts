@@ -12,8 +12,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 
-import { SurveyRow, ChoiceRow, SettingsRow } from './config/types';
-import { XLSFormToTSVConverter } from './xlsformConverter';
+import { SurveyRow, ChoiceRow, SettingsRow } from './config/types.js';
+import { XLSFormToTSVConverter } from './xlsformConverter.js';
 
 interface XLSFormFixture {
   survey: SurveyRow[];
@@ -43,7 +43,7 @@ function cleanOutputDirectory(dir: string): void {
   }
 }
 
-function generateTSVFromFixture(fixturePath: string, outputPath: string): void {
+async function generateTSVFromFixture(fixturePath: string, outputPath: string): Promise<void> {
   console.log(`Processing: ${path.basename(fixturePath)}`);
 
   // Read fixture
@@ -54,7 +54,7 @@ function generateTSVFromFixture(fixturePath: string, outputPath: string): void {
   // This matches LimeSurvey's behavior (removes underscores but allows longer field names)
   // Answer codes are already limited to 5 chars in the fixtures
   const converter = new XLSFormToTSVConverter({});
-  const tsv = converter.convert(
+  const tsv = await converter.convert(
     fixture.survey,
     fixture.choices,
     fixture.settings
@@ -69,7 +69,7 @@ function generateTSVFromFixture(fixturePath: string, outputPath: string): void {
   console.log(`  → ${lines} rows (including header)`);
 }
 
-function main(): void {
+async function main(): Promise<void> {
   console.log('Generating TSV files from XLSForm fixtures...\n');
 
   // Ensure output directory exists and clean old files
@@ -94,7 +94,7 @@ function main(): void {
     const outputPath = path.join(OUTPUT_DIR, `${baseName}.tsv`);
 
     try {
-      generateTSVFromFixture(fixturePath, outputPath);
+      await generateTSVFromFixture(fixturePath, outputPath);
       successCount++;
     } catch (error) {
       console.error(`  ✗ Error processing ${baseName}:`, error);
@@ -118,4 +118,6 @@ function main(): void {
     process.exit(1);
   }
 }
-main();
+(async () => {
+  await main();
+})();

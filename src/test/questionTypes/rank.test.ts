@@ -2,29 +2,29 @@ import { describe, test, expect } from 'vitest';
 import { convertAndParse, findRowByName, findRowsByClass, createChoices } from '../helpers';
 
 describe('Rank Question Type', () => {
-	test('converts rank as ranking', () => {
+	test('converts rank as ranking', async () => {
 		const survey = [
 			{ type: 'rank', name: 'pref', label: 'Rank your preferences' }
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'pref');
 
 		expect(question?.['type/scale']).toBe('R');
 	});
 
-	test('converts rank with required', () => {
+	test('converts rank with required', async () => {
 		const survey = [
 			{ type: 'rank', name: 'priority', label: 'Priority ranking', required: 'yes' }
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'priority');
 
 		expect(question?.mandatory).toBe('Y');
 	});
 
-	test('converts rank with hint', () => {
+	test('converts rank with hint', async () => {
 		const survey = [
 			{
 				type: 'rank',
@@ -34,13 +34,13 @@ describe('Rank Question Type', () => {
 			}
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'order');
 
 		expect(question?.help).toBe('Drag and drop to rank from most to least important');
 	});
 
-	test('converts rank with relevance', () => {
+	test('converts rank with relevance', async () => {
 		const survey = [
 			{ type: 'select_one yesno', name: 'hasrank', label: 'Do you want to rank?' },
 			{
@@ -56,14 +56,14 @@ describe('Rank Question Type', () => {
 			{ list_name: 'yesno', name: 'no', label: 'No' }
 		];
 
-		const rows = convertAndParse(survey, choices);
+		const rows = await convertAndParse(survey, choices);
 		const question = findRowByName(rows, 'ranking');
 
 		expect(question?.relevance).toContain('hasrank'); // Underscores removed
 	});
 
 	describe('answer options', () => {
-		test('creates answer options for rank questions', () => {
+		test('creates answer options for rank questions', async () => {
 			const survey = [
 				{ type: 'rank priorities', name: 'ranking', label: 'Rank your priorities' }
 			];
@@ -74,7 +74,7 @@ describe('Rank Question Type', () => {
 				{ name: 'envr', label: 'Environment' }
 			]);
 
-			const rows = convertAndParse(survey, choices);
+			const rows = await convertAndParse(survey, choices);
 			const answers = findRowsByClass(rows, 'A');
 
 			expect(answers.length).toBeGreaterThanOrEqual(3);
@@ -83,20 +83,20 @@ describe('Rank Question Type', () => {
 			expect(answers.map(a => a.name)).toContain('envr');
 		});
 
-		test('handles rank questions with missing choice list', () => {
+		test('handles rank questions with missing choice list', async () => {
 			const survey = [
 				{ type: 'rank missing_list', name: 'ranking', label: 'Rank items' }
 			];
 
 			// Don't provide the choice list
-			const rows = convertAndParse(survey, []);
+			const rows = await convertAndParse(survey, []);
 			const question = findRowByName(rows, 'ranking');
 
 			expect(question).toBeDefined();
 			expect(question?.['type/scale']).toBe('R');
 		});
 
-		test('handles rank questions with or_other', () => {
+		test('handles rank questions with or_other', async () => {
 			const survey = [
 				{ type: 'rank options or_other', name: 'ranking', label: 'Rank options' }
 			];
@@ -106,7 +106,7 @@ describe('Rank Question Type', () => {
 				{ name: 'opt2', label: 'Option 2' }
 			]);
 
-			const rows = convertAndParse(survey, choices);
+			const rows = await convertAndParse(survey, choices);
 			const question = findRowByName(rows, 'ranking');
 
 			expect(question?.other).toBe('Y');

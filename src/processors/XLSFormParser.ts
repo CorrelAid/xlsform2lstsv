@@ -2,9 +2,9 @@
  * @file Main entrypoint of this library.
  */
 
-import { ConversionConfig } from '../config/ConfigManager';
+import { ConversionConfig } from '../config/ConfigManager.js';
 
-import { XLSLoader } from './XLSLoader';
+import { XLSLoader } from './XLSLoader.js';
 
 export class XLSFormParser {
 
@@ -18,13 +18,13 @@ export class XLSFormParser {
 		filePath: string,
 		config?: Partial<ConversionConfig>
 	): Promise<string> {
-		const { XLSFormToTSVConverter } = await import('../xlsformConverter');
+		const { XLSFormToTSVConverter } = await import('../xlsformConverter.js');
 		
 		// Load data (validation is included by default)
 		const { surveyData, choicesData, settingsData } = XLSLoader.parseXLSFile(filePath);
 		
 		const converter = new XLSFormToTSVConverter(config);
-		return converter.convert(surveyData, choicesData, settingsData);
+		return await converter.convert(surveyData, choicesData, settingsData);
 	}
 
 	/**
@@ -37,12 +37,12 @@ export class XLSFormParser {
 		data: Buffer | ArrayBuffer,
 		config?: Partial<ConversionConfig>
 	): Promise<string> {
-		const { XLSFormToTSVConverter } = await import('../xlsformConverter');
+		const { XLSFormToTSVConverter } = await import('../xlsformConverter.js');
 		
 		// Load data (validation is included by default)
 		const { surveyData, choicesData, settingsData } = XLSLoader.parseXLSData(data);
 		
 		const converter = new XLSFormToTSVConverter(config);
-		return converter.convert(surveyData, choicesData, settingsData);
+		return await converter.convert(surveyData, choicesData, settingsData);
 	}
 }

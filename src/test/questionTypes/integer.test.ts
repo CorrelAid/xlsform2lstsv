@@ -2,12 +2,12 @@ import { describe, test, expect } from 'vitest';
 import { convertAndParse, findRowByName } from '../helpers';
 
 describe('Integer Question Type', () => {
-	test('converts basic integer question', () => {
+	test('converts basic integer question', async () => {
 		const survey = [
 			{ type: 'integer', name: 'age', label: 'How old are you?' }
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'age');
 
 		expect(question).toBeDefined();
@@ -16,29 +16,29 @@ describe('Integer Question Type', () => {
 		expect(question?.text).toBe('How old are you?');
 	});
 
-	test('converts int type as numeric', () => {
+	test('converts int type as numeric', async () => {
 		const survey = [
 			{ type: 'int', name: 'count', label: 'Count' }
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'count');
 
 		expect(question?.['type/scale']).toBe('N');
 	});
 
-	test('converts required integer question', () => {
+	test('converts required integer question', async () => {
 		const survey = [
 			{ type: 'integer', name: 'year', label: 'Birth year', required: 'true' }
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'year');
 
 		expect(question?.mandatory).toBe('Y');
 	});
 
-	test('converts integer question with constraint', () => {
+	test('converts integer question with constraint', async () => {
 		const survey = [
 			{
 				type: 'integer',
@@ -48,25 +48,25 @@ describe('Integer Question Type', () => {
 			}
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'age');
 
 		// AST-based converter returns LimeSurvey expressions for numeric ranges
 		expect(question?.em_validation_q).toBe('self >= 18 and self <= 100');
 	});
 
-	test('converts integer question with default value', () => {
+	test('converts integer question with default value', async () => {
 		const survey = [
 			{ type: 'integer', name: 'qty', label: 'Quantity', default: '1' }
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'qty');
 
 		expect(question?.default).toBe('1');
 	});
 
-	test('converts integer question with relevance based on another numeric', () => {
+	test('converts integer question with relevance based on another numeric', async () => {
 		const survey = [
 			{ type: 'integer', name: 'inc', label: 'Annual income' },
 			{
@@ -77,14 +77,14 @@ describe('Integer Question Type', () => {
 			}
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'tax');
 
 		expect(question?.relevance).toContain('income');
 		expect(question?.relevance).toContain('>');
 	});
 
-	test('handles integer question with hint', () => {
+	test('handles integer question with hint', async () => {
 		const survey = [
 			{
 				type: 'integer',
@@ -94,7 +94,7 @@ describe('Integer Question Type', () => {
 			}
 		];
 
-		const rows = convertAndParse(survey);
+		const rows = await convertAndParse(survey);
 		const question = findRowByName(rows, 'score');
 
 		expect(question?.help).toBe('Enter a number between 0-100');

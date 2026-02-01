@@ -2,7 +2,7 @@ import { describe, test, expect } from 'vitest';
 import { convertAndParse, findRowByName, findRowsByClass, createChoices } from '../helpers';
 
 describe('Select One Question Type', () => {
-	test('converts basic select_one question', () => {
+	test('converts basic select_one question', async () => {
 		const survey = [
 			{ type: 'select_one yesno', name: 'agree', label: 'Do you agree?' }
 		];
@@ -12,14 +12,14 @@ describe('Select One Question Type', () => {
 			{ name: 'no', label: 'No' }
 		]);
 
-		const rows = convertAndParse(survey, choices);
+		const rows = await convertAndParse(survey, choices);
 		const question = findRowByName(rows, 'agree');
 
 		expect(question?.class).toBe('Q');
 		expect(question?.['type/scale']).toBe('L'); // List radio in LimeSurvey
 	});
 
-	test('creates answer options for select_one', () => {
+	test('creates answer options for select_one', async () => {
 		const survey = [
 			{ type: 'select_one colors', name: 'color', label: 'Favorite color?' }
 		];
@@ -30,7 +30,7 @@ describe('Select One Question Type', () => {
 			{ name: 'green', label: 'Green' }
 		]);
 
-		const rows = convertAndParse(survey, choices);
+		const rows = await convertAndParse(survey, choices);
 		const answers = findRowsByClass(rows, 'A');
 
 		expect(answers.length).toBeGreaterThanOrEqual(3);
@@ -39,7 +39,7 @@ describe('Select One Question Type', () => {
 		expect(answers.map(a => a.name)).toContain('green');
 	});
 
-	test('converts select_one with or_other', () => {
+	test('converts select_one with or_other', async () => {
 		const survey = [
 			{ type: 'select_one yesno or_other', name: 'cho', label: 'Choose' }
 		];
@@ -49,13 +49,13 @@ describe('Select One Question Type', () => {
 			{ name: 'no', label: 'No' }
 		]);
 
-		const rows = convertAndParse(survey, choices);
+		const rows = await convertAndParse(survey, choices);
 		const question = findRowByName(rows, 'cho');
 
 		expect(question?.other).toBe('Y');
 	});
 
-	test('handles select_one with required', () => {
+	test('handles select_one with required', async () => {
 		const survey = [
 			{
 				type: 'select_one yesno',
@@ -70,26 +70,26 @@ describe('Select One Question Type', () => {
 			{ name: 'no', label: 'No' }
 		]);
 
-		const rows = convertAndParse(survey, choices);
+		const rows = await convertAndParse(survey, choices);
 		const question = findRowByName(rows, 'reqcho');
 
 		expect(question?.mandatory).toBe('Y');
 	});
 
-	test('handles missing choice list gracefully', () => {
+	test('handles missing choice list gracefully', async () => {
 		const survey = [
 			{ type: 'select_one missing_list', name: 'q1', label: 'Question' }
 		];
 
 		// Don't provide the choice list
-		const rows = convertAndParse(survey, []);
+		const rows = await convertAndParse(survey, []);
 		const question = findRowByName(rows, 'q1');
 
 		expect(question).toBeDefined();
 		expect(question?.['type/scale']).toBe('L');
 	});
 
-	test('converts select_one with relevance', () => {
+	test('converts select_one with relevance', async () => {
 		const survey = [
 			{ type: 'select_one yesno', name: 'mar', label: 'Are you married?' },
 			{
@@ -105,7 +105,7 @@ describe('Select One Question Type', () => {
 			{ name: 'no', label: 'No' }
 		]);
 
-		const rows = convertAndParse(survey, choices);
+		const rows = await convertAndParse(survey, choices);
 		const spouseQuestion = findRowByName(rows, 'spous');
 
 		expect(spouseQuestion?.relevance).toContain('married'); // Underscores removed
@@ -113,7 +113,7 @@ describe('Select One Question Type', () => {
 		expect(spouseQuestion?.relevance).toContain('yes');
 	});
 
-	test('converts select_one with hint', () => {
+	test('converts select_one with hint', async () => {
 		const survey = [
 			{
 				type: 'select_one options',
@@ -128,13 +128,13 @@ describe('Select One Question Type', () => {
 			{ name: 'opt2', label: 'Option 2' }
 		]);
 
-		const rows = convertAndParse(survey, choices);
+		const rows = await convertAndParse(survey, choices);
 		const question = findRowByName(rows, 'opt');
 
 		expect(question?.help).toBe('Choose the best option');
 	});
 
-	test('handles select_one with required', () => {
+	test('handles select_one with required', async () => {
 		const survey = [
 			{
 				type: 'select_one yesno',
@@ -149,26 +149,26 @@ describe('Select One Question Type', () => {
 			{ name: 'no', label: 'No' }
 		]);
 
-		const rows = convertAndParse(survey, choices);
+		const rows = await convertAndParse(survey, choices);
 		const question = findRowByName(rows, 'reqcho');
 
 		expect(question?.mandatory).toBe('Y');
 	});
 
-	test('handles missing choice list gracefully', () => {
+	test('handles missing choice list gracefully', async () => {
 		const survey = [
 			{ type: 'select_one missing_list', name: 'q1', label: 'Question' }
 		];
 
 		// Don't provide the choice list
-		const rows = convertAndParse(survey, []);
+		const rows = await convertAndParse(survey, []);
 		const question = findRowByName(rows, 'q1');
 
 		expect(question).toBeDefined();
 		expect(question?.['type/scale']).toBe('L');
 	});
 
-	test('converts select_one with relevance', () => {
+	test('converts select_one with relevance', async () => {
 		const survey = [
 			{ type: 'select_one yesno', name: 'mar', label: 'Are you married?' },
 			{
@@ -184,7 +184,7 @@ describe('Select One Question Type', () => {
 			{ name: 'no', label: 'No' }
 		]);
 
-		const rows = convertAndParse(survey, choices);
+		const rows = await convertAndParse(survey, choices);
 		const spouseQuestion = findRowByName(rows, 'spous');
 
 		expect(spouseQuestion?.relevance).toContain('married'); // Underscores removed
@@ -193,7 +193,7 @@ describe('Select One Question Type', () => {
 	});
 
 	describe('choice filters', () => {
-		test('handles choice filters in relevance', () => {
+		test('handles choice filters in relevance', async () => {
 			const survey = [
 				{ type: 'select_one countries', name: 'cnt', label: 'Country' },
 				{ type: 'select_one cities', name: 'city', label: 'City' }
@@ -209,7 +209,7 @@ describe('Select One Question Type', () => {
 				{ list_name: 'cities', name: 'tor', label: 'Toronto', filter: 'can' }
 			];
 
-			const rows = convertAndParse(survey, choices);
+			const rows = await convertAndParse(survey, choices);
 			const nycAnswer = findRowByName(rows, 'nyc');
 			const torontoAnswer = findRowByName(rows, 'tor');
 
