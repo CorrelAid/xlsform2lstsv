@@ -1,0 +1,27 @@
+class	type/scale	name	relevance	text	help	language	validation	em_validation_q	mandatory	other	default	same_default
+S		language	1	en		en						
+S		additional_languages	1	es		en						
+SL		surveyls_title	1	Multilingual Survey		en						
+SL		surveyls_title	1	Encuesta multilingüe		es						
+G		demographics	1	Demographics		en						
+G		demographics	1	Datos demográficos		es						
+Q	S	name	1	What is your name?	Enter your full name	en						
+Q	S	name	1	¿Cuál es tu nombre?	Ingresa tu nombre completo	es						
+Q	N	age	1	What is your age?		en						
+Q	N	age	1	¿Cuál es tu edad?		es						
+Q	L	gender	1	Gender		en						
+Q	L	gender	1	Género		es						
+A		male		Male		en						
+A		male		Masculino		es						
+A		femal		Female		en						
+A		femal		Femenino		es						
+A		other		Other		en						
+A		other		Otro		es						
+Q	L	satisfaction	1	How satisfied are you?		en						
+Q	L	satisfaction	1	¿Qué tan satisfecho estás?		es						
+A		happy		Very satisfied		en						
+A		happy		Muy satisfecho		es						
+A		neutr		Neutral		en						
+A		neutr		Neutral		es						
+A		unhap		Not satisfied		en						
+A		unhap		No satisfecho		es						

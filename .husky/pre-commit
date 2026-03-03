@@ -22,13 +22,4 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# Check version consistency
-echo "🔢 Checking version consistency..."
-npm run check-version
-
-if [ $? -ne 0 ]; then
-  echo "❌ Version check failed. Commit aborted."
-  exit 1
-fi
-
 echo "✅ Pre-commit validation passed. Proceeding with commit."

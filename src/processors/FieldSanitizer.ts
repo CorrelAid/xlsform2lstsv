@@ -11,8 +11,8 @@ export class FieldSanitizer {
     // Answer codes in LimeSurvey have a 5-character limit
     let result = code;
     
-    // Always remove underscores (LimeSurvey removes them automatically)
-    result = result.replace(/_/g, '');
+    // Always remove underscores and hyphens (LimeSurvey only allows alphanumeric)
+    result = result.replace(/[_-]/g, '');
     
     // Limit to 5 characters (LimeSurvey answer codes limit)
     const maxLength = 5;

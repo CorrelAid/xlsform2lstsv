@@ -6,20 +6,22 @@ import { TSVGenerator } from './processors/TSVGenerator.js';
 import { TypeMapper, TypeInfo, LSType } from './processors/TypeMapper.js';
 import { getBaseLanguage } from './utils/languageUtils.js';
 
+// Metadata types that should be silently skipped (no visual representation)
+const SKIP_TYPES = [
+	'start', 'end', 'today', 'deviceid', 'username',
+	'calculate', 'hidden', 'audit'
+];
+
 // Unimplemented XLSForm types that should raise an error
 const UNIMPLEMENTED_TYPES = [
 	'geopoint', 'geotrace', 'geoshape', 'start-geopoint',
 	'image', 'audio', 'video', 'file',
 	'background-audio', 'csv-external', 'phonenumber', 'email',
 	'barcode',
-	'audit',
-	'calculate',
-	'hidden',
 	'range', // Range questions don't exist in LimeSurvey
 	'select_one_from_file', // External file loading not supported in LimeSurvey TSV import
 	'select_multiple_from_file', // External file loading not supported in LimeSurvey TSV import
 	'acknowledge', // Acknowledge type not supported in LimeSurvey TSV import
-	'start', 'end', 'today', 'deviceid', 'username', // Record types not supported
 	'begin_repeat',
 	'end_repeat'
 ];
@@ -43,13 +45,15 @@ export class XLSFormToTSVConverter {
 	private subquestionSeq: number;
 	private availableLanguages: string[];
 	private baseLanguage: string;
+	private inMatrix: boolean;
+	private matrixListName: string | null;
 
 	constructor(config?: Partial<ConversionConfig>) {
 		this.configManager = new ConfigManager(config);
 		this.configManager.validateConfig();
-		
+
 		this.fieldSanitizer = new FieldSanitizer();
-		
+
 		this.typeMapper = new TypeMapper();
 
 		this.tsvGenerator = new TSVGenerator();
@@ -61,6 +65,8 @@ export class XLSFormToTSVConverter {
 		this.subquestionSeq = 0;
 		this.availableLanguages = ['en']; // Default to English
 		this.baseLanguage = 'en'; // Default to English
+		this.inMatrix = false;
+		this.matrixListName = null;
 	}
 
 	/**
@@ -90,6 +96,8 @@ export class XLSFormToTSVConverter {
 		this.questionSeq = 0;
 		this.answerSeq = 0;
 		this.subquestionSeq = 0;
+		this.inMatrix = false;
+		this.matrixListName = null;
 
 		// Set base language from settings first
 		this.baseLanguage = getBaseLanguage(settingsData[0] || {});
@@ -120,6 +128,9 @@ export class XLSFormToTSVConverter {
 			await this.processRow(row);
 		}
 
+		// Flush any pending matrix at the end
+		this.flushMatrix();
+
 		// Generate TSV
 		return this.tsvGenerator.generateTSV();
 	}
@@ -146,7 +157,6 @@ export class XLSFormToTSVConverter {
 		for (const [, value] of Object.entries(settings)) {
 			if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
 				// This looks like a language-specific field (e.g., {en: '...', es: '...'})
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 				for (const lang of Object.keys(value)) {
 					languageCodes.add(lang);
 				}
@@ -317,21 +327,27 @@ export class XLSFormToTSVConverter {
 
 		// Check for unimplemented types (extract base type first, before any spaces)
 		const baseType = xfType.split(/\s+/)[0];
-		
+
+		// Silently skip metadata types
+		if (SKIP_TYPES.includes(baseType)) {
+			return;
+		}
+
 		// Other unimplemented types throw errors
 		if (UNIMPLEMENTED_TYPES.includes(baseType)) {
 			throw new Error(`Unimplemented XLSForm type: '${baseType}'. This type is not currently supported.`);
 		}
 
 		if (xfType === 'begin_group' || xfType === 'begin group') {
+			this.flushMatrix();
 			await this.addGroup(row);
 			return;
 		}
 		if (xfType === 'end_group' || xfType === 'end group') {
+			this.flushMatrix();
 			this.currentGroup = null;
 			return;
 		}
-
 
 		// Handle notes and questions
 		await this.addQuestion(row);
@@ -347,10 +363,9 @@ export class XLSFormToTSVConverter {
 		
 		// If it's an object with language codes, get the specific language
 		if (typeof value === 'object' && value !== null) {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unnecessary-type-assertion
 			const valueObj: Record<string, unknown> = value as Record<string, unknown>;
 			if (languageCode in valueObj) {
-				return valueObj[languageCode] as string; // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+				return valueObj[languageCode] as string;
 			}
 			
 			// If it doesn't have the specific language, try to get any available language
@@ -401,6 +416,25 @@ export class XLSFormToTSVConverter {
 	}
 
 	private async addQuestion(row: SurveyRow): Promise<void> {
+		const xfTypeInfo = this.parseType(row.type || '');
+		const appearance = typeof row['appearance'] === 'string' ? row['appearance'].trim() : '';
+
+		// Matrix header: select_one with appearance "label"
+		if (appearance === 'label' && xfTypeInfo.base === 'select_one' && xfTypeInfo.listName) {
+			this.flushMatrix();
+			await this.addMatrixHeader(row, xfTypeInfo);
+			return;
+		}
+
+		// Matrix subquestion: select_one with appearance "list-nolabel" while in matrix mode
+		if (appearance === 'list-nolabel' && this.inMatrix && xfTypeInfo.base === 'select_one') {
+			await this.addMatrixSubquestion(row);
+			return;
+		}
+
+		// Non-matrix question: flush any pending matrix first
+		this.flushMatrix();
+
 		// Auto-generate name if missing (matches LimeSurvey behavior)
 		const questionName = row.name && row.name.trim() !== ''
 			? this.sanitizeName(row.name.trim())
@@ -408,7 +442,6 @@ export class XLSFormToTSVConverter {
 
 		this.questionSeq++;
 
-		const xfTypeInfo = this.parseType(row.type || '');
 		const lsType = this.mapType(xfTypeInfo);
 
 		// Notes have special handling
@@ -441,6 +474,101 @@ export class XLSFormToTSVConverter {
 		if (!isNote && xfTypeInfo.listName) {
 			this.addAnswers(xfTypeInfo, lsType);
 		}
+	}
+
+	private async addMatrixHeader(row: SurveyRow, xfTypeInfo: TypeInfo): Promise<void> {
+		const questionName = row.name && row.name.trim() !== ''
+			? this.sanitizeName(row.name.trim())
+			: `Q${this.questionSeq}`;
+
+		this.questionSeq++;
+		this.inMatrix = true;
+		this.matrixListName = xfTypeInfo.listName;
+		this.subquestionSeq = 0;
+
+		// Emit Q row with type F (Array)
+		for (const lang of this.availableLanguages) {
+			this.tsvGenerator.addRow({
+				class: 'Q',
+				'type/scale': 'F',
+				name: questionName,
+				relevance: await this.convertRelevance(row.relevant),
+				text: this.getLanguageSpecificValue(row.label, lang) || questionName,
+				help: this.getLanguageSpecificValue(row.hint, lang) || '',
+				language: lang,
+				validation: '',
+				em_validation_q: '',
+				mandatory: row.required === 'yes' || row.required === 'true' ? 'Y' : '',
+				other: '',
+				default: '',
+				same_default: ''
+			});
+		}
+	}
+
+	private async addMatrixSubquestion(row: SurveyRow): Promise<void> {
+		const sqName = row.name && row.name.trim() !== ''
+			? this.sanitizeName(row.name.trim())
+			: `SQ${this.subquestionSeq}`;
+
+		this.subquestionSeq++;
+
+		for (const lang of this.availableLanguages) {
+			this.tsvGenerator.addRow({
+				class: 'SQ',
+				'type/scale': '',
+				name: sqName,
+				relevance: await this.convertRelevance(row.relevant),
+				text: this.getLanguageSpecificValue(row.label, lang) || sqName,
+				help: '',
+				language: lang,
+				validation: '',
+				em_validation_q: '',
+				mandatory: row.required === 'yes' || row.required === 'true' ? 'Y' : '',
+				other: '',
+				default: '',
+				same_default: ''
+			});
+		}
+	}
+
+	private flushMatrix(): void {
+		if (!this.inMatrix || !this.matrixListName) {
+			this.inMatrix = false;
+			this.matrixListName = null;
+			return;
+		}
+
+		const choices = this.choicesMap.get(this.matrixListName);
+		if (choices) {
+			let seq = 0;
+			for (const choice of choices) {
+				const choiceName = choice.name && choice.name.trim() !== ''
+					? this.sanitizeAnswerCode(choice.name.trim())
+					: `A${seq++}`;
+
+				for (const lang of this.availableLanguages) {
+					this.tsvGenerator.addRow({
+						class: 'A',
+						'type/scale': '',
+						name: choiceName,
+						relevance: '',
+						text: this.getLanguageSpecificValue(choice.label, lang) || choiceName,
+						help: '',
+						language: lang,
+						validation: '',
+						em_validation_q: '',
+						mandatory: '',
+						other: '',
+						default: '',
+						same_default: ''
+					});
+				}
+			}
+		}
+
+		this.inMatrix = false;
+		this.matrixListName = null;
 	}
 
 	private parseType(typeStr: string): TypeInfo {

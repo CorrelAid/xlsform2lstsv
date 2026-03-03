@@ -1,5 +1,11 @@
 import { execSync } from 'child_process';
-import { VERSION_COMPATIBILITY } from '../src/config/version.ts';
+import { readFileSync } from 'fs';
+
+const packageJson = JSON.parse(readFileSync('package.json', 'utf-8'));
+
+const LIMESURVEY_TESTED_VERSIONS = [
+  "6.16.0", "6.16.1", "6.16.2", "6.16.3", "6.16.4", "6.16.5", "6.17.0", "6.17.2"
+];
 
 interface TestResult {
   version: string;
@@ -12,7 +18,7 @@ async function testLimeSurveyCompatibilitySafe() {
   const versionsToTest = getVersionsToTest();
   const results: TestResult[] = [];
   
-  console.log(`🔍 Testing xlsform2lstsv v${VERSION_COMPATIBILITY.xlsform2lstsv} compatibility`);
+  console.log(`🔍 Testing xlsform2lstsv v${packageJson.version} compatibility`);
   console.log(`📋 Testing ${versionsToTest.length} LimeSurvey versions...
 `);
   
@@ -103,13 +109,13 @@ function getVersionsToTest(): string[] {
   }
   
   // Use the tested versions array (simplified approach)
-  if (!VERSION_COMPATIBILITY.limeSurvey.tested || VERSION_COMPATIBILITY.limeSurvey.tested.length === 0) {
+  if (!LIMESURVEY_TESTED_VERSIONS || LIMESURVEY_TESTED_VERSIONS.length === 0) {
     throw new Error(
-      'No tested versions configured. Please specify versions in VERSION_COMPATIBILITY.limeSurvey.tested'
+      'No tested versions configured. Please specify versions in LIMESURVEY_TESTED_VERSIONS'
     );
   }
 
-  const versions = [...VERSION_COMPATIBILITY.limeSurvey.tested];
+  const versions = [...LIMESURVEY_TESTED_VERSIONS];
 
   return versions.sort(compareVersions);
 }

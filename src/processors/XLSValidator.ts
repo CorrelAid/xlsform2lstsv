@@ -30,25 +30,32 @@ export class XLSValidator {
 			return;
 		}
 
-		// Find the first non-empty row to check for headers
-		const firstNonEmptyRow = data.find(row => row && Object.keys(row).length > 0);
-		if (!firstNonEmptyRow) {
+		// Collect all column keys that appear across any row
+		const allColumns = new Set<string>();
+		for (const row of data) {
+			if (row && typeof row === 'object') {
+				for (const key of Object.keys(row)) {
+					allColumns.add(key);
+				}
+			}
+		}
+
+		if (allColumns.size === 0) {
 			console.warn(`Warning: Survey sheet "${sheetName}" has no valid data rows.`);
 			return;
 		}
 
-		// Check for required columns
+		// Check for required columns across all rows
 		const requiredColumns = ['type', 'name', 'label'];
-		const missingColumns = requiredColumns.filter(col => !firstNonEmptyRow[col]);
+		const missingColumns = requiredColumns.filter(col => !allColumns.has(col));
 
 		if (missingColumns.length > 0) {
 			throw new Error(`Survey sheet "${sheetName}" is missing required columns: ${missingColumns.join(', ')}. A survey sheet must contain type, name, and label columns.`);
 		}
 
 		// Warn about unexpected columns
-		const expectedColumns = ['type', 'name', 'label', 'hint', 'required', 'relevant', 'constraint', 'constraint_message', 'calculation', 'default'];
-		const allColumns = Object.keys(firstNonEmptyRow);
-		const unexpectedColumns = allColumns.filter(col => !expectedColumns.includes(col));
+		const expectedColumns = ['type', 'name', 'label', 'hint', 'required', 'relevant', 'constraint', 'constraint_message', 'calculation', 'default', 'appearance', 'parameters'];
+		const unexpectedColumns = [...allColumns].filter(col => !expectedColumns.includes(col) && !col.startsWith('_'));
 
 		if (unexpectedColumns.length > 0) {
 			console.warn(`Warning: Survey sheet "${sheetName}" contains unexpected columns: ${unexpectedColumns.join(', ')}. These columns will be ignored.`);
@@ -67,17 +74,25 @@ export class XLSValidator {
 			return;
 		}
 
-		// Find the first non-empty row to check for headers
-		const firstNonEmptyRow = data.find(row => row && Object.keys(row).length > 0);
-		if (!firstNonEmptyRow) {
+		// Collect all column keys that appear across any row
+		const allColumns = new Set<string>();
+		for (const row of data) {
+			if (row && typeof row === 'object') {
+				for (const key of Object.keys(row)) {
+					allColumns.add(key);
+				}
+			}
+		}
+
+		if (allColumns.size === 0) {
 			console.warn(`Warning: Choices sheet "${sheetName}" has no valid data rows.`);
 			return;
 		}
 
 		// Check for required columns (handle both list_name and list name variations)
-		const hasListName = firstNonEmptyRow['list_name'] || firstNonEmptyRow['list name'];
-		const hasName = firstNonEmptyRow['name'];
-		const hasLabel = firstNonEmptyRow['label'];
+		const hasListName = allColumns.has('list_name') || allColumns.has('list name');
+		const hasName = allColumns.has('name');
+		const hasLabel = allColumns.has('label');
 
 		const missingColumns = [];
 		if (!hasListName) missingColumns.push('list_name');
@@ -90,8 +105,7 @@ export class XLSValidator {
 
 		// Warn about unexpected columns
 		const expectedColumns = ['list_name', 'list name', 'name', 'label', 'filter'];
-		const allColumns = Object.keys(firstNonEmptyRow);
-		const unexpectedColumns = allColumns.filter(col => !expectedColumns.includes(col));
+		const unexpectedColumns = [...allColumns].filter(col => !expectedColumns.includes(col) && !col.startsWith('_'));
 
 		if (unexpectedColumns.length > 0) {
 			console.warn(`Warning: Choices sheet "${sheetName}" contains unexpected columns: ${unexpectedColumns.join(', ')}. These columns will be ignored.`);

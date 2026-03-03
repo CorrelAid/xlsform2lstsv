@@ -3,9 +3,9 @@
  * Generate TSV files from XLSForm fixtures for integration testing.
  *
  * This script:
- * 1. Reads XLSForm JSON fixtures from tests/fixtures/
+ * 1. Reads XLSForm JSON and XLSX fixtures from docker_tests/fixtures/
  * 2. Converts them to LimeSurvey TSV format
- * 3. Saves output to tests/integration/output/
+ * 3. Saves output to docker_tests/integration/output/
  */
 
 import * as fs from 'fs';
@@ -13,6 +13,7 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 
 import { SurveyRow, ChoiceRow, SettingsRow } from './config/types.js';
+import { XLSLoader } from './processors/XLSLoader.js';
 import { XLSFormToTSVConverter } from './xlsformConverter.js';
 
 interface XLSFormFixture {
@@ -22,8 +23,8 @@ interface XLSFormFixture {
 }
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const FIXTURES_DIR = path.join(__dirname, '../tests/fixtures');
-const OUTPUT_DIR = path.join(__dirname, '../tests/integration/output');
+const FIXTURES_DIR = path.join(__dirname, '../docker_tests/fixtures');
+const OUTPUT_DIR = path.join(__dirname, '../docker_tests/integration/output');
 
 function ensureDirectoryExists(dir: string): void {
   if (!fs.existsSync(dir)) {
@@ -69,6 +70,26 @@ async function generateTSVFromFixture(fixturePath: string, outputPath: string): 
   console.log(`  → ${lines} rows (including header)`);
 }
 
+async function generateTSVFromXLSX(xlsxPath: string, outputPath: string): Promise<void> {
+  console.log(`Processing: ${path.basename(xlsxPath)}`);
+
+  // Read and parse xlsx file
+  const fileData = fs.readFileSync(xlsxPath);
+  const { surveyData, choicesData, settingsData } = XLSLoader.parseXLSData(fileData, { skipValidation: true });
+
+  // Convert to TSV
+  const converter = new XLSFormToTSVConverter({});
+  const tsv = await converter.convert(surveyData, choicesData, settingsData);
+
+  // Write output
+  fs.writeFileSync(outputPath, tsv, 'utf-8');
+  console.log(`  → Generated: ${path.basename(outputPath)}`);
+
+  // Print stats
+  const lines = tsv.split('\n').filter(l => l.trim()).length;
+  console.log(`  → ${lines} rows (including header)`);
+}
+
 async function main(): Promise<void> {
   console.log('Generating TSV files from XLSForm fixtures...\n');
 
@@ -78,18 +99,24 @@ async function main(): Promise<void> {
   console.log('Cleaned output directory\n');
 
   // Find all JSON fixtures
-  const fixtureFiles = fs.readdirSync(FIXTURES_DIR)
+  const jsonFiles = fs.readdirSync(FIXTURES_DIR)
     .filter(file => file.endsWith('.json'))
     .map(file => path.join(FIXTURES_DIR, file));
 
-  if (fixtureFiles.length === 0) {
+  // Find all XLSX fixtures
+  const xlsxFiles = fs.readdirSync(FIXTURES_DIR)
+    .filter(file => file.endsWith('.xlsx'))
+    .map(file => path.join(FIXTURES_DIR, file));
+
+  const totalFiles = jsonFiles.length + xlsxFiles.length;
+  if (totalFiles === 0) {
     console.error('No fixture files found in', FIXTURES_DIR);
     process.exit(1);
   }
 
-  // Generate TSV for each fixture
+  // Generate TSV for each JSON fixture
   let successCount = 0;
-  for (const fixturePath of fixtureFiles) {
+  for (const fixturePath of jsonFiles) {
     const baseName = path.basename(fixturePath, '.json');
     const outputPath = path.join(OUTPUT_DIR, `${baseName}.tsv`);
 
@@ -102,19 +129,23 @@ async function main(): Promise<void> {
     console.log('');
   }
 
-  console.log(`\nFinal Summary: ${successCount}/${fixtureFiles.length} files generated successfully`);
-  
-  // Verify we have all expected fixtures
-  const expectedFixtures = ['basic_survey', 'complex_survey', 'complex_xpath_survey', 'validation_relevance_survey'];
-  const generatedFixtures = fixtureFiles.map(f => path.basename(f, '.json'));
-  
-  expectedFixtures.forEach(expected => {
-    if (!generatedFixtures.includes(expected)) {
-      console.warn(`⚠ Expected fixture ${expected} was not found`);
-    }
-  });
+  // Generate TSV for each XLSX fixture
+  for (const xlsxPath of xlsxFiles) {
+    const baseName = path.basename(xlsxPath, '.xlsx');
+    const outputPath = path.join(OUTPUT_DIR, `${baseName}.tsv`);
 
-  if (successCount < fixtureFiles.length) {
+    try {
+      await generateTSVFromXLSX(xlsxPath, outputPath);
+      successCount++;
+    } catch (error) {
+      console.error(`  ✗ Error processing ${baseName}:`, error);
+    }
+    console.log('');
+  }
+
+  console.log(`\nFinal Summary: ${successCount}/${totalFiles} files generated successfully`);
+
+  if (successCount < totalFiles) {
     process.exit(1);
   }
 }

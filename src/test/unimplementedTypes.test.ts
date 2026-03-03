@@ -138,89 +138,87 @@ describe('Unimplemented XLSForm Types Validation', () => {
 		});
 	});
 
-	describe('Record Types', () => {
-		test('throws error for unimplemented start type', async () => {
+	describe('Silently Skipped Types (metadata/record types)', () => {
+		test('silently skips start type', async () => {
 			const survey = [
-				{ type: 'start', name: 'start_time', label: 'Start time' }
+				{ type: 'start', name: 'start_time', label: 'Start time' },
+				{ type: 'text', name: 'q1', label: 'Question 1' }
 			];
 
-			await expect(() => convertAndParse(survey)).rejects.toThrow(
-				'Unimplemented XLSForm type: \'start\'. This type is not currently supported.'
-			);
+			const rows = await convertAndParse(survey);
+			expect(rows.find(r => r.name === 'starttime')).toBeUndefined();
+			expect(rows.find(r => r.name === 'q1')).toBeDefined();
 		});
 
-		test('throws error for unimplemented end type', async () => {
+		test('silently skips end type', async () => {
 			const survey = [
-				{ type: 'end', name: 'end_time', label: 'End time' }
+				{ type: 'end', name: 'end_time', label: 'End time' },
+				{ type: 'text', name: 'q1', label: 'Question 1' }
 			];
 
-			await expect(() => convertAndParse(survey)).rejects.toThrow(
-				'Unimplemented XLSForm type: \'end\'. This type is not currently supported.'
-			);
+			const rows = await convertAndParse(survey);
+			expect(rows.find(r => r.name === 'endtime')).toBeUndefined();
+			expect(rows.find(r => r.name === 'q1')).toBeDefined();
 		});
 
-		test('throws error for unimplemented today type', async () => {
+		test('silently skips today type', async () => {
 			const survey = [
-				{ type: 'today', name: 'today_date', label: 'Today date' }
+				{ type: 'today', name: 'today_date', label: 'Today date' },
+				{ type: 'text', name: 'q1', label: 'Question 1' }
 			];
 
-			await expect(() => convertAndParse(survey)).rejects.toThrow(
-				'Unimplemented XLSForm type: \'today\'. This type is not currently supported.'
-			);
+			const rows = await convertAndParse(survey);
+			expect(rows.find(r => r.name === 'todaydate')).toBeUndefined();
 		});
 
-		test('throws error for unimplemented deviceid type', async () => {
+		test('silently skips deviceid type', async () => {
 			const survey = [
-				{ type: 'deviceid', name: 'device_id', label: 'Device ID' }
+				{ type: 'deviceid', name: 'device_id', label: 'Device ID' },
+				{ type: 'text', name: 'q1', label: 'Question 1' }
 			];
 
-			await expect(() => convertAndParse(survey)).rejects.toThrow(
-				'Unimplemented XLSForm type: \'deviceid\'. This type is not currently supported.'
-			);
+			const rows = await convertAndParse(survey);
+			expect(rows.find(r => r.name === 'deviceid')).toBeUndefined();
 		});
 
-		test('throws error for unimplemented username type', async () => {
+		test('silently skips username type', async () => {
 			const survey = [
-				{ type: 'username', name: 'user_name', label: 'Username' }
+				{ type: 'username', name: 'user_name', label: 'Username' },
+				{ type: 'text', name: 'q1', label: 'Question 1' }
 			];
 
-			await expect(() => convertAndParse(survey)).rejects.toThrow(
-				'Unimplemented XLSForm type: \'username\'. This type is not currently supported.'
-			);
-		});
-	});
-
-	describe('Other Types', () => {
-		test('throws error for unimplemented audit type', async () => {
-			const survey = [
-				{ type: 'audit', name: 'audit_q', label: 'Audit Question' }
-			];
-
-			await expect(() => convertAndParse(survey)).rejects.toThrow(
-				'Unimplemented XLSForm type: \'audit\'. This type is not currently supported.'
-			);
-		});
-	});
-
-	describe('Calculation Types', () => {
-		test('throws error for unimplemented calculate type', async () => {
-			const survey = [
-				{ type: 'calculate', name: 'calc_q', label: 'Calculation', calculation: '${a} + ${b}' }
-			];
-
-			await expect(() => convertAndParse(survey)).rejects.toThrow(
-				'Unimplemented XLSForm type: \'calculate\'. This type is not currently supported.'
-			);
+			const rows = await convertAndParse(survey);
+			expect(rows.find(r => r.name === 'username')).toBeUndefined();
 		});
 
-		test('throws error for unimplemented hidden type', async () => {
+		test('silently skips audit type', async () => {
 			const survey = [
-				{ type: 'hidden', name: 'hidden_q', label: 'Hidden Field', calculation: 'uuid()' }
+				{ type: 'audit', name: 'audit_q', label: 'Audit Question' },
+				{ type: 'text', name: 'q1', label: 'Question 1' }
 			];
 
-			await expect(() => convertAndParse(survey)).rejects.toThrow(
-				'Unimplemented XLSForm type: \'hidden\'. This type is not currently supported.'
-			);
+			const rows = await convertAndParse(survey);
+			expect(rows.find(r => r.name === 'auditq')).toBeUndefined();
+		});
+
+		test('silently skips calculate type', async () => {
+			const survey = [
+				{ type: 'calculate', name: 'calc_q', label: 'Calculation', calculation: '${a} + ${b}' },
+				{ type: 'text', name: 'q1', label: 'Question 1' }
+			];
+
+			const rows = await convertAndParse(survey);
+			expect(rows.find(r => r.name === 'calcq')).toBeUndefined();
+		});
+
+		test('silently skips hidden type', async () => {
+			const survey = [
+				{ type: 'hidden', name: 'hidden_q', label: 'Hidden Field', calculation: 'uuid()' },
+				{ type: 'text', name: 'q1', label: 'Question 1' }
+			];
+
+			const rows = await convertAndParse(survey);
+			expect(rows.find(r => r.name === 'hiddenq')).toBeUndefined();
 		});
 	});
 

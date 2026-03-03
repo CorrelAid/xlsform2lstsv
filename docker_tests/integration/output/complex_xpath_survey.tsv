@@ -1,0 +1,12 @@
+class	type/scale	name	relevance	text	help	language	validation	em_validation_q	mandatory	other	default	same_default
+S		language	1	en		en						
+SL		surveyls_title	1	Complex XPath Survey		en						
+G		consentsection	1	Consent and Demographics		en						
+Q	S	consent	1	Do you consent to participate?		en						
+Q	N	age	1	What is your age?		en						
+Q	S	country	1	What country do you live in?		en						
+Q	S	adultconsent	"(consent==""yes"") and age >= 18"	Adult consent verification		en						
+Q	S	eligibleparticipant	age >= 18 and country == 'USA' or country == 'Canada'	Eligible participant		en						
+Q	S	validresponse	!(consent == '') and age > 0	Valid response check		en						
+Q	S	agecategory	1	Age category		en						
+Q	S	complexvalidation	consent == 'yes' and age >= 18 or country == 'USA'	Complex validation test		en		self >= 5 and self <= 100				

@@ -1,0 +1,383 @@
+class	type/scale	name	relevance	text	help	language	validation	em_validation_q	mandatory	other	default	same_default
+S		language	1	de		de						
+S		additional_languages	1	en		de						
+SL		surveyls_title	1	Untitled Survey		de						
+SL		surveyls_title	1	Untitled Survey		en						
+Q	M	projectrole202602DTC	"(projectid==""2026-02-DTC"")"	In welcher Rolle siehst du dich im Projekt Dare2Care?		de			Y			
+Q	M	projectrole202602DTC	"(projectid==""2026-02-DTC"")"	Which role do you think you could fill in Dare2Care?		en			Y			
+SQ		roles		Sparringspartner*in Surveydesign und Datenerhebung		de						
+SQ		roles		Sparringspartner*in Surveydesign und Datenerhebung		en						
+G		grouplt58n55	1	Deine Fähigkeiten und Erfahrungen		de						
+G		grouplt58n55	1	Your skills and experiences		en						
+G		ratingtechnologiesto	1	Tools		de						
+G		ratingtechnologiesto	1	Tools		en						
+Q	F	ratingtechnologiesto	1	Bitte bewerte Deine Erfahrung mit den folgenden Technologien und Tools:	Hier kannst du  mehr darüber lesen, wie wir die verschiedenen Erfahrungsstufen definieren: https://docs.correlaid.org/project-manual/data4good-projects#experience-scale	de						
+Q	F	ratingtechnologiesto	1	Please rate your experience with the following technologies and tools:	Read more about what the different experience labels mean for us: https://docs.correlaid.org/project-manual/data4good-projects#experience-scale	en						
+SQ		python	1	Python		de			Y			
+SQ		python	1	Python		en			Y			
+SQ		rstats	1	R		de			Y			
+SQ		rstats	1	R		en			Y			
+SQ		sql	1	SQL		de			Y			
+SQ		sql	1	SQL		en			Y			
+SQ		git	1	Git		de			Y			
+SQ		git	1	Git		en			Y			
+SQ		javascriptfrontend	1	Javascript (Frontend)		de			Y			
+SQ		javascriptfrontend	1	Javascript (Frontend)		en			Y			
+SQ		htmlcss	1	HTML/CSS		de			Y			
+SQ		htmlcss	1	HTML/CSS		en			Y			
+SQ		nodejs	1	Node.js		de			Y			
+SQ		nodejs	1	Node.js		en			Y			
+SQ		excel	1	Microsoft Excel		de			Y			
+SQ		excel	1	Microsoft Excel		en			Y			
+SQ		googlesheets	1	Google Sheets		de			Y			
+SQ		googlesheets	1	Google Sheets		en			Y			
+SQ		lamapoll	1	Lamapoll		de			Y			
+SQ		lamapoll	1	Lamapoll		en			Y			
+SQ		soscisurvey	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	SoSci Survey		de			Y			
+SQ		soscisurvey	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	SoSci Survey		en			Y			
+SQ		powerbi	1	Power BI		de			Y			
+SQ		powerbi	1	Power BI		en			Y			
+A		begin		Anfänger:in		de						
+A		begin		Beginner		en						
+A		user		Benutzer:in		de						
+A		user		User		en						
+A		advan		Fortgeschrittene:r		de						
+A		advan		Advanced		en						
+A		exper		Expert:in		de						
+A		exper		Expert		en						
+A		begin		Anfänger:in		de						
+A		begin		Beginner		en						
+A		user		Benutzer:in		de						
+A		user		User		en						
+A		advan		Fortgeschrittene:r		de						
+A		advan		Advanced		en						
+A		exper		Expert:in		de						
+A		exper		Expert		en						
+Q	S	toolsother	1	Andere relevante Tools	Bitte gib hier andere Tools an, die du kennst und die du für relevant erachtest.	de						
+Q	S	toolsother	1	Other relevant tools	Please specifiy other tools you know that you consider relevant	en						
+G		ratingtechniques	1	Techniken		de						
+G		ratingtechniques	1	Techniques		en						
+Q	F	ratingtechniqueshead	1	Bitte bewerte Deine Erfahrung mit den folgenden Techniken.	Hier kannst du  mehr darüber lesen, wie wir die verschiedenen Erfahrungsstufen definieren: https://docs.correlaid.org/project-manual/data4good-projects#experience-scale	de						
+Q	F	ratingtechniqueshead	1	Please rate your experience with the following techniques:	Read more about what the different experience labels mean for us: https://docs.correlaid.org/project-manual/data4good-projects#experience-scale	en						
+SQ		datacleaning	1	Datenbereinigung		de			Y			
+SQ		datacleaning	1	Data cleaning		en			Y			
+SQ		dataanonymization	1	Datenanonymisierung		de			Y			
+SQ		dataanonymization	1	Data anonymization		en			Y			
+SQ		databasemanagement	1	Datenbankmanagement		de			Y			
+SQ		databasemanagement	1	Database management		en			Y			
+SQ		descriptivestatistic	1	Deskriptive Statistik		de			Y			
+SQ		descriptivestatistic	1	Descriptive statistics		en			Y			
+SQ		datavisualization	1	Datenvisualisierung		de			Y			
+SQ		datavisualization	1	Data visualization		en			Y			
+SQ		inferentialstatistic	1	Inferenzstatistik		de			Y			
+SQ		inferentialstatistic	1	Inferential statistics		en			Y			
+SQ		regressionsandmodell	1	Regressionen und Modellierung		de			Y			
+SQ		regressionsandmodell	1	Regressions and modelling		en			Y			
+SQ		classification	1	Klassifizierung		de			Y			
+SQ		classification	1	Classification		en			Y			
+SQ		clustering	1	Clustering		de			Y			
+SQ		clustering	1	Clustering		en			Y			
+SQ		nlp	1	Natural Language Processing		de			Y			
+SQ		nlp	1	Natural Language Processing		en			Y			
+SQ		neuralnetworksanddee	1	Neuronale Netze/Deep Learning		de			Y			
+SQ		neuralnetworksanddee	1	Neural networks / Deep Learning		en			Y			
+SQ		imagedataprocessing	1	Verarbeitung von Bilddateien		de			Y			
+SQ		imagedataprocessing	1	Processing of image data		en			Y			
+SQ		audiodataprocessing	1	Verarbeitungen von Audiodateien		de			Y			
+SQ		audiodataprocessing	1	Processing of audio data		en			Y			
+SQ		surveydesign	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Entwicklung von Fragebögen		de			Y			
+SQ		surveydesign	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Survey design		en			Y			
+SQ		theoriesofchangedeve	1	Entwicklung von Wirkungsketten		de			Y			
+SQ		theoriesofchangedeve	1	Development of Theories of Change		en			Y			
+SQ		indicatordevelopment	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Entwicklung von Indikatoren		de			Y			
+SQ		indicatordevelopment	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Development of indicators		en			Y			
+SQ		datacollection	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Datenerhebung		de			Y			
+SQ		datacollection	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Data collection		en			Y			
+SQ		dataengineering	1	Data Engineering		de			Y			
+SQ		dataengineering	1	Data Engineering		en			Y			
+SQ		automation	1	Automatisierung		de			Y			
+SQ		automation	1	Automatation		en			Y			
+A		begin		Anfänger:in		de						
+A		begin		Beginner		en						
+A		user		Benutzer:in		de						
+A		user		User		en						
+A		advan		Fortgeschrittene:r		de						
+A		advan		Advanced		en						
+A		exper		Expert:in		de						
+A		exper		Expert		en						
+A		begin		Anfänger:in		de						
+A		begin		Beginner		en						
+A		user		Benutzer:in		de						
+A		user		User		en						
+A		advan		Fortgeschrittene:r		de						
+A		advan		Advanced		en						
+A		exper		Expert:in		de						
+A		exper		Expert		en						
+G		ratingtopics	1	Themen		de						
+G		ratingtopics	1	Topics		en						
+Q	F	ratingtopicsheader	1	Bitte bewerte Deine Erfahrung mit den folgenden Themen:	Hier kannst du  mehr darüber lesen, wie wir die verschiedenen Erfahrungsstufen definieren: https://docs.correlaid.org/project-manual/data4good-projects#experience-scale	de						
+Q	F	ratingtopicsheader	1	Please rate your experience with the following topics:	Read more about what the different experience labels mean for us: https://docs.correlaid.org/project-manual/data4good-projects#experience-scale	en						
+SQ		wirkungsmessung	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Wirkungsmessung		de			Y			
+SQ		wirkungsmessung	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Impact Measurement		en			Y			
+SQ		researchdesign	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Research Design		de			Y			
+SQ		researchdesign	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Research Design		en			Y			
+SQ		surveyresearch	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Umfrageforschung		de			Y			
+SQ		surveyresearch	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Survey Research		en			Y			
+SQ		dataprotection	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Datenschutz		de			Y			
+SQ		dataprotection	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Data protection		en			Y			
+SQ		datasecurity	1	Datensicherheit		de			Y			
+SQ		datasecurity	1	Data security		en			Y			
+SQ		workingagile	1	Agiles Arbeiten		de			Y			
+SQ		workingagile	1	Working agile		en			Y			
+SQ		projectmanagement	1	Projektmanagement		de			Y			
+SQ		projectmanagement	1	Project management		en			Y			
+SQ		ethicalcriticalai	1	Ethical AI/Critical AI		de			Y			
+SQ		ethicalcriticalai	1	Ethical AI/Critical AI		en			Y			
+SQ		dataethics	1	Datenethik		de			Y			
+SQ		dataethics	1	Data Ethics		en			Y			
+SQ		resiliencementalheal	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Resilienz und Mentale Gesundheit		de			Y			
+SQ		resiliencementalheal	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Resilience and mental health		en			Y			
+SQ		educationresearch	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Bildungsforschung o.ä.		de			Y			
+SQ		educationresearch	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Education research (or similar)		en			Y			
+A		begin		Anfänger:in		de						
+A		begin		Beginner		en						
+A		user		Benutzer:in		de						
+A		user		User		en						
+A		advan		Fortgeschrittene:r		de						
+A		advan		Advanced		en						
+A		exper		Expert:in		de						
+A		exper		Expert		en						
+A		begin		Anfänger:in		de						
+A		begin		Beginner		en						
+A		user		Benutzer:in		de						
+A		user		User		en						
+A		advan		Fortgeschrittene:r		de						
+A		advan		Advanced		en						
+A		exper		Expert:in		de						
+A		exper		Expert		en						
+G		grouppr7pr34	1	Du und das Projekt		de						
+G		grouppr7pr34	1	You and the project		en						
+Q	S	motivationskills	1	Bitte beschreibe hier, welche Deiner Fähigkeiten und Erfahrungen Dich besonders für die Teilnahme an diesem Projekt qualifizieren.	Bitte schreibe maximal 5 Sätze pro Projekt, auf das du dich bewerben möchtest.	de			Y			
+Q	S	motivationskills	1	Please describe here what skills and experiences you would bring to the project.	Please write maximum 5 sentences per project that you are applying to.	en			Y			
+Q	S	motivationwhy	1	Bitte beschreibe hier, warum Du Dich für dieses Projekt engagieren möchtest.	Bitte schreibe maximal 5 Sätze pro Projekt, auf das du dich bewerben möchtest.	de			Y			
+Q	S	motivationwhy	1	Please describe here why you want to get involved in this project.	Please write maximum 5 sentences per project that you are applying to.	en			Y			
+Q	L	pastapplications	1	Hast du dich in der Vergangenheit bereits auf CorrelAid-Projekte beworben?	Um möglichst vielen Personen die Gelegenheit zu geben, an unseren Projekten teilzunehmen, werden Bewerbungen von bisher unerfolgreichen Personen bei gleicher Eignung bevorzugt behandelt.	de			Y			
+Q	L	pastapplications	1	Have you applied to a CorrelAid project in the past?	In order to give as many people as possible the opportunity to participate in one of our projects, applications of individuals who have unsuccessfully applied in the past are preferred given equal suitability for the project.	en			Y			
+A		succe		Ja, und ich war mindestens einmal erfolgreich / Teil eines Projektteams.		de						
+A		succe		Yes, and I have been successful / part of a project team at least once.		en						
+A		notsu		Ja, aber ich war nicht erfolgreich / ich wurde bis jetzt immer abgelehnt.		de						
+A		notsu		Yes, but I have not been successful / all my applications have been rejected so far.		en						
+A		first		Nein, das ist meine erste Bewerbung.		de						
+A		first		No, this is my first application.		en						
+A		succe		Ja, und ich war mindestens einmal erfolgreich / Teil eines Projektteams.		de						
+A		succe		Yes, and I have been successful / part of a project team at least once.		en						
+A		notsu		Ja, aber ich war nicht erfolgreich / ich wurde bis jetzt immer abgelehnt.		de						
+A		notsu		Yes, but I have not been successful / all my applications have been rejected so far.		en						
+A		first		Nein, das ist meine erste Bewerbung.		de						
+A		first		No, this is my first application.		en						
+Q	S	pastapplicationsdeta	pastapplications == 'not_successful'	Bitte gib hier an, für welche Projekte du dich beworben hast, falls du dich noch erinnern kannst.	Grobe Angaben helfen uns auch schon weiter.	de						
+Q	S	pastapplicationsdeta	pastapplications == 'not_successful'	If you can remember, please specify which project(s) you have applied for.	Any information is helpful to us.	en						
+G		demographics	1	Über dich		de						
+G		demographics	1	About you		en						
+Q	S	firstname	1	Wie lautet dein Vorname?		de			Y			
+Q	S	firstname	1	What is your first name?		en			Y			
+Q	S	lastname	1	Wie lautet dein Nachname?		de			Y			
+Q	S	lastname	1	What is your last name?		en			Y			
+Q	S	emailaddress	1	Unter welcher E-Mail Adresse können wir dich erreichen?		de		regexMatch(self, '^[\w-\.]+@([\w-]+\.)+[\w-]{2,}$')	Y			
+Q	S	emailaddress	1	Which email address can we use to contact you?		en		regexMatch(self, '^[\w-\.]+@([\w-]+\.)+[\w-]{2,}$')	Y			
+Q	L	gender	1	Was ist dein Geschlecht?	Hinweis: Da wir bei CorrelAid nach dem Grundprinzip von Geschlechtergleichberechtigung arbeiten, ist diese Frage für uns besonders wichtig.	de			Y			
+Q	L	gender	1	What is your gender?	Note: We ask this question because we want to foster gender diversity within CorrelAid.	en			Y			
+A		femal		Weiblich		de						
+A		femal		Female		en						
+A		male		Männlich		de						
+A		male		Male		en						
+A		nonbi		Nicht-binär / non-binary		de						
+A		nonbi		Non-binary		en						
+A		notdi		Das möchte ich nicht angeben		de						
+A		notdi		I do not want to disclose my gender		en						
+A		selfi		Mein Geschlecht ist (eigene Angabe):		de						
+A		selfi		My gender is (manually specify):		en						
+A		femal		Weiblich		de						
+A		femal		Female		en						
+A		male		Männlich		de						
+A		male		Male		en						
+A		nonbi		Nicht-binär / non-binary		de						
+A		nonbi		Non-binary		en						
+A		notdi		Das möchte ich nicht angeben		de						
+A		notdi		I do not want to disclose my gender		en						
+A		selfi		Mein Geschlecht ist (eigene Angabe):		de						
+A		selfi		My gender is (manually specify):		en						
+Q	S	genderselfidentifica	gender == 'self_identification'	Mein Geschlecht ist:	Bitte gebe hier dein Geschlecht an.	de			Y			
+Q	S	genderselfidentifica	gender == 'self_identification'	My gender is:	Please specify your gender here.	en			Y			
+Q	L	consentprivacypolicy	1	Einwilligung in die Datenschutzerklärung	Ich habe den Disclaimer gelesen und erteile hiermit meine Zustimmung zur Erhebung, Verarbeitung und Nutzung meiner personenbezogener Daten (Geschlecht und persönliche Fähigkeiten) zu internen und externen Reporting- und Präsentationszwecken. Daneben erteile ich ausdrücklich die Erlaubnis meine Kontaktdaten (Name und E-Mail) zur Kontaktaufnahme zu nutzen und diese bei erfolgreicher Bewerbung mit dem Projektteam zu teilen.	de			Y			
+Q	L	consentprivacypolicy	1	Consent to privacy policy	I have read the disclaimer and hereby give my consent to the collection, processing and use of my personal data (gender and personal skills) for the team selection process and for internal and external reporting as well as presentation purposes. In addition, I expressly grant permission to use my contact details (name and e-mail) to contact me and to share them with the project team if the application is successful.	en			Y			
+A		yes		Ja		de						
+A		yes		Yes		en						
+A		yes		Ja		de						
+A		yes		Yes		en						
+G		groupgi4rv46	1	Hallo!		de						
+G		groupgi4rv46	1	Hallo!		en						
+Q	X	Hallo	1	Hallo!	"Hier kannst Du Dich auf das Projekt mit Dare2Care bewerben. Bitte beachte, dass du dir pro Woche ca. 4h Zeit für das Projekt nehmen können solltest. 
+
+Für die Umfrage benötigst Du 5 bis 10 Minuten. Mach Dir also keine Sorgen, falls Du auch mal Anfänger*in ankreuzt, du musst nicht alles schon perfekt können, um zum Projekt beitragen zu können. Das trifft vor allem auf das Thema Wirkungsmessung zu. Unsere Projektkoordinator*innen kontaktieren Dich dann schnellstmöglich."	de						
+Q	X	Hallo	1	Hello!	"Here you can apply for the project with Dare2Care. Please note that you should be able to devote approximately 4 hours per week to the project. 
+
+The survey will take 5 to 10 minutes to complete. So don't worry if you check the “beginner” box—you don't have to be an expert to contribute to the project. This applies in particular to the topic of impact measurement. Our project coordinators will then contact you as soon as possible."	en						
+Q	X	Disclaimer	1	Disclaimer	"In der folgenden Umfrage fragen wir Daten zu Dir und Deiner bisherigen Berufserfahrung ab. Dabei erheben wir Deinen Namen und Deine Kontaktdaten, damit unsere Projektmanager*innen Dich kontaktieren können. Nach erfolgreicher Ausschreibung werden diese Daten auch mit dem Projektteam innerhalb unserer Organisation geteilt.
+
+Bei einer Umfrage hast Du gemäß der DSGVO das Recht auf Auskunft sowie Löschung Deiner personenbezogenen Daten. Du kannst diese Einwilligungserklärung jederzeit widerrufen. Schreib hierzu einfach eine E-Mail an info@correlaid.org. Nach erfolgtem Widerruf werden Deine Daten gelöscht."	de						
+Q	X	Disclaimer	1	Disclaimer	"In the following survey, we ask for information about you and your previous professional experience. We collect your name and contact details so that our project managers can contact you. Once you have been successfully selected, this data will also be shared with the project team within our organization.
+
+In accordance with the GDPR, you have the right to access and delete your personal data in a survey. You can revoke this declaration of consent at any time. Simply send an email to info@correlaid.org. Your data will be deleted after revocation."	en						
+Q	M	projectid	1	Für welche Projekte möchtest Du dich bewerben?		de			Y			
+Q	M	projectid	1	Which project(s) do you want to apply for?		en			Y			
+SQ		20260		Dare2Care		de						
+SQ		20260		Dare2Care		en						
+Q	M	projectrole202602DTC	"(projectid==""2026-02-DTC"")"	In welcher Rolle siehst du dich im Projekt Dare2Care?		de			Y			
+Q	M	projectrole202602DTC	"(projectid==""2026-02-DTC"")"	Which role do you think you could fill in Dare2Care?		en			Y			
+SQ		roles		Sparringspartner*in Surveydesign und Datenerhebung		de						
+SQ		roles		Sparringspartner*in Surveydesign und Datenerhebung		en						
+G		grouplt58n55	1	Deine Fähigkeiten und Erfahrungen		de						
+G		grouplt58n55	1	Your skills and experiences		en						
+G		ratingtechnologiesto	1	Tools		de						
+G		ratingtechnologiesto	1	Tools		en						
+Q	F	ratingtechnologiesto	1	Bitte bewerte Deine Erfahrung mit den folgenden Technologien und Tools:	Hier kannst du  mehr darüber lesen, wie wir die verschiedenen Erfahrungsstufen definieren: https://docs.correlaid.org/project-manual/data4good-projects#experience-scale	de						
+Q	F	ratingtechnologiesto	1	Please rate your experience with the following technologies and tools:	Read more about what the different experience labels mean for us: https://docs.correlaid.org/project-manual/data4good-projects#experience-scale	en						
+SQ		soscisurvey	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	SoSci Survey		de			Y			
+SQ		soscisurvey	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	SoSci Survey		en			Y			
+A		begin		Anfänger:in		de						
+A		begin		Beginner		en						
+A		user		Benutzer:in		de						
+A		user		User		en						
+A		advan		Fortgeschrittene:r		de						
+A		advan		Advanced		en						
+A		exper		Expert:in		de						
+A		exper		Expert		en						
+A		begin		Anfänger:in		de						
+A		begin		Beginner		en						
+A		user		Benutzer:in		de						
+A		user		User		en						
+A		advan		Fortgeschrittene:r		de						
+A		advan		Advanced		en						
+A		exper		Expert:in		de						
+A		exper		Expert		en						
+Q	S	toolsother	1	Andere relevante Tools	Bitte gib hier andere Tools an, die du kennst und die du für relevant erachtest.	de						
+Q	S	toolsother	1	Other relevant tools	Please specifiy other tools you know that you consider relevant	en						
+G		ratingtechniques	1	Techniken		de						
+G		ratingtechniques	1	Techniques		en						
+Q	F	ratingtechniqueshead	1	Bitte bewerte Deine Erfahrung mit den folgenden Techniken.	Hier kannst du  mehr darüber lesen, wie wir die verschiedenen Erfahrungsstufen definieren: https://docs.correlaid.org/project-manual/data4good-projects#experience-scale	de						
+Q	F	ratingtechniqueshead	1	Please rate your experience with the following techniques:	Read more about what the different experience labels mean for us: https://docs.correlaid.org/project-manual/data4good-projects#experience-scale	en						
+SQ		surveydesign	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Entwicklung von Fragebögen		de			Y			
+SQ		surveydesign	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Survey design		en			Y			
+SQ		indicatordevelopment	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Entwicklung von Indikatoren		de			Y			
+SQ		indicatordevelopment	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Development of indicators		en			Y			
+SQ		datacollection	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Datenerhebung		de			Y			
+SQ		datacollection	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Data collection		en			Y			
+A		begin		Anfänger:in		de						
+A		begin		Beginner		en						
+A		user		Benutzer:in		de						
+A		user		User		en						
+A		advan		Fortgeschrittene:r		de						
+A		advan		Advanced		en						
+A		exper		Expert:in		de						
+A		exper		Expert		en						
+A		begin		Anfänger:in		de						
+A		begin		Beginner		en						
+A		user		Benutzer:in		de						
+A		user		User		en						
+A		advan		Fortgeschrittene:r		de						
+A		advan		Advanced		en						
+A		exper		Expert:in		de						
+A		exper		Expert		en						
+G		ratingtopics	1	Themen		de						
+G		ratingtopics	1	Topics		en						
+Q	F	ratingtopicsheader	1	Bitte bewerte Deine Erfahrung mit den folgenden Themen:	Hier kannst du  mehr darüber lesen, wie wir die verschiedenen Erfahrungsstufen definieren: https://docs.correlaid.org/project-manual/data4good-projects#experience-scale	de						
+Q	F	ratingtopicsheader	1	Please rate your experience with the following topics:	Read more about what the different experience labels mean for us: https://docs.correlaid.org/project-manual/data4good-projects#experience-scale	en						
+SQ		wirkungsmessung	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Wirkungsmessung		de			Y			
+SQ		wirkungsmessung	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Impact Measurement		en			Y			
+SQ		researchdesign	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Research Design		de			Y			
+SQ		researchdesign	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Research Design		en			Y			
+SQ		surveyresearch	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Umfrageforschung		de			Y			
+SQ		surveyresearch	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Survey Research		en			Y			
+SQ		dataprotection	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Datenschutz		de			Y			
+SQ		dataprotection	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Data protection		en			Y			
+SQ		resiliencementalheal	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Resilienz und Mentale Gesundheit		de			Y			
+SQ		resiliencementalheal	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Resilience and mental health		en			Y			
+SQ		educationresearch	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Bildungsforschung o.ä.		de			Y			
+SQ		educationresearch	"(projectrole202602DTC==""role-surveydesign-datacollection"")"	Education research (or similar)		en			Y			
+A		begin		Anfänger:in		de						
+A		begin		Beginner		en						
+A		user		Benutzer:in		de						
+A		user		User		en						
+A		advan		Fortgeschrittene:r		de						
+A		advan		Advanced		en						
+A		exper		Expert:in		de						
+A		exper		Expert		en						
+A		begin		Anfänger:in		de						
+A		begin		Beginner		en						
+A		user		Benutzer:in		de						
+A		user		User		en						
+A		advan		Fortgeschrittene:r		de						
+A		advan		Advanced		en						
+A		exper		Expert:in		de						
+A		exper		Expert		en						
+G		grouppr7pr34	1	Du und das Projekt		de						
+G		grouppr7pr34	1	You and the project		en						
+Q	S	motivationskills	1	Bitte beschreibe hier, welche Deiner Fähigkeiten und Erfahrungen Dich besonders für die Teilnahme an diesem Projekt qualifizieren.	Bitte schreibe maximal 5 Sätze pro Projekt, auf das du dich bewerben möchtest.	de			Y			
+Q	S	motivationskills	1	Please describe here what skills and experiences you would bring to the project.	Please write maximum 5 sentences per project that you are applying to.	en			Y			
+Q	S	motivationwhy	1	Bitte beschreibe hier, warum Du Dich für dieses Projekt engagieren möchtest.	Bitte schreibe maximal 5 Sätze pro Projekt, auf das du dich bewerben möchtest.	de			Y			
+Q	S	motivationwhy	1	Please describe here why you want to get involved in this project.	Please write maximum 5 sentences per project that you are applying to.	en			Y			
+Q	L	pastapplications	1	Hast du dich in der Vergangenheit bereits auf CorrelAid-Projekte beworben?	Um möglichst vielen Personen die Gelegenheit zu geben, an unseren Projekten teilzunehmen, werden Bewerbungen von bisher unerfolgreichen Personen bei gleicher Eignung bevorzugt behandelt.	de			Y			
+Q	L	pastapplications	1	Have you applied to a CorrelAid project in the past?	In order to give as many people as possible the opportunity to participate in one of our projects, applications of individuals who have unsuccessfully applied in the past are preferred given equal suitability for the project.	en			Y			
+A		succe		Ja, und ich war mindestens einmal erfolgreich / Teil eines Projektteams.		de						
+A		succe		Yes, and I have been successful / part of a project team at least once.		en						
+A		notsu		Ja, aber ich war nicht erfolgreich / ich wurde bis jetzt immer abgelehnt.		de						
+A		notsu		Yes, but I have not been successful / all my applications have been rejected so far.		en						
+A		first		Nein, das ist meine erste Bewerbung.		de						
+A		first		No, this is my first application.		en						
+A		succe		Ja, und ich war mindestens einmal erfolgreich / Teil eines Projektteams.		de						
+A		succe		Yes, and I have been successful / part of a project team at least once.		en						
+A		notsu		Ja, aber ich war nicht erfolgreich / ich wurde bis jetzt immer abgelehnt.		de						
+A		notsu		Yes, but I have not been successful / all my applications have been rejected so far.		en						
+A		first		Nein, das ist meine erste Bewerbung.		de						
+A		first		No, this is my first application.		en						
+Q	S	pastapplicationsdeta	pastapplications == 'not_successful'	Bitte gib hier an, für welche Projekte du dich beworben hast, falls du dich noch erinnern kannst.	Grobe Angaben helfen uns auch schon weiter.	de						
+Q	S	pastapplicationsdeta	pastapplications == 'not_successful'	If you can remember, please specify which project(s) you have applied for.	Any information is helpful to us.	en						
+G		demographics	1	Über dich		de						
+G		demographics	1	About you		en						
+Q	S	firstname	1	Wie lautet dein Vorname?		de			Y			
+Q	S	firstname	1	What is your first name?		en			Y			
+Q	S	lastname	1	Wie lautet dein Nachname?		de			Y			
+Q	S	lastname	1	What is your last name?		en			Y			
+Q	S	emailaddress	1	Unter welcher E-Mail Adresse können wir dich erreichen?		de		regexMatch(self, '^[\w-\.]+@([\w-]+\.)+[\w-]{2,}$')	Y			
+Q	S	emailaddress	1	Which email address can we use to contact you?		en		regexMatch(self, '^[\w-\.]+@([\w-]+\.)+[\w-]{2,}$')	Y			
+Q	L	gender	1	Was ist dein Geschlecht?	Hinweis: Da wir bei CorrelAid nach dem Grundprinzip von Geschlechtergleichberechtigung arbeiten, ist diese Frage für uns besonders wichtig.	de			Y			
+Q	L	gender	1	What is your gender?	Note: We ask this question because we want to foster gender diversity within CorrelAid.	en			Y			
+A		femal		Weiblich		de						
+A		femal		Female		en						
+A		male		Männlich		de						
+A		male		Male		en						
+A		nonbi		Nicht-binär / non-binary		de						
+A		nonbi		Non-binary		en						
+A		notdi		Das möchte ich nicht angeben		de						
+A		notdi		I do not want to disclose my gender		en						
+A		selfi		Mein Geschlecht ist (eigene Angabe):		de						
+A		selfi		My gender is (manually specify):		en						
+A		femal		Weiblich		de						
+A		femal		Female		en						
+A		male		Männlich		de						
+A		male		Male		en						
+A		nonbi		Nicht-binär / non-binary		de						
+A		nonbi		Non-binary		en						
+A		notdi		Das möchte ich nicht angeben		de						
+A		notdi		I do not want to disclose my gender		en						
+A		selfi		Mein Geschlecht ist (eigene Angabe):		de						
+A		selfi		My gender is (manually specify):		en						
+Q	S	genderselfidentifica	gender == 'self_identification'	Mein Geschlecht ist:	Bitte gebe hier dein Geschlecht an.	de			Y			
+Q	S	genderselfidentifica	gender == 'self_identification'	My gender is:	Please specify your gender here.	en			Y			
+Q	L	consentprivacypolicy	1	Einwilligung in die Datenschutzerklärung	Ich habe den Disclaimer gelesen und erteile hiermit meine Zustimmung zur Erhebung, Verarbeitung und Nutzung meiner personenbezogener Daten (Geschlecht und persönliche Fähigkeiten) zu internen und externen Reporting- und Präsentationszwecken. Daneben erteile ich ausdrücklich die Erlaubnis meine Kontaktdaten (Name und E-Mail) zur Kontaktaufnahme zu nutzen und diese bei erfolgreicher Bewerbung mit dem Projektteam zu teilen.	de			Y			
+Q	L	consentprivacypolicy	1	Consent to privacy policy	I have read the disclaimer and hereby give my consent to the collection, processing and use of my personal data (gender and personal skills) for the team selection process and for internal and external reporting as well as presentation purposes. In addition, I expressly grant permission to use my contact details (name and e-mail) to contact me and to share them with the project team if the application is successful.	en			Y			
+A		yes		Ja		de						
+A		yes		Yes		en						
+A		yes		Ja		de						
+A		yes		Yes		en						

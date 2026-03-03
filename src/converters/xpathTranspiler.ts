@@ -28,10 +28,10 @@ interface XPathNode {
 }
 
 /**
- * Sanitize field names by removing underscores to match LimeSurvey's naming conventions
+ * Sanitize field names by removing underscores and hyphens to match LimeSurvey's naming conventions
  */
 function sanitizeName(name: string): string {
-  return name.replace(/_/g, '');
+  return name.replace(/[_-]/g, '');
 }
 
 /**
@@ -258,14 +258,14 @@ export async function xpathToLimeSurvey(xpathExpr: string): Promise<string> {
   // Preprocess XLSForm template syntax to standard XPath
   let processedExpr = xpathExpr;
 
-  // Convert ${field} to field references
-  processedExpr = processedExpr.replace(/\$\{(\w+)\}/g, (match: string, fieldName: string) => {
+  // Convert ${field} to field references (supports hyphens and other chars in names)
+  processedExpr = processedExpr.replace(/\$\{([^}]+)\}/g, (match: string, fieldName: string) => {
     return sanitizeName(fieldName);
   });
 
   // Convert selected(${field}, 'value') to selected(field, 'value')
   processedExpr = processedExpr.replace(
-    /selected\(\s*\$\{(\w+)\}\s*,\s*['"]([^'"]+)['"]\s*\)/g,
+    /selected\(\s*\$\{([^}]+)\}\s*,\s*['"]([^'"]+)['"]\s*\)/g,
     (match: string, fieldName: string, value: string) => {
       return `selected(${sanitizeName(fieldName)}, '${value}')`;
     }

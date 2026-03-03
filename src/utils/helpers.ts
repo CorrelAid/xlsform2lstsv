@@ -28,13 +28,13 @@ function isObject(item: unknown): item is object {
 
 /**
  * Sanitize field names for LimeSurvey compatibility
- * Removes underscores and truncates to 20 characters (LimeSurvey question title limit)
+ * Removes underscores/hyphens and truncates to 20 characters (LimeSurvey question title limit)
  */
 export function sanitizeFieldName(name: string): string {
   let result = name;
-  
-  // Always remove underscores (LimeSurvey removes them automatically)
-  result = result.replace(/_/g, '');
+
+  // Always remove underscores and hyphens (LimeSurvey only allows alphanumeric)
+  result = result.replace(/[_-]/g, '');
   
   // Limit to 20 characters (LimeSurvey questions.title field limit)
   const maxLength = 20;
