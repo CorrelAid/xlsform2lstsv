@@ -6,6 +6,9 @@ dist/
 
 .claude/*
 
+# Python cache
+__pycache__/
+
 # Coverage files
 coverage/
 .coverage
