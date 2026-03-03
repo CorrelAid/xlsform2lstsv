@@ -67,17 +67,111 @@ describe('Integration: testB.xlsx', () => {
 		const rows = parseTSV(tsv);
 
 		// The sosci_survey subquestion should have a proper relevance expression
-		// original: selected(${project_role_2026-02-DTC}, 'role-surveydesign-datacollection')
+		// original: selected(${project_role_project-alpha}, 'role-survey-design')
 		const sqRow = rows.find(r => r.class === 'SQ' && r.name === 'soscisurvey');
 		expect(sqRow).toBeDefined();
-		expect(sqRow!.relevance).toContain('projectrole202602DTC');
-		expect(sqRow!.relevance).toContain('role-surveydesign-datacollection');
+		expect(sqRow!.relevance).toContain('projectroleprojectalpha');
+		expect(sqRow!.relevance).toContain('role-survey-design');
+
+		// Project-beta role relevance: selected(${project_role_project-beta}, 'role-visualization')
+		const powerbiRow = rows.find(r => r.class === 'SQ' && r.name === 'powerbi');
+		expect(powerbiRow).toBeDefined();
+		expect(powerbiRow!.relevance).toContain('projectroleprojectbeta');
+		expect(powerbiRow!.relevance).toContain('role-visualization');
+
+		// Project-gamma role relevance: selected(${project_role_project-gamma}, 'role-machine-learning')
+		const jupyterRow = rows.find(r => r.class === 'SQ' && r.name === 'jupyter');
+		expect(jupyterRow).toBeDefined();
+		expect(jupyterRow!.relevance).toContain('projectroleprojectgamma');
+		expect(jupyterRow!.relevance).toContain('role-machine-learning');
 
 		// Simple equality relevant: ${past_applications} = 'not_successful'
 		const pastDetailsRow = rows.find(r => r.name === 'pastapplicationsdeta' && r.class === 'Q');
 		expect(pastDetailsRow).toBeDefined();
 		expect(pastDetailsRow!.relevance).toContain('pastapplications');
 		expect(pastDetailsRow!.relevance).toContain('not_successful');
+	});
+
+	it('should preserve correct question ordering from the survey sheet', async () => {
+		const { surveyData, choicesData, settingsData } = XLSLoader.parseXLSData(testFileData, { skipValidation: true });
+
+		const converter = new XLSFormToTSVConverter();
+		const tsv = await converter.convert(surveyData, choicesData, settingsData);
+		const rows = parseTSV(tsv);
+
+		// Extract Q-class rows (questions) in order, deduplicate by name (multilingual rows)
+		const questionNames: string[] = [];
+		for (const r of rows) {
+			if (r.class === 'Q' && !questionNames.includes(r.name)) {
+				questionNames.push(r.name);
+			}
+		}
+
+		// Verify key ordering: notes -> project -> roles -> skills -> demographics
+		const indexOf = (name: string) => questionNames.indexOf(name);
+		expect(indexOf('Hallo')).toBeLessThan(indexOf('projectid'));
+		expect(indexOf('projectid')).toBeLessThan(indexOf('projectroleprojectal'));
+		expect(indexOf('projectroleprojectal')).toBeLessThan(indexOf('projectroleprojectbe'));
+		expect(indexOf('projectroleprojectbe')).toBeLessThan(indexOf('projectroleprojectga'));
+		expect(indexOf('projectroleprojectga')).toBeLessThan(indexOf('ratingtechnologiesto'));
+		expect(indexOf('ratingtechnologiesto')).toBeLessThan(indexOf('ratingtechniqueshead'));
+		expect(indexOf('ratingtechniqueshead')).toBeLessThan(indexOf('ratingtopicsheader'));
+		expect(indexOf('motivationskills')).toBeLessThan(indexOf('firstname'));
+		expect(indexOf('gender')).toBeLessThan(indexOf('consentprivacypolicy'));
+	});
+
+	it('should produce correct groups (parent-only flattened, orphans get auto-groups)', async () => {
+		const { surveyData, choicesData, settingsData } = XLSLoader.parseXLSData(testFileData, { skipValidation: true });
+
+		const converter = new XLSFormToTSVConverter();
+		const tsv = await converter.convert(surveyData, choicesData, settingsData);
+		const rows = parseTSV(tsv);
+
+		// Extract unique group names from G-class rows
+		const groupNames = new Set<string>();
+		for (const r of rows) {
+			if (r.class === 'G') {
+				groupNames.add(r.name);
+			}
+		}
+
+		// grouplt58n55 is parent-only (no direct questions, only child groups)
+		// so it gets flattened into a note question instead of a G row
+		expect(groupNames).not.toContain('grouplt58n55');
+
+		// Named groups from the XLSForm
+		for (const group of [
+			'groupgi4rv46',
+			'ratingtechnologiesto',
+			'ratingtechniques',
+			'ratingtopics',
+			'grouppr7pr34',
+			'demographics',
+		]) {
+			expect(groupNames).toContain(group);
+		}
+
+		// Orphan questions (outside any group) get auto-generated groups:
+		// - project_id and project_role_* are between groupgi4rv46 and grouplt58n55
+		// - consent_privacy_policy is after demographics
+		expect(groupNames.size).toBe(8);
+
+		// projectroleprojectal must NOT be in the same group as Hallo
+		const gRows = rows.filter(r => r.class === 'G' || r.class === 'Q');
+		let currentGroup = '';
+		const questionGroup = new Map<string, string>();
+		for (const r of gRows) {
+			if (r.class === 'G') currentGroup = r.name;
+			if (r.class === 'Q') {
+				if (!questionGroup.has(r.name)) questionGroup.set(r.name, currentGroup);
+			}
+		}
+		expect(questionGroup.get('Hallo')).not.toBe(questionGroup.get('projectroleprojectal'));
+
+		// grouplt58n55 should appear as a note question (type X) in the first child group
+		const noteRow = rows.find(r => r.class === 'Q' && r.name === 'grouplt58n55');
+		expect(noteRow).toBeDefined();
+		expect(noteRow!['type/scale']).toBe('X');
 	});
 
 	it('should produce both languages (de and en)', async () => {

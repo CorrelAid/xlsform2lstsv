@@ -1,7 +1,8 @@
 class	type/scale	name	relevance	text	help	language	validation	em_validation_q	mandatory	other	default	same_default
 S		language	1	en		en						
+S		format	1	A		en						
 SL		surveyls_title	1	Complex XPath Survey		en						
-G		consentsection	1	Consent and Demographics		en						
+G	1	consentsection	1	Consent and Demographics		en						
 Q	S	consent	1	Do you consent to participate?		en						
 Q	N	age	1	What is your age?		en						
 Q	S	country	1	What country do you live in?		en						

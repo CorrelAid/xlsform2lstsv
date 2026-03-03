@@ -26,10 +26,24 @@ const UNIMPLEMENTED_TYPES = [
 	'end_repeat'
 ];
 
+// Appearances handled without warning: label, list-nolabel (matrix), multiline (→T), likert (no-op), field-list (no-op with format=A)
+const UNSUPPORTED_APPEARANCES = [
+	'minimal', 'quick', 'no-calendar', 'month-year', 'year',
+	'horizontal-compact', 'horizontal', 'compact', 'quickcompact',
+	'table-list', 'signature', 'draw', 'map', 'quick map',
+];
+
 // Naming convention:
 // - xfType: XLSForm type (string from row.type)
 // - xfTypeInfo: Parsed XLSForm type information (TypeInfo interface)
 // - lsType: LimeSurvey type information (LSType interface)
+
+interface TSVRowData {
+	class: string; 'type/scale': string; name: string; relevance: string;
+	text: string; help: string; language: string; validation: string;
+	em_validation_q: string; mandatory: string; other: string;
+	default: string; same_default: string;
+}
 
 export class XLSFormToTSVConverter {
 
@@ -39,6 +53,9 @@ export class XLSFormToTSVConverter {
 	private tsvGenerator: TSVGenerator;
 	private choicesMap: Map<string, ChoiceRow[]>;
 	private currentGroup: string | null;
+	private groupStack: Array<{ originalName: string; sanitizedName: string; emittedAsGroup: boolean }>;
+	private parentOnlyGroups: Set<string>;
+	private pendingGroupNotes: SurveyRow[];
 	private groupSeq: number;
 	private questionSeq: number;
 	private answerSeq: number;
@@ -47,6 +64,7 @@ export class XLSFormToTSVConverter {
 	private baseLanguage: string;
 	private inMatrix: boolean;
 	private matrixListName: string | null;
+	private groupContentBuffer: TSVRowData[];
 
 	constructor(config?: Partial<ConversionConfig>) {
 		this.configManager = new ConfigManager(config);
@@ -59,6 +77,9 @@ export class XLSFormToTSVConverter {
 		this.tsvGenerator = new TSVGenerator();
 		this.choicesMap = new Map();
 		this.currentGroup = null;
+		this.groupStack = [];
+		this.parentOnlyGroups = new Set();
+		this.pendingGroupNotes = [];
 		this.groupSeq = 0;
 		this.questionSeq = 0;
 		this.answerSeq = 0;
@@ -67,6 +88,7 @@ export class XLSFormToTSVConverter {
 		this.baseLanguage = 'en'; // Default to English
 		this.inMatrix = false;
 		this.matrixListName = null;
+		this.groupContentBuffer = [];
 	}
 
 	/**
@@ -91,6 +113,8 @@ export class XLSFormToTSVConverter {
 		// Reset state
 		this.choicesMap.clear();
 		this.currentGroup = null;
+		this.groupStack = [];
+		this.pendingGroupNotes = [];
 		this.tsvGenerator.clear();
 		this.groupSeq = 0;
 		this.questionSeq = 0;
@@ -98,6 +122,10 @@ export class XLSFormToTSVConverter {
 		this.subquestionSeq = 0;
 		this.inMatrix = false;
 		this.matrixListName = null;
+		this.groupContentBuffer = [];
+
+		// Pre-scan to identify parent-only groups (no direct questions, only child groups)
+		this.parentOnlyGroups = this.identifyParentOnlyGroups(surveyData);
 
 		// Set base language from settings first
 		this.baseLanguage = getBaseLanguage(settingsData[0] || {});
@@ -130,6 +158,9 @@ export class XLSFormToTSVConverter {
 
 		// Flush any pending matrix at the end
 		this.flushMatrix();
+
+		// Flush remaining buffered group content
+		this.flushGroupContent();
 
 		// Generate TSV
 		return this.tsvGenerator.generateTSV();
@@ -226,6 +257,32 @@ export class XLSFormToTSVConverter {
 		this.groupSeq++;
 	}
 
+	private addAutoGroupForOrphans(): void {
+		const groupName = `G${this.groupSeq}`;
+		this.groupSeq++;
+		this.currentGroup = groupName;
+
+		const groupSeqKey = String(this.groupSeq);
+
+		for (const lang of this.availableLanguages) {
+			this.tsvGenerator.addRow({
+				class: 'G',
+				'type/scale': groupSeqKey,
+				name: groupName,
+				relevance: '1',
+				text: groupName,
+				help: '',
+				language: lang,
+				validation: '',
+				em_validation_q: '',
+				mandatory: '',
+				other: '',
+				default: '',
+				same_default: ''
+			});
+		}
+	}
+
 	private addSurveyRow(settings: SettingsRow): void {
 		// Add survey-level settings as individual S rows
 		// Each survey property gets its own row with name=property_name, text=value
@@ -270,6 +327,23 @@ export class XLSFormToTSVConverter {
 				same_default: ''
 			});
 		}
+
+		// Set survey format to "All in one" (all groups/questions on one page)
+		this.tsvGenerator.addRow({
+			class: 'S',
+			'type/scale': '',
+			name: 'format',
+			relevance: '1',
+			text: 'A',
+			help: '',
+			language: this.baseLanguage,
+			validation: '',
+			em_validation_q: '',
+			mandatory: '',
+			other: '',
+			default: '',
+			same_default: ''
+		});
 
 		// First, add the default language row according to LimeSurvey spec
 		// This should be the first SL row for the default language
@@ -320,6 +394,40 @@ export class XLSFormToTSVConverter {
 		}
 	}
 
+	/**
+	 * Pre-scan survey data to identify parent-only groups.
+	 * A parent-only group contains no direct questions — only child groups.
+	 * These will be flattened into note questions in the first child group.
+	 */
+	private identifyParentOnlyGroups(surveyData: SurveyRow[]): Set<string> {
+		const parentOnly = new Set<string>();
+		const stack: string[] = [];
+		const hasDirectContent = new Map<string, boolean>();
+
+		for (const row of surveyData) {
+			const type = (row.type || '').trim();
+			const baseType = type.split(/\s+/)[0];
+
+			if (type === 'begin_group' || type === 'begin group') {
+				const name = (row.name || '').trim();
+				stack.push(name);
+				hasDirectContent.set(name, false);
+			} else if (type === 'end_group' || type === 'end group') {
+				const name = stack.pop();
+				if (name !== undefined && !hasDirectContent.get(name)) {
+					parentOnly.add(name);
+				}
+			} else if (type && !SKIP_TYPES.includes(baseType)) {
+				// Any non-skip, non-group row counts as direct content
+				if (stack.length > 0) {
+					hasDirectContent.set(stack[stack.length - 1], true);
+				}
+			}
+		}
+
+		return parentOnly;
+	}
+
 	private async processRow(row: SurveyRow): Promise<void> {
 		const xfType = (row.type || '').trim();
 
@@ -340,17 +448,81 @@ export class XLSFormToTSVConverter {
 
 		if (xfType === 'begin_group' || xfType === 'begin group') {
 			this.flushMatrix();
-			await this.addGroup(row);
+			const originalName = (row.name || '').trim();
+			const sanitizedName = originalName
+				? this.sanitizeName(originalName)
+				: `G${this.groupSeq}`;
+
+			if (this.parentOnlyGroups.has(originalName)) {
+				// Parent-only group: save label as pending note, don't emit G row
+				this.groupStack.push({ originalName, sanitizedName, emittedAsGroup: false });
+				this.pendingGroupNotes.push(row);
+			} else {
+				// Regular group: flush buffered content from previous group, then emit G row
+				this.groupStack.push({ originalName, sanitizedName, emittedAsGroup: true });
+				this.flushGroupContent();
+				await this.addGroup(row);
+				// Emit pending parent-only group notes as note questions in this group
+				await this.emitPendingGroupNotes();
+			}
 			return;
 		}
 		if (xfType === 'end_group' || xfType === 'end group') {
 			this.flushMatrix();
+			this.groupStack.pop();
+			// Restore currentGroup to nearest ancestor that was emitted as a group
 			this.currentGroup = null;
+			for (let i = this.groupStack.length - 1; i >= 0; i--) {
+				if (this.groupStack[i].emittedAsGroup) {
+					this.currentGroup = this.groupStack[i].sanitizedName;
+					break;
+				}
+			}
 			return;
+		}
+
+		// Auto-create a group for questions outside any explicit group.
+		// LimeSurvey requires every question to belong to a group.
+		if (this.currentGroup === null && this.groupStack.length === 0) {
+			this.flushGroupContent();
+			this.addAutoGroupForOrphans();
 		}
 
 		// Handle notes and questions
 		await this.addQuestion(row);
+	}
+
+	/**
+	 * Emit pending parent-only group labels as note questions (type X).
+	 * Called after a child group's G row is emitted.
+	 */
+	private async emitPendingGroupNotes(): Promise<void> {
+		for (const noteRow of this.pendingGroupNotes) {
+			const noteName = noteRow.name && noteRow.name.trim() !== ''
+				? this.sanitizeName(noteRow.name.trim())
+				: `GN${this.questionSeq}`;
+
+			this.questionSeq++;
+
+			for (const lang of this.availableLanguages) {
+				this.bufferRow({
+					class: 'Q',
+					'type/scale': 'X',
+					name: noteName,
+					relevance: await this.convertRelevance(noteRow.relevant),
+					text: this.getLanguageSpecificValue(noteRow.label, lang) || noteName,
+					help: this.getLanguageSpecificValue(noteRow.hint, lang) || '',
+					language: lang,
+					validation: '',
+					em_validation_q: '',
+					mandatory: '',
+					other: '',
+					default: '',
+					same_default: ''
+				});
+			}
+		}
+		this.pendingGroupNotes = [];
 	}
 
 	private getLanguageSpecificValue(value: unknown, languageCode: string): string | undefined {
@@ -377,6 +549,48 @@ export class XLSFormToTSVConverter {
 		return undefined;
 	}
 
+	/**
+	 * Buffer a Q/SQ/A row for later language-grouped output.
+	 * LimeSurvey's TSV importer uses a question_order counter ($qseq) that gets
+	 * reset when it encounters a translation of a previously-seen question.
+	 * With interleaved languages (Q de, Q en, Q de, Q en), the counter resets
+	 * after each translation, giving all subsequent questions order=0.
+	 * By outputting all base-language rows first, the counter increments correctly,
+	 * and translation rows just look up their stored values.
+	 */
+	private bufferRow(row: TSVRowData): void {
+		this.groupContentBuffer.push(row);
+	}
+
+	/**
+	 * Flush buffered group content, outputting base language rows first,
+	 * then each additional language. This preserves insertion order within
+	 * each language while ensuring LimeSurvey's question_order counter
+	 * increments correctly.
+	 */
+	private flushGroupContent(): void {
+		if (this.groupContentBuffer.length === 0) return;
+
+		// Output base language rows first (preserving insertion order)
+		for (const row of this.groupContentBuffer) {
+			if (row.language === this.baseLanguage) {
+				this.tsvGenerator.addRow(row);
+			}
+		}
+
+		// Then output each additional language (preserving insertion order)
+		for (const lang of this.availableLanguages) {
+			if (lang === this.baseLanguage) continue;
+			for (const row of this.groupContentBuffer) {
+				if (row.language === lang) {
+					this.tsvGenerator.addRow(row);
+				}
+			}
+		}
+
+		this.groupContentBuffer = [];
+	}
+
 	private sanitizeName(name: string): string {
 		return this.fieldSanitizer.sanitizeName(name);
 	}
@@ -394,12 +608,17 @@ export class XLSFormToTSVConverter {
 		this.groupSeq++;
 		this.currentGroup = groupName;
 
-		// Groups support relevance but not validation
-		// Add group for each language
+		// Groups support relevance but not validation.
+		// LimeSurvey's TSV importer matches group translations across languages
+		// using the type/scale column as a stable group sequence key. Without it,
+		// an auto-counter resets on each language change and mismatches groups.
+		// We set type/scale to the group sequence number to ensure correct matching.
+		const groupSeqKey = String(this.groupSeq);
+
 		for (const lang of this.availableLanguages) {
 			this.tsvGenerator.addRow({
 				class: 'G',
-				'type/scale': '',
+				'type/scale': groupSeqKey,
 				name: groupName,
 				relevance: await this.convertRelevance(row.relevant),
 				text: this.getLanguageSpecificValue(row.label, lang) || groupName,
@@ -435,6 +654,16 @@ export class XLSFormToTSVConverter {
 		// Non-matrix question: flush any pending matrix first
 		this.flushMatrix();
 
+		// Warn on unsupported appearances
+		if (appearance) {
+			const parts = appearance.split(/\s+/);
+			for (const part of parts) {
+				if (UNSUPPORTED_APPEARANCES.includes(part)) {
+					console.warn(`Unsupported appearance "${part}" on question "${row.name}" will be ignored`);
+				}
+			}
+		}
+
 		// Auto-generate name if missing (matches LimeSurvey behavior)
 		const questionName = row.name && row.name.trim() !== ''
 			? this.sanitizeName(row.name.trim())
@@ -444,12 +673,21 @@ export class XLSFormToTSVConverter {
 
 		const lsType = this.mapType(xfTypeInfo);
 
+		// Appearance-based type overrides
+		if (appearance) {
+			const parts = appearance.split(/\s+/);
+			// multiline text → Long free text (T)
+			if (parts.includes('multiline') && (xfTypeInfo.base === 'text' || xfTypeInfo.base === 'string')) {
+				lsType.type = 'T';
+			}
+		}
+
 		// Notes have special handling
 		const isNote = xfTypeInfo.base === 'note';
 
 		// Add main question for each language
 		for (const lang of this.availableLanguages) {
-			this.tsvGenerator.addRow({
+			this.bufferRow({
 				class: 'Q',
 				'type/scale': isNote ? 'X' : lsType.type,
 				name: questionName,
@@ -488,7 +726,7 @@ export class XLSFormToTSVConverter {
 
 		// Emit Q row with type F (Array)
 		for (const lang of this.availableLanguages) {
-			this.tsvGenerator.addRow({
+			this.bufferRow({
 				class: 'Q',
 				'type/scale': 'F',
 				name: questionName,
@@ -514,7 +752,7 @@ export class XLSFormToTSVConverter {
 		this.subquestionSeq++;
 
 		for (const lang of this.availableLanguages) {
-			this.tsvGenerator.addRow({
+			this.bufferRow({
 				class: 'SQ',
 				'type/scale': '',
 				name: sqName,
@@ -548,7 +786,7 @@ export class XLSFormToTSVConverter {
 					: `A${seq++}`;
 
 				for (const lang of this.availableLanguages) {
-					this.tsvGenerator.addRow({
+					this.bufferRow({
 						class: 'A',
 						'type/scale': '',
 						name: choiceName,
@@ -597,7 +835,7 @@ export class XLSFormToTSVConverter {
 
 			// Add answer for each language
 			for (const lang of this.availableLanguages) {
-				this.tsvGenerator.addRow({
+				this.bufferRow({
 					class: answerClass,
 					'type/scale': '',
 					name: choiceName,

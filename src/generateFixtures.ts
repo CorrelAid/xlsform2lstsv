@@ -115,14 +115,14 @@ async function main(): Promise<void> {
   }
 
   // Generate TSV for each JSON fixture
-  let successCount = 0;
+  let jsonSuccessCount = 0;
   for (const fixturePath of jsonFiles) {
     const baseName = path.basename(fixturePath, '.json');
     const outputPath = path.join(OUTPUT_DIR, `${baseName}.tsv`);
 
     try {
       await generateTSVFromFixture(fixturePath, outputPath);
-      successCount++;
+      jsonSuccessCount++;
     } catch (error) {
       console.error(`  ✗ Error processing ${baseName}:`, error);
     }
@@ -130,22 +130,26 @@ async function main(): Promise<void> {
   }
 
   // Generate TSV for each XLSX fixture
+  // XLSX files may contain unimplemented types (e.g. range) — failures are logged but not fatal
+  let xlsxSuccessCount = 0;
   for (const xlsxPath of xlsxFiles) {
     const baseName = path.basename(xlsxPath, '.xlsx');
     const outputPath = path.join(OUTPUT_DIR, `${baseName}.tsv`);
 
     try {
       await generateTSVFromXLSX(xlsxPath, outputPath);
-      successCount++;
+      xlsxSuccessCount++;
     } catch (error) {
-      console.error(`  ✗ Error processing ${baseName}:`, error);
+      console.warn(`  ⚠ Skipped ${baseName}:`, (error as Error).message);
     }
     console.log('');
   }
 
-  console.log(`\nFinal Summary: ${successCount}/${totalFiles} files generated successfully`);
+  const totalSuccess = jsonSuccessCount + xlsxSuccessCount;
+  console.log(`\nFinal Summary: ${totalSuccess}/${totalFiles} files generated successfully`);
 
-  if (successCount < totalFiles) {
+  // Only fail if JSON fixtures (which should always succeed) had errors
+  if (jsonSuccessCount < jsonFiles.length) {
     process.exit(1);
   }
 }

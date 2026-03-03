@@ -664,6 +664,238 @@ describe('Language-Specific Parameters', () => {
 		});
 	});
 
+	describe('Language-grouped output ordering (LimeSurvey compatibility)', () => {
+		test('outputs all base-language Q rows before secondary-language Q rows within a group', async () => {
+			const survey = [
+				{
+					type: 'begin_group', name: 'g1',
+					label: { en: 'Group', de: 'Gruppe' },
+					_languages: ['en', 'de']
+				},
+				{
+					type: 'text', name: 'q1',
+					label: { en: 'First', de: 'Erste' },
+					_languages: ['en', 'de']
+				},
+				{
+					type: 'text', name: 'q2',
+					label: { en: 'Second', de: 'Zweite' },
+					_languages: ['en', 'de']
+				},
+				{
+					type: 'text', name: 'q3',
+					label: { en: 'Third', de: 'Dritte' },
+					_languages: ['en', 'de']
+				},
+				{ type: 'end_group' }
+			];
+
+			const settings = [{ form_title: 'Test', default_language: 'en' }];
+			const rows = await convertAndParse(survey, [], settings);
+			const questions = findRowsByClass(rows, 'Q');
+
+			// All en Q rows should come before all de Q rows
+			const lastEnIdx = Math.max(...questions.map((q, i) => q.language === 'en' ? i : -1));
+			const firstDeIdx = questions.findIndex(q => q.language === 'de');
+
+			expect(lastEnIdx).toBeLessThan(firstDeIdx);
+
+			// Order within en block preserved: q1 < q2 < q3
+			const enQs = questions.filter(q => q.language === 'en');
+			const enNames = enQs.map(q => q.name);
+			expect(enNames).toEqual(['q1', 'q2', 'q3']);
+
+			// Order within de block preserved: q1 < q2 < q3
+			const deQs = questions.filter(q => q.language === 'de');
+			const deNames = deQs.map(q => q.name);
+			expect(deNames).toEqual(['q1', 'q2', 'q3']);
+		});
+
+		test('language-groups SQ and A rows along with their parent Q', async () => {
+			const survey = [
+				{
+					type: 'begin_group', name: 'g1',
+					label: { en: 'Group', es: 'Grupo' },
+					_languages: ['en', 'es']
+				},
+				{
+					type: 'select_one opts', name: 'sel',
+					label: { en: 'Choose', es: 'Elegir' },
+					_languages: ['en', 'es']
+				},
+				{
+					type: 'text', name: 'other',
+					label: { en: 'Other', es: 'Otro' },
+					_languages: ['en', 'es']
+				},
+				{ type: 'end_group' }
+			];
+
+			const choices = [
+				{
+					list_name: 'opts', name: 'a',
+					label: { en: 'Opt A', es: 'Opc A' },
+					_languages: ['en', 'es']
+				},
+				{
+					list_name: 'opts', name: 'b',
+					label: { en: 'Opt B', es: 'Opc B' },
+					_languages: ['en', 'es']
+				}
+			];
+
+			const settings = [{ form_title: 'Test', default_language: 'en' }];
+			const rows = await convertAndParse(survey, choices, settings);
+
+			// Get all non-G, non-S, non-SL rows (the group content)
+			const content = rows.filter(r => !['G', 'S', 'SL'].includes(r.class));
+
+			// All en content rows should come before all es content rows
+			const lastEnIdx = Math.max(...content.map((r, i) => r.language === 'en' ? i : -1));
+			const firstEsIdx = content.findIndex(r => r.language === 'es');
+			expect(lastEnIdx).toBeLessThan(firstEsIdx);
+
+			// Within en block: Q sel → A a → A b → Q other
+			const enContent = content.filter(r => r.language === 'en');
+			const enClasses = enContent.map(r => `${r.class}:${r.name}`);
+			expect(enClasses).toEqual(['Q:sel', 'A:a', 'A:b', 'Q:other']);
+
+			// Within es block: same order
+			const esContent = content.filter(r => r.language === 'es');
+			const esClasses = esContent.map(r => `${r.class}:${r.name}`);
+			expect(esClasses).toEqual(['Q:sel', 'A:a', 'A:b', 'Q:other']);
+		});
+
+		test('language grouping resets at each group boundary', async () => {
+			const survey = [
+				{
+					type: 'begin_group', name: 'g1',
+					label: { en: 'Group 1', de: 'Gruppe 1' },
+					_languages: ['en', 'de']
+				},
+				{
+					type: 'text', name: 'q1',
+					label: { en: 'Q1 en', de: 'Q1 de' },
+					_languages: ['en', 'de']
+				},
+				{ type: 'end_group' },
+				{
+					type: 'begin_group', name: 'g2',
+					label: { en: 'Group 2', de: 'Gruppe 2' },
+					_languages: ['en', 'de']
+				},
+				{
+					type: 'text', name: 'q2',
+					label: { en: 'Q2 en', de: 'Q2 de' },
+					_languages: ['en', 'de']
+				},
+				{ type: 'end_group' }
+			];
+
+			const settings = [{ form_title: 'Test', default_language: 'en' }];
+			const rows = await convertAndParse(survey, [], settings);
+
+			// Expected order: G g1(en), G g1(de), Q q1(en), Q q1(de), G g2(en), G g2(de), Q q2(en), Q q2(de)
+			const contentRows = rows.filter(r => ['G', 'Q'].includes(r.class));
+			const sequence = contentRows.map(r => `${r.class}:${r.name}:${r.language}`);
+
+			// g1 content should be fully flushed before g2 starts
+			const g2Start = sequence.findIndex(s => s.startsWith('G:g2'));
+			const q1DeIdx = sequence.findIndex(s => s === 'Q:q1:de');
+			expect(q1DeIdx).toBeLessThan(g2Start);
+
+			// Within g2, en before de
+			const q2EnIdx = sequence.findIndex(s => s === 'Q:q2:en');
+			const q2DeIdx = sequence.findIndex(s => s === 'Q:q2:de');
+			expect(q2EnIdx).toBeLessThan(q2DeIdx);
+		});
+
+		test('language-groups matrix Q/SQ/A rows correctly', async () => {
+			const survey = [
+				{
+					type: 'begin_group', name: 'skills',
+					label: { en: 'Skills', de: 'Fähigkeiten' },
+					_languages: ['en', 'de']
+				},
+				{
+					type: 'select_one lvl', name: 'tools',
+					label: { en: 'Rate tools', de: 'Tools bewerten' },
+					appearance: 'label',
+					_languages: ['en', 'de']
+				},
+				{
+					type: 'select_one lvl', name: 'git',
+					label: { en: 'Git', de: 'Git' },
+					appearance: 'list-nolabel',
+					_languages: ['en', 'de']
+				},
+				{
+					type: 'text', name: 'note',
+					label: { en: 'Other tools', de: 'Andere Tools' },
+					_languages: ['en', 'de']
+				},
+				{ type: 'end_group' }
+			];
+
+			const choices = [
+				{
+					list_name: 'lvl', name: 'beg',
+					label: { en: 'Beginner', de: 'Anfänger' },
+					_languages: ['en', 'de']
+				},
+				{
+					list_name: 'lvl', name: 'exp',
+					label: { en: 'Expert', de: 'Experte' },
+					_languages: ['en', 'de']
+				}
+			];
+
+			const settings = [{ form_title: 'Test', default_language: 'en' }];
+			const rows = await convertAndParse(survey, choices, settings);
+
+			// Get all group content (Q, SQ, A)
+			const content = rows.filter(r => ['Q', 'SQ', 'A'].includes(r.class));
+
+			// All en rows come before all de rows
+			const lastEnIdx = Math.max(...content.map((r, i) => r.language === 'en' ? i : -1));
+			const firstDeIdx = content.findIndex(r => r.language === 'de');
+			expect(lastEnIdx).toBeLessThan(firstDeIdx);
+
+			// en block should have: Q(tools) → SQ(git) → A(beg) → A(exp) → Q(note)
+			const enContent = content.filter(r => r.language === 'en');
+			const enSeq = enContent.map(r => `${r.class}:${r.name}`);
+			expect(enSeq).toEqual(['Q:tools', 'SQ:git', 'A:beg', 'A:exp', 'Q:note']);
+
+			// de block should have the same structure
+			const deContent = content.filter(r => r.language === 'de');
+			const deSeq = deContent.map(r => `${r.class}:${r.name}`);
+			expect(deSeq).toEqual(['Q:tools', 'SQ:git', 'A:beg', 'A:exp', 'Q:note']);
+		});
+
+		test('single-language surveys are unaffected by language grouping', async () => {
+			const survey = [
+				{ type: 'begin_group', name: 'g1', label: 'Group' },
+				{ type: 'text', name: 'q1', label: 'First' },
+				{ type: 'select_one yn', name: 'q2', label: 'Yes or no?' },
+				{ type: 'text', name: 'q3', label: 'Third' },
+				{ type: 'end_group' }
+			];
+
+			const choices = [
+				{ list_name: 'yn', name: 'y', label: 'Yes' },
+				{ list_name: 'yn', name: 'n', label: 'No' }
+			];
+
+			const rows = await convertAndParse(survey, choices);
+			const content = rows.filter(r => ['Q', 'A'].includes(r.class));
+
+			// All rows should be en, in natural order
+			expect(content.every(r => r.language === 'en')).toBe(true);
+			const seq = content.map(r => `${r.class}:${r.name}`);
+			expect(seq).toEqual(['Q:q1', 'Q:q2', 'A:y', 'A:n', 'Q:q3']);
+		});
+	});
+
 	describe('Complete multilingual survey structure', () => {
 		test('creates complete structure with all language-specific elements', async () => {
 			const survey = [

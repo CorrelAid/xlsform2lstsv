@@ -55,7 +55,7 @@ def test_complex_survey_import(limesurvey_client: Client, generated_files_dir: P
         stats = get_survey_structure_stats(limesurvey_client, survey_id)
 
         # Validate counts based on survey structure
-        assert stats['groups'] == 2, f"Expected 2 question groups, got {stats['groups']}"
+        assert stats['groups'] == 3, f"Expected 3 question groups, got {stats['groups']}"
         assert stats['questions'] == 8, f"Expected 8 parent questions, got {stats['questions']}"
         assert stats['subquestions'] == 4, f"Expected 4 subquestions, got {stats['subquestions']}"
         assert stats['answers'] == 9, f"Expected 9 answer options (3 gender + 2 satisfaction + 4 priorities), got {stats['answers']}"

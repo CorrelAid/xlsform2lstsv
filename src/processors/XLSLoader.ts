@@ -103,15 +103,15 @@ export class XLSLoader {
 				return obj;
 			});
 
-			// Process sheets based on their names (simpler and more reliable)
-			const lowerCaseSheetName = sheetName.toLowerCase();
-			if (lowerCaseSheetName.includes('survey')) {
+			// Match standard XLSForm sheet names (exact match, case-insensitive)
+			const lowerCaseSheetName = sheetName.toLowerCase().trim();
+			if (lowerCaseSheetName === 'survey') {
 				hasSurveySheet = true;
 				sheetData.forEach(row => surveyData.push(row));
-			} else if (lowerCaseSheetName.includes('choice')) {
+			} else if (lowerCaseSheetName === 'choices' || lowerCaseSheetName === 'choice') {
 				hasChoicesSheet = true;
 				sheetData.forEach(row => choicesData.push(row));
-			} else if (lowerCaseSheetName.includes('setting')) {
+			} else if (lowerCaseSheetName === 'settings' || lowerCaseSheetName === 'setting') {
 				hasSettingsSheet = true;
 				sheetData.forEach(row => settingsData.push(row));
 			}

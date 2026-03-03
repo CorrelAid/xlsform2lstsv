@@ -6,12 +6,10 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const testFilePath = path.join(__dirname, '../../../docker_tests/fixtures/testA.xlsx');
-
-const fileExists = fs.existsSync(testFilePath);
-const testFileData = fileExists ? fs.readFileSync(testFilePath) : Buffer.alloc(0);
+const testFileData = fs.readFileSync(testFilePath);
 
 describe('Integration: testA.xlsx', () => {
-	it.skipIf(!fileExists)('should load and validate the xlsx file', () => {
+	it('should load and validate the xlsx file', () => {
 		const { surveyData, choicesData, settingsData } = XLSLoader.parseXLSData(testFileData);
 
 		expect(surveyData.length).toBeGreaterThan(0);
@@ -19,7 +17,7 @@ describe('Integration: testA.xlsx', () => {
 		expect(settingsData.length).toBeGreaterThan(0);
 	});
 
-	it.skipIf(!fileExists)('should throw on unimplemented range type during conversion', async () => {
+	it('should throw on unimplemented range type during conversion', async () => {
 		const { surveyData, choicesData, settingsData } = XLSLoader.parseXLSData(testFileData);
 
 		const converter = new XLSFormToTSVConverter();

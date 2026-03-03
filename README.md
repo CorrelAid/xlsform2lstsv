@@ -24,6 +24,7 @@ Convert XLSForm surveys to LimeSurvey TSV format.
 
 - Question Groups  ✅
   - Group level relevance ✅
+  - Nested groups: LimeSurvey does not support nested groups. Parent-only groups (groups that contain only child groups and no direct questions) are automatically flattened — their label is converted to a note question (type X) in the first child group.
 
 - Hints (normal) ✅
 
@@ -41,9 +42,25 @@ Convert XLSForm surveys to LimeSurvey TSV format.
 - LimeSurvey Quotas ❌
 - LimeSurvey Quota language settings ❌
 - LimeSurvey Quota members ❌
-- XLSForms Appearances ❌
+- XLSForms Appearances 🟡
+  - `multiline` on text questions → LimeSurvey type `T` (Long free text) ✅
+  - `likert` on select_one → kept as `L` (no LimeSurvey visual equivalent) ✅
+  - `label`/`list-nolabel` → LimeSurvey matrix question type `F` ✅
+  - `field-list` on groups → silently ignored (format=A already shows everything on one page) ✅
+  - Other appearances (e.g. `minimal`, `compact`, `horizontal`) trigger a warning and are ignored
 - Additional columns ❌
 - guidance_hint ❌
+
+## Transformation defaults and limitations
+
+XLSForm and LimeSurvey differ in how they model surveys. Some information is lost or transformed during conversion, and some defaults are applied:
+
+- **Survey format**: The output defaults to "All in one" mode (`format=A`), displaying all groups and questions on a single page.
+- **Nested groups**: LimeSurvey does not support nested groups. Parent-only groups (containing only child groups, no direct questions) are flattened — their label becomes a note question (type X) in the first child group.
+- **Field name truncation**: LimeSurvey limits question codes to 20 characters and answer codes to 5 characters. Longer names are truncated (underscores removed first, then cut to length).
+- **Record/metadata types**: XLSForm `start`, `end`, `today`, `deviceid` etc. are silently skipped — LimeSurvey handles these internally.
+- **Appearances**: Most XLSForm `appearance` values have no LimeSurvey equivalent and are ignored (a warning is logged). Supported appearances: `multiline` on text questions maps to type `T` (Long free text); `likert` on select_one is accepted silently (stays type `L`); `label`/`list-nolabel` is converted to LimeSurvey's matrix question type (`F`); `field-list` on groups is a no-op since format=A already shows everything on one page.
+- **Multilingual row ordering**: Rows are grouped by language within each group (all base-language rows first, then translations) to work around a LimeSurvey TSV importer bug that resets question ordering counters on translation rows.
 
 ## Installation
 

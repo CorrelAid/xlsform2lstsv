@@ -22,6 +22,20 @@ from test_helpers import (
 
 
 # ===========================
+# testA.xlsx TSV tests
+# ===========================
+
+
+def test_testA_tsv_not_generated(generated_files_dir: Path):
+    """Verify that testA.tsv was NOT generated (contains unimplemented 'range' type)."""
+    tsv_path = generated_files_dir / "testA.tsv"
+    assert not tsv_path.exists(), (
+        "testA.tsv should not be generated because testA.xlsx contains an unimplemented 'range' type"
+    )
+    print("✓ testA.tsv correctly not generated (unimplemented 'range' type)")
+
+
+# ===========================
 # testB.xlsx TSV tests
 # ===========================
 
@@ -135,7 +149,7 @@ def test_testB_multilingual_content(generated_files_dir: Path):
 
 
 def test_testB_groups(generated_files_dir: Path):
-    """Verify testB.tsv contains expected question groups."""
+    """Verify testB.tsv contains correct groups (parent-only flattened, orphans get auto-groups)."""
     tsv_path = generated_files_dir / "testB.tsv"
     if not tsv_path.exists():
         pytest.skip("testB.tsv not found")
@@ -149,12 +163,72 @@ def test_testB_groups(generated_files_dir: Path):
         if len(parts) >= 3 and parts[0] == "G":
             group_names.add(parts[2])
 
-    # testB.xlsx has 7 begin_group rows
-    assert len(group_names) >= 5, (
-        f"Expected at least 5 groups, got {len(group_names)}: {group_names}"
-    )
+    # grouplt58n55 is parent-only (no direct questions, only child groups)
+    # so it gets flattened into a note question instead of a G row
+    named_groups = {
+        "groupgi4rv46",
+        "ratingtechnologiesto",
+        "ratingtechniques",
+        "ratingtopics",
+        "grouppr7pr34",
+        "demographics",
+    }
 
-    print(f"✓ Found {len(group_names)} groups: {group_names}")
+    missing = named_groups - group_names
+    assert not missing, f"Missing groups: {missing}. Found: {group_names}"
+
+    # Orphan questions (outside any group) get auto-generated groups:
+    # - project_id and project_role_* between groupgi4rv46 and grouplt58n55
+    # - consent_privacy_policy after demographics
+    assert len(group_names) == 8, f"Expected exactly 8 groups (6 named + 2 auto), got {len(group_names)}"
+
+    # grouplt58n55 should appear as a note question (type X)
+    note_found = False
+    for line in lines:
+        parts = line.split("\t")
+        if len(parts) >= 3 and parts[0] == "Q" and parts[1] == "X" and parts[2] == "grouplt58n55":
+            note_found = True
+            break
+    assert note_found, "Parent-only group grouplt58n55 should appear as a note question (type X)"
+
+    print(f"✓ All 8 groups present: {group_names}")
+    print("✓ Parent-only group grouplt58n55 flattened to note question")
+
+
+def test_testB_question_ordering(generated_files_dir: Path):
+    """Verify questions appear in the correct order from the survey sheet."""
+    tsv_path = generated_files_dir / "testB.tsv"
+    if not tsv_path.exists():
+        pytest.skip("testB.tsv not found")
+
+    content = read_tsv_content(tsv_path)
+    lines = content.strip().split("\n")
+
+    # Extract unique Q-class question names in order of appearance
+    question_names = []
+    for line in lines:
+        parts = line.split("\t")
+        if len(parts) >= 3 and parts[0] == "Q":
+            name = parts[2]
+            if name not in question_names:
+                question_names.append(name)
+
+    # Verify key ordering: notes -> project -> roles -> skills -> motivation -> demographics -> consent
+    def idx(name):
+        assert name in question_names, f"Question '{name}' not found in output"
+        return question_names.index(name)
+
+    assert idx("Hallo") < idx("projectid"), "Notes should come before project questions"
+    assert idx("projectid") < idx("projectroleprojectal"), "Project selection before role selection"
+    assert idx("projectroleprojectal") < idx("projectroleprojectbe"), "Alpha roles before beta roles"
+    assert idx("projectroleprojectbe") < idx("projectroleprojectga"), "Beta roles before gamma roles"
+    assert idx("projectroleprojectga") < idx("ratingtechnologiesto"), "Role questions before skills"
+    assert idx("ratingtechnologiesto") < idx("ratingtechniqueshead"), "Tools before techniques"
+    assert idx("ratingtechniqueshead") < idx("ratingtopicsheader"), "Techniques before topics"
+    assert idx("motivationskills") < idx("firstname"), "Motivation before demographics"
+    assert idx("gender") < idx("consentprivacypolicy"), "Demographics before consent"
+
+    print(f"✓ Question ordering verified ({len(question_names)} unique questions)")
 
 
 def test_testB_relevance_expressions(generated_files_dir: Path):
@@ -174,7 +248,7 @@ def test_testB_relevance_expressions(generated_files_dir: Path):
 
 
 def test_testB_import(limesurvey_client: Client, generated_files_dir: Path):
-    """Test import of testB.tsv into LimeSurvey."""
+    """Test import of testB.tsv into LimeSurvey and verify groups."""
     tsv_path = generated_files_dir / "testB.tsv"
     if not tsv_path.exists():
         pytest.skip("testB.tsv not found")
@@ -187,6 +261,153 @@ def test_testB_import(limesurvey_client: Client, generated_files_dir: Path):
 
     try:
         verify_survey_import(limesurvey_client, survey_id)
+
+        # Verify named groups were imported (grouplt58n55 was flattened to note)
+        # Plus 2 auto-generated groups for orphan questions
+        expected_groups = [
+            "groupgi4rv46",
+            "G1",
+            "ratingtechnologiesto",
+            "ratingtechniques",
+            "ratingtopics",
+            "grouppr7pr34",
+            "demographics",
+            "G7",
+        ]
+        verify_group_exists(limesurvey_client, survey_id, expected_groups)
+
         print(f"\n✓ testB survey imported successfully (ID: {survey_id})")
+        print(f"✓ All 8 groups verified in LimeSurvey")
+    finally:
+        cleanup_survey(limesurvey_client, survey_id)
+
+
+def test_testB_question_order_in_groups(limesurvey_client: Client, generated_files_dir: Path):
+    """Verify that questions within each group have correct, incrementing order after import.
+
+    LimeSurvey's TSV importer derives question_order from row position. With interleaved
+    multilingual rows (Q de, Q en, Q de, Q en), the internal $qseq counter resets on each
+    translation lookup, causing all questions to get question_order=0. Language-grouped
+    output (all base-lang rows first, then translations) fixes this.
+    """
+    tsv_path = generated_files_dir / "testB.tsv"
+    if not tsv_path.exists():
+        pytest.skip("testB.tsv not found")
+
+    survey_id = import_survey_from_tsv(
+        limesurvey_client,
+        tsv_path,
+        "testB Question Order Test"
+    )
+
+    try:
+        questions = limesurvey_client.list_questions(survey_id)
+        groups = limesurvey_client.list_groups(survey_id)
+
+        # Build group_id -> group_name mapping
+        gid_to_name = {}
+        for g in groups:
+            gid = g.get("gid") if isinstance(g, dict) else g.gid
+            gname = g.get("group_name") if isinstance(g, dict) else g.group_name
+            gid_to_name[int(gid)] = gname
+
+        # Build group_id -> sorted questions mapping (parent questions only)
+        questions_by_group = {}
+        for q in questions:
+            parent_qid = q.get("parent_qid") if isinstance(q, dict) else getattr(q, "parent_qid", 0)
+            if parent_qid and int(parent_qid) != 0:
+                continue  # skip subquestions
+
+            gid = int(q.get("gid") if isinstance(q, dict) else q.gid)
+            title = q.get("title") if isinstance(q, dict) else q.title
+            order = int(q.get("question_order") if isinstance(q, dict) else q.question_order)
+
+            if gid not in questions_by_group:
+                questions_by_group[gid] = []
+            questions_by_group[gid].append({"title": title, "order": order})
+
+        # For every group, verify question_order values are unique and incrementing
+        for gid, qs in questions_by_group.items():
+            sorted_qs = sorted(qs, key=lambda x: x["order"])
+            orders = [q["order"] for q in sorted_qs]
+            titles = [q["title"] for q in sorted_qs]
+            group_name = gid_to_name.get(gid, f"gid={gid}")
+
+            # Orders must be unique (no duplicates from counter reset bug)
+            assert len(set(orders)) == len(orders), (
+                f"Group '{group_name}' has duplicate question_order values: "
+                f"{list(zip(titles, orders))}"
+            )
+
+            # Orders must be strictly increasing
+            for i in range(1, len(orders)):
+                assert orders[i] > orders[i - 1], (
+                    f"Group '{group_name}' has non-increasing question_order: "
+                    f"{list(zip(titles, orders))}"
+                )
+
+            print(f"✓ Group '{group_name}': {len(qs)} questions with correct order {orders}")
+
+        # Verify specific expected ordering within key groups
+        # Group "groupgi4rv46": Hallo → Disclaimer (only notes, project questions are in auto-group)
+        g1_qs = None
+        for gid, gname in gid_to_name.items():
+            if gname == "groupgi4rv46":
+                g1_qs = sorted(questions_by_group.get(gid, []), key=lambda x: x["order"])
+                break
+
+        if g1_qs:
+            g1_titles = [q["title"] for q in g1_qs]
+            assert g1_titles.index("Hallo") < g1_titles.index("Disclaimer"), (
+                f"Hallo should come before Disclaimer, got: {g1_titles}"
+            )
+            # projectid should NOT be in this group (it's in an auto-generated group)
+            assert "projectid" not in g1_titles, (
+                f"projectid should not be in groupgi4rv46, got: {g1_titles}"
+            )
+
+        # Auto-generated group "G1": projectid → projectroleprojectal → projectroleprojectbe → projectroleprojectga
+        auto_g1_qs = None
+        for gid, gname in gid_to_name.items():
+            if gname == "G1":
+                auto_g1_qs = sorted(questions_by_group.get(gid, []), key=lambda x: x["order"])
+                break
+
+        if auto_g1_qs:
+            auto_titles = [q["title"] for q in auto_g1_qs]
+            assert auto_titles.index("projectid") < auto_titles.index("projectroleprojectal"), (
+                f"projectid should come before projectroleprojectal, got: {auto_titles}"
+            )
+            assert auto_titles.index("projectroleprojectal") < auto_titles.index("projectroleprojectbe"), (
+                f"projectroleprojectal should come before projectroleprojectbe, got: {auto_titles}"
+            )
+            assert auto_titles.index("projectroleprojectbe") < auto_titles.index("projectroleprojectga"), (
+                f"projectroleprojectbe should come before projectroleprojectga, got: {auto_titles}"
+            )
+
+        # Group "demographics": firstname → lastname → emailaddress → gender → genderselfidentifica
+        demo_qs = None
+        for gid, gname in gid_to_name.items():
+            if gname == "demographics":
+                demo_qs = sorted(questions_by_group.get(gid, []), key=lambda x: x["order"])
+                break
+
+        if demo_qs:
+            demo_titles = [q["title"] for q in demo_qs]
+            assert demo_titles.index("firstname") < demo_titles.index("lastname"), (
+                f"firstname should come before lastname, got: {demo_titles}"
+            )
+            assert demo_titles.index("lastname") < demo_titles.index("emailaddress"), (
+                f"lastname should come before emailaddress, got: {demo_titles}"
+            )
+            assert demo_titles.index("emailaddress") < demo_titles.index("gender"), (
+                f"emailaddress should come before gender, got: {demo_titles}"
+            )
+            # consentprivacypolicy is now in its own auto-generated group
+            assert "consentprivacypolicy" not in demo_titles, (
+                f"consentprivacypolicy should not be in demographics, got: {demo_titles}"
+            )
+
+        print(f"\n✓ Question ordering verified across all {len(questions_by_group)} groups")
     finally:
         cleanup_survey(limesurvey_client, survey_id)

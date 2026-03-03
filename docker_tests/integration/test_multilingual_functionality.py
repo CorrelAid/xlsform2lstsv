@@ -151,7 +151,7 @@ def test_multilingual_survey_structure(generated_files_dir: Path):
     # - 1 group × 2 languages = 2 G rows
     # - 4 questions × 2 languages = 8 Q rows
     # - 6 choices × 2 languages = 12 A rows
-    
+
     assert survey_language_rows >= 2, f"Expected at least 2 survey language rows, got {survey_language_rows}"
     assert group_rows >= 2, f"Expected at least 2 group rows, got {group_rows}"
     assert question_rows >= 8, f"Expected at least 8 question rows, got {question_rows}"
