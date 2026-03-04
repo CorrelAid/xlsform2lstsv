@@ -174,6 +174,41 @@ describe('Integration: testB.xlsx', () => {
 		expect(noteRow!['type/scale']).toBe('X');
 	});
 
+	it('should have unique answer/subquestion names per question', async () => {
+		const { surveyData, choicesData, settingsData } = XLSLoader.parseXLSData(testFileData, { skipValidation: true });
+
+		const converter = new XLSFormToTSVConverter();
+		const tsv = await converter.convert(surveyData, choicesData, settingsData);
+		const rows = parseTSV(tsv);
+
+		// Group SQ and A rows by their parent question (the preceding Q row)
+		let currentQuestion = '';
+		const namesByQuestion = new Map<string, Map<string, string[]>>();
+
+		for (const row of rows) {
+			if (row.class === 'Q') {
+				currentQuestion = row.name;
+			} else if ((row.class === 'SQ' || row.class === 'A') && currentQuestion) {
+				if (!namesByQuestion.has(currentQuestion)) {
+					namesByQuestion.set(currentQuestion, new Map());
+				}
+				const langNames = namesByQuestion.get(currentQuestion)!;
+				if (!langNames.has(row.language)) {
+					langNames.set(row.language, []);
+				}
+				langNames.get(row.language)!.push(row.name);
+			}
+		}
+
+		// For each question and language, check that names are unique
+		for (const [question, langNames] of namesByQuestion) {
+			for (const [lang, names] of langNames) {
+				const duplicates = names.filter((n, i) => names.indexOf(n) !== i);
+				expect(duplicates, `Question "${question}" (${lang}) has duplicate answer codes: ${duplicates.join(', ')}`).toEqual([]);
+			}
+		}
+	});
+
 	it('should produce both languages (de and en)', async () => {
 		const { surveyData, choicesData, settingsData } = XLSLoader.parseXLSData(testFileData, { skipValidation: true });
 

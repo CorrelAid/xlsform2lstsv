@@ -827,11 +827,38 @@ export class XLSFormToTSVConverter {
 		// Use the answer class from the type mapping
 		const answerClass = lsType.answerClass || (xfTypeInfo.base === 'select_multiple' ? 'SQ' : 'A');
 
+		// Pre-compute sanitized choice names
+		const choiceNames: string[] = [];
 		for (const choice of choices) {
-			// Auto-generate name if missing (matches LimeSurvey behavior)
-			const choiceName = choice.name && choice.name.trim() !== ''
-				? this.sanitizeAnswerCode(choice.name.trim())
-				: (answerClass === 'SQ' ? `SQ${this.subquestionSeq++}` : `A${this.answerSeq++}`);
+			const rawName = choice.name && choice.name.trim() !== '' ? choice.name.trim() : '';
+			choiceNames.push(
+				rawName
+					? this.sanitizeAnswerCode(rawName)
+					: (answerClass === 'SQ' ? `SQ${this.subquestionSeq++}` : `A${this.answerSeq++}`)
+			);
+		}
+
+		// Resolve duplicate names by appending a counter suffix
+		const usedNames = new Set<string>();
+		for (let i = 0; i < choiceNames.length; i++) {
+			let name = choiceNames[i];
+			if (usedNames.has(name)) {
+				let counter = 1;
+				let candidate: string;
+				do {
+					const suffix = String(counter);
+					candidate = name.substring(0, 5 - suffix.length) + suffix;
+					counter++;
+				} while (usedNames.has(candidate));
+				console.warn(`Duplicate answer code "${name}" resolved to "${candidate}"`);
+				choiceNames[i] = candidate;
+			}
+			usedNames.add(choiceNames[i]);
+		}
+
+		for (let i = 0; i < choices.length; i++) {
+			const choice = choices[i];
+			const choiceName = choiceNames[i];
 
 			// Add answer for each language
 			for (const lang of this.availableLanguages) {

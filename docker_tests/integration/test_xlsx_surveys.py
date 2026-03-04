@@ -127,6 +127,44 @@ def test_testB_matrix_questions(generated_files_dir: Path):
     print(f"  - Answer options: {len(answer_rows)}")
 
 
+def test_testB_unique_answer_codes(generated_files_dir: Path):
+    """Verify that SQ/A answer codes are unique per question per language."""
+    tsv_path = generated_files_dir / "testB.tsv"
+    if not tsv_path.exists():
+        pytest.skip("testB.tsv not found")
+
+    content = read_tsv_content(tsv_path)
+    lines = content.strip().split("\n")
+
+    current_question = ""
+    # Map: (question_name, language) -> list of answer codes
+    names_by_question: dict[tuple[str, str], list[str]] = {}
+
+    for line in lines:
+        parts = line.split("\t")
+        if len(parts) < 7:
+            continue
+
+        row_class = parts[0]
+        row_name = parts[2]
+        row_lang = parts[6].strip()
+
+        if row_class == "Q":
+            current_question = row_name
+        elif row_class in ("SQ", "A") and current_question:
+            key = (current_question, row_lang)
+            names_by_question.setdefault(key, []).append(row_name)
+
+    # Check uniqueness
+    for (question, lang), names in names_by_question.items():
+        duplicates = [n for n in names if names.count(n) > 1]
+        assert len(set(duplicates)) == 0, (
+            f"Question '{question}' ({lang}) has duplicate answer codes: {set(duplicates)}"
+        )
+
+    print(f"✓ All answer codes unique per question ({len(names_by_question)} question/language combos checked)")
+
+
 def test_testB_multilingual_content(generated_files_dir: Path):
     """Verify testB.tsv contains expected German and English content."""
     tsv_path = generated_files_dir / "testB.tsv"

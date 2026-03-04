@@ -14,8 +14,8 @@ G	2	G1	1	G1		de
 G	2	G1	1	G1		en						
 Q	M	projectid	1	Für welche Projekte möchtest Du dich bewerben?		de			Y			
 SQ		proje		Projekt Alpha		de						
-SQ		proje		Projekt Beta		de						
-SQ		proje		Projekt Gamma		de						
+SQ		proj1		Projekt Beta		de						
+SQ		proj2		Projekt Gamma		de						
 Q	M	projectroleprojectal	"(projectid==""project-alpha"")"	In welcher Rolle siehst du dich im Projekt Projekt Alpha?		de			Y			
 SQ		roles		Umfragedesign und Datenerhebung		de						
 SQ		roled		Datenanalyse		de						
@@ -27,8 +27,8 @@ SQ		rolep		Projektmanagement		de
 SQ		rolem		Machine Learning		de						
 Q	M	projectid	1	Which project(s) do you want to apply for?		en			Y			
 SQ		proje		Project Alpha		en						
-SQ		proje		Project Beta		en						
-SQ		proje		Project Gamma		en						
+SQ		proj1		Project Beta		en						
+SQ		proj2		Project Gamma		en						
 Q	M	projectroleprojectal	"(projectid==""project-alpha"")"	Which role do you think you could fill in Project Alpha?		en			Y			
 SQ		roles		Survey design and data collection		en						
 SQ		roled		Data analysis		en						
