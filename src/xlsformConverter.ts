@@ -65,6 +65,8 @@ export class XLSFormToTSVConverter {
 	private inMatrix: boolean;
 	private matrixListName: string | null;
 	private groupContentBuffer: TSVRowData[];
+	private answerCodeMap: Map<string, Map<string, string>>;
+	private questionToListMap: Map<string, string>;
 
 	constructor(config?: Partial<ConversionConfig>) {
 		this.configManager = new ConfigManager(config);
@@ -89,6 +91,8 @@ export class XLSFormToTSVConverter {
 		this.inMatrix = false;
 		this.matrixListName = null;
 		this.groupContentBuffer = [];
+		this.answerCodeMap = new Map();
+		this.questionToListMap = new Map();
 	}
 
 	/**
@@ -135,6 +139,10 @@ export class XLSFormToTSVConverter {
 		
 		// Build choices map
 		this.buildChoicesMap(choicesData);
+
+		// Build answer code and question-to-list maps for relevance rewriting
+		this.buildAnswerCodeMap();
+		this.buildQuestionToListMap(surveyData);
 
 		// Add survey row (class S)
 		this.addSurveyRow(settingsData[0] || {});
@@ -229,6 +237,50 @@ export class XLSFormToTSVConverter {
 				this.choicesMap.set(listName, []);
 			}
 			this.choicesMap.get(listName)!.push(choice);
+		}
+	}
+
+	private buildAnswerCodeMap(): void {
+		this.answerCodeMap = new Map();
+		for (const [listName, choices] of this.choicesMap) {
+			const codeMap = new Map<string, string>();
+			const sanitized: string[] = [];
+			for (const choice of choices) {
+				const raw = choice.name?.trim() || '';
+				sanitized.push(raw ? this.sanitizeAnswerCode(raw) : '');
+			}
+			const used = new Set<string>();
+			for (let i = 0; i < sanitized.length; i++) {
+				if (!sanitized[i]) continue;
+				let name = sanitized[i];
+				if (used.has(name)) {
+					let counter = 1;
+					let candidate: string;
+					do {
+						const suffix = String(counter);
+						candidate = name.substring(0, 5 - suffix.length) + suffix;
+						counter++;
+					} while (used.has(candidate));
+					sanitized[i] = candidate;
+				}
+				used.add(sanitized[i]);
+				const originalName = choices[i].name?.trim() || '';
+				if (originalName) {
+					codeMap.set(originalName, sanitized[i]);
+				}
+			}
+			this.answerCodeMap.set(listName, codeMap);
+		}
+	}
+
+	private buildQuestionToListMap(surveyData: SurveyRow[]): void {
+		this.questionToListMap = new Map();
+		for (const row of surveyData) {
+			const typeInfo = this.parseType(row.type || '');
+			if (typeInfo.listName && row.name) {
+				const sanitizedName = this.sanitizeName(row.name.trim());
+				this.questionToListMap.set(sanitizedName, typeInfo.listName);
+			}
 		}
 	}
 
@@ -885,7 +937,16 @@ export class XLSFormToTSVConverter {
 
 	private async convertRelevance(relevant?: string): Promise<string> {
 		if (!relevant) return '1';
-		return await convertRelevance(relevant);
+		return await convertRelevance(relevant, (questionName, choiceValue) => {
+			// Truncate to 20 chars to match converter's field sanitization
+			// (the transpiler only removes _/- but doesn't truncate)
+			const truncated = questionName.length > 20 ? questionName.substring(0, 20) : questionName;
+			const listName = this.questionToListMap.get(truncated);
+			if (!listName) return choiceValue;
+			const codeMap = this.answerCodeMap.get(listName);
+			if (!codeMap) return choiceValue;
+			return codeMap.get(choiceValue) ?? choiceValue;
+		});
 	}
 
 

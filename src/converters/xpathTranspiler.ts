@@ -28,6 +28,20 @@ interface XPathNode {
 }
 
 /**
+ * Callback to look up a sanitized answer code given a question name and original choice value.
+ * Returns the sanitized code, or the original value unchanged if no mapping exists.
+ */
+export type AnswerCodeLookup = (sanitizedQuestionName: string, originalChoiceValue: string) => string;
+
+function isVariableRef(node: XPathNode): boolean {
+  return !!(node.steps && node.steps.length > 0 && node.steps[0].name);
+}
+
+function isStringLiteral(node: XPathNode): boolean {
+  return typeof node.value === 'string';
+}
+
+/**
  * Sanitize field names by removing underscores and hyphens to match LimeSurvey's naming conventions
  */
 function sanitizeName(name: string): string {
@@ -53,7 +67,7 @@ function sanitizeName(name: string): string {
  * @returns The transpiled LimeSurvey expression string
  * @throws Error if an unsupported node structure is encountered
  */
-function transpile(node: XPathNode): string {
+function transpile(node: XPathNode, lookupAnswerCode?: AnswerCodeLookup): string {
   if (!node) return '';
 
   // https://getodk.github.io/xforms-spec/#xpath-functions
@@ -61,15 +75,15 @@ function transpile(node: XPathNode): string {
   if (node.id) {
     switch (node.id) {
       case 'count':
-        return `count(${node.args?.map(arg => transpile(arg as XPathNode)).join(', ') || ''})`;
+        return `count(${node.args?.map(arg => transpile(arg as XPathNode, lookupAnswerCode)).join(', ') || ''})`;
       case 'concat':
-        return node.args?.map(arg => transpile(arg as XPathNode)).join(' + ') || '';
+        return node.args?.map(arg => transpile(arg as XPathNode, lookupAnswerCode)).join(' + ') || '';
       case 'regex':
-        return `regexMatch(${node.args?.map(arg => transpile(arg as XPathNode)).join(', ') || ''})`;
+        return `regexMatch(${node.args?.map(arg => transpile(arg as XPathNode, lookupAnswerCode)).join(', ') || ''})`;
       case 'contains':
         // Custom handling for contains
         if (node.args?.length === 2) {
-          return `contains(${transpile(node.args[0] as XPathNode)}, ${transpile(node.args[1] as XPathNode)})`;
+          return `contains(${transpile(node.args[0] as XPathNode, lookupAnswerCode)}, ${transpile(node.args[1] as XPathNode, lookupAnswerCode)})`;
         }
         break;
       case 'selected':
@@ -77,76 +91,80 @@ function transpile(node: XPathNode): string {
         if (node.args?.length === 2) {
           const fieldArg = node.args[0] as XPathNode;
           const valueArg = node.args[1] as XPathNode;
-          const fieldName = transpile(fieldArg);
-          let value = transpile(valueArg);
+          const fieldName = transpile(fieldArg, lookupAnswerCode);
+          let value = transpile(valueArg, lookupAnswerCode);
           // Remove any existing quotes and use double quotes
           value = value.replace(/^['"]|['"]$/g, "");
-          return `(${sanitizeName(fieldName)}=="${value}")`;
+          const sanitizedField = sanitizeName(fieldName);
+          if (lookupAnswerCode) {
+            value = lookupAnswerCode(sanitizedField, value);
+          }
+          return `(${sanitizedField}=="${value}")`;
         }
         break;
       case 'string':
         // string() function - just return the argument
         if (node.args?.length === 1) {
-          return transpile(node.args[0] as XPathNode);
+          return transpile(node.args[0] as XPathNode, lookupAnswerCode);
         }
         break;
       case 'number':
         // number() function - just return the argument
         if (node.args?.length === 1) {
-          return transpile(node.args[0] as XPathNode);
+          return transpile(node.args[0] as XPathNode, lookupAnswerCode);
         }
         break;
       case 'floor':
         if (node.args?.length === 1) {
-          return `floor(${transpile(node.args[0] as XPathNode)})`;
+          return `floor(${transpile(node.args[0] as XPathNode, lookupAnswerCode)})`;
         }
         break;
       case 'ceiling':
         if (node.args?.length === 1) {
-          return `ceil(${transpile(node.args[0] as XPathNode)})`;
+          return `ceil(${transpile(node.args[0] as XPathNode, lookupAnswerCode)})`;
         }
         break;
       case 'round':
         if (node.args?.length === 1) {
-          return `round(${transpile(node.args[0] as XPathNode)})`;
+          return `round(${transpile(node.args[0] as XPathNode, lookupAnswerCode)})`;
         }
         break;
       case 'sum':
         if (node.args?.length === 1) {
-          return `sum(${transpile(node.args[0] as XPathNode)})`;
+          return `sum(${transpile(node.args[0] as XPathNode, lookupAnswerCode)})`;
         }
         break;
       case 'substring':
         if (node.args && node.args.length >= 2) {
-          const stringArg = transpile(node.args[0] as XPathNode);
-          const startArg = transpile(node.args[1] as XPathNode);
-          const lengthArg = node.args.length > 2 ? transpile(node.args[2] as XPathNode) : '';
+          const stringArg = transpile(node.args[0] as XPathNode, lookupAnswerCode);
+          const startArg = transpile(node.args[1] as XPathNode, lookupAnswerCode);
+          const lengthArg = node.args.length > 2 ? transpile(node.args[2] as XPathNode, lookupAnswerCode) : '';
           return `substr(${stringArg}, ${startArg}${lengthArg ? ', ' + lengthArg : ''})`;
         }
         break;
       case 'string-length':
         if (node.args?.length === 1) {
-          return `strlen(${transpile(node.args[0] as XPathNode)})`;
+          return `strlen(${transpile(node.args[0] as XPathNode, lookupAnswerCode)})`;
         }
         break;
       case 'starts-with':
         if (node.args?.length === 2) {
-          return `startsWith(${transpile(node.args[0] as XPathNode)}, ${transpile(node.args[1] as XPathNode)})`;
+          return `startsWith(${transpile(node.args[0] as XPathNode, lookupAnswerCode)}, ${transpile(node.args[1] as XPathNode, lookupAnswerCode)})`;
         }
         break;
       case 'ends-with':
         if (node.args?.length === 2) {
-          return `endsWith(${transpile(node.args[0] as XPathNode)}, ${transpile(node.args[1] as XPathNode)})`;
+          return `endsWith(${transpile(node.args[0] as XPathNode, lookupAnswerCode)}, ${transpile(node.args[1] as XPathNode, lookupAnswerCode)})`;
         }
         break;
       case 'not':
         if (node.args?.length === 1) {
-          return `!(${transpile(node.args[0] as XPathNode)})`;
+          return `!(${transpile(node.args[0] as XPathNode, lookupAnswerCode)})`;
         }
         break;
       case 'if':
         if (node.args?.length === 3) {
-          return `(${transpile(node.args[0] as XPathNode)} ? ${transpile(node.args[1] as XPathNode)} : ${transpile(node.args[2] as XPathNode)})`;
+          return `(${transpile(node.args[0] as XPathNode, lookupAnswerCode)} ? ${transpile(node.args[1] as XPathNode, lookupAnswerCode)} : ${transpile(node.args[2] as XPathNode, lookupAnswerCode)})`;
         }
         break;
       case 'today':
@@ -164,36 +182,58 @@ function transpile(node: XPathNode): string {
     switch (node.type) {
       // Comparison operators
       case '<=':
-        return `${transpile(node.left as XPathNode)} <= ${transpile(node.right as XPathNode)}`;
+        return `${transpile(node.left as XPathNode, lookupAnswerCode)} <= ${transpile(node.right as XPathNode, lookupAnswerCode)}`;
       case '>=':
-        return `${transpile(node.left as XPathNode)} >= ${transpile(node.right as XPathNode)}`;
+        return `${transpile(node.left as XPathNode, lookupAnswerCode)} >= ${transpile(node.right as XPathNode, lookupAnswerCode)}`;
       case '=':
-      case '==':
-        return `${transpile(node.left as XPathNode)} == ${transpile(node.right as XPathNode)}`;
-      case '!=':
-        return `${transpile(node.left as XPathNode)} != ${transpile(node.right as XPathNode)}`;
+      case '==': {
+        const leftNode = node.left as XPathNode;
+        const rightNode = node.right as XPathNode;
+        if (lookupAnswerCode && isVariableRef(leftNode) && isStringLiteral(rightNode)) {
+          const fieldName = sanitizeName(leftNode.steps![0].name!);
+          const rawValue = rightNode.value as string;
+          const rewritten = lookupAnswerCode(fieldName, rawValue);
+          if (rewritten !== rawValue) {
+            return `${fieldName} == "${rewritten}"`;
+          }
+        }
+        return `${transpile(leftNode, lookupAnswerCode)} == ${transpile(rightNode, lookupAnswerCode)}`;
+      }
+      case '!=': {
+        const leftNode = node.left as XPathNode;
+        const rightNode = node.right as XPathNode;
+        if (lookupAnswerCode && isVariableRef(leftNode) && isStringLiteral(rightNode)) {
+          const fieldName = sanitizeName(leftNode.steps![0].name!);
+          const rawValue = rightNode.value as string;
+          const rewritten = lookupAnswerCode(fieldName, rawValue);
+          if (rewritten !== rawValue) {
+            return `${fieldName} != "${rewritten}"`;
+          }
+        }
+        return `${transpile(leftNode, lookupAnswerCode)} != ${transpile(rightNode, lookupAnswerCode)}`;
+      }
       case '<':
-        return `${transpile(node.left as XPathNode)} < ${transpile(node.right as XPathNode)}`;
+        return `${transpile(node.left as XPathNode, lookupAnswerCode)} < ${transpile(node.right as XPathNode, lookupAnswerCode)}`;
       case '>':
-        return `${transpile(node.left as XPathNode)} > ${transpile(node.right as XPathNode)}`;
+        return `${transpile(node.left as XPathNode, lookupAnswerCode)} > ${transpile(node.right as XPathNode, lookupAnswerCode)}`;
 
       // Arithmetic operators
       case '+':
-        return `${transpile(node.left as XPathNode)} + ${transpile(node.right as XPathNode)}`;
+        return `${transpile(node.left as XPathNode, lookupAnswerCode)} + ${transpile(node.right as XPathNode, lookupAnswerCode)}`;
       case '-':
-        return `${transpile(node.left as XPathNode)} - ${transpile(node.right as XPathNode)}`;
+        return `${transpile(node.left as XPathNode, lookupAnswerCode)} - ${transpile(node.right as XPathNode, lookupAnswerCode)}`;
       case '*':
-        return `${transpile(node.left as XPathNode)} * ${transpile(node.right as XPathNode)}`;
+        return `${transpile(node.left as XPathNode, lookupAnswerCode)} * ${transpile(node.right as XPathNode, lookupAnswerCode)}`;
       case 'div':
-        return `${transpile(node.left as XPathNode)} / ${transpile(node.right as XPathNode)}`;
+        return `${transpile(node.left as XPathNode, lookupAnswerCode)} / ${transpile(node.right as XPathNode, lookupAnswerCode)}`;
       case 'mod':
-        return `${transpile(node.left as XPathNode)} % ${transpile(node.right as XPathNode)}`;
+        return `${transpile(node.left as XPathNode, lookupAnswerCode)} % ${transpile(node.right as XPathNode, lookupAnswerCode)}`;
 
       // Logical operators
       case 'and':
-        return `${transpile(node.left as XPathNode)} and ${transpile(node.right as XPathNode)}`;
+        return `${transpile(node.left as XPathNode, lookupAnswerCode)} and ${transpile(node.right as XPathNode, lookupAnswerCode)}`;
       case 'or':
-        return `${transpile(node.left as XPathNode)} or ${transpile(node.right as XPathNode)}`;
+        return `${transpile(node.left as XPathNode, lookupAnswerCode)} or ${transpile(node.right as XPathNode, lookupAnswerCode)}`;
 
       // Unsupported operators
       case '|':
@@ -250,7 +290,7 @@ function transpile(node: XPathNode): string {
  * @param xpathExpr - The XPath expression to convert
  * @returns LimeSurvey Expression Manager syntax, or null if conversion fails
  */
-export async function xpathToLimeSurvey(xpathExpr: string): Promise<string> {
+export async function xpathToLimeSurvey(xpathExpr: string, lookupAnswerCode?: AnswerCodeLookup): Promise<string> {
   if (!xpathExpr || xpathExpr.trim() === '') {
     return '1'; // Default relevance expression
   }
@@ -281,7 +321,7 @@ export async function xpathToLimeSurvey(xpathExpr: string): Promise<string> {
     }
     
     const parsed = jxpath.parse(processedExpr) as XPathNode;
-    return transpile(parsed);
+    return transpile(parsed, lookupAnswerCode);
   } catch (error: unknown) {
     console.error(`Transpilation error: ${(error as Error).message}`);
     return '1';
@@ -438,7 +478,7 @@ function parseRegexMatchArguments(argsString: string): string[] {
  * @param xpath - The XPath relevance expression
  * @returns LimeSurvey Expression Manager syntax
  */
-export async function convertRelevance(xpathExpr: string): Promise<string> {
+export async function convertRelevance(xpathExpr: string, lookupAnswerCode?: AnswerCodeLookup): Promise<string> {
   if (!xpathExpr) return '1';
 
   // Preprocess: normalize operators to lowercase for jsxpath compatibility
@@ -446,7 +486,7 @@ export async function convertRelevance(xpathExpr: string): Promise<string> {
     .replace(/\bAND\b/gi, 'and')
     .replace(/\bOR\b/gi, 'or');
 
-  const result = await xpathToLimeSurvey(normalizedXPath);
+  const result = await xpathToLimeSurvey(normalizedXPath, lookupAnswerCode);
 
   // Handle edge case: selected() with just {field} (without $)
   if (result && result.includes('selected(')) {

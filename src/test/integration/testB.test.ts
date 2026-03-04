@@ -68,28 +68,32 @@ describe('Integration: testB.xlsx', () => {
 
 		// The sosci_survey subquestion should have a proper relevance expression
 		// original: selected(${project_role_project-alpha}, 'role-survey-design')
+		// 'role-survey-design' sanitizes to 'roles' (remove hyphens → rolesurveydesign → truncate to 5)
 		const sqRow = rows.find(r => r.class === 'SQ' && r.name === 'soscisurvey');
 		expect(sqRow).toBeDefined();
 		expect(sqRow!.relevance).toContain('projectroleprojectalpha');
-		expect(sqRow!.relevance).toContain('role-survey-design');
+		expect(sqRow!.relevance).toContain('roles');
 
 		// Project-beta role relevance: selected(${project_role_project-beta}, 'role-visualization')
+		// 'role-visualization' sanitizes to 'rolev'
 		const powerbiRow = rows.find(r => r.class === 'SQ' && r.name === 'powerbi');
 		expect(powerbiRow).toBeDefined();
 		expect(powerbiRow!.relevance).toContain('projectroleprojectbeta');
-		expect(powerbiRow!.relevance).toContain('role-visualization');
+		expect(powerbiRow!.relevance).toContain('rolev');
 
 		// Project-gamma role relevance: selected(${project_role_project-gamma}, 'role-machine-learning')
+		// 'role-machine-learning' sanitizes to 'rolem'
 		const jupyterRow = rows.find(r => r.class === 'SQ' && r.name === 'jupyter');
 		expect(jupyterRow).toBeDefined();
 		expect(jupyterRow!.relevance).toContain('projectroleprojectgamma');
-		expect(jupyterRow!.relevance).toContain('role-machine-learning');
+		expect(jupyterRow!.relevance).toContain('rolem');
 
 		// Simple equality relevant: ${past_applications} = 'not_successful'
+		// 'not_successful' sanitizes to 'notsu' (remove underscore → notsuccessful → truncate to 5)
 		const pastDetailsRow = rows.find(r => r.name === 'pastapplicationsdeta' && r.class === 'Q');
 		expect(pastDetailsRow).toBeDefined();
 		expect(pastDetailsRow!.relevance).toContain('pastapplications');
-		expect(pastDetailsRow!.relevance).toContain('not_successful');
+		expect(pastDetailsRow!.relevance).toContain('notsu');
 	});
 
 	it('should preserve correct question ordering from the survey sheet', async () => {

@@ -16,41 +16,41 @@ Q	M	projectid	1	Für welche Projekte möchtest Du dich bewerben?		de			Y
 SQ		proje		Projekt Alpha		de						
 SQ		proj1		Projekt Beta		de						
 SQ		proj2		Projekt Gamma		de						
-Q	M	projectroleprojectal	"(projectid==""project-alpha"")"	In welcher Rolle siehst du dich im Projekt Projekt Alpha?		de			Y			
+Q	M	projectroleprojectal	"(projectid==""proje"")"	In welcher Rolle siehst du dich im Projekt Projekt Alpha?		de			Y			
 SQ		roles		Umfragedesign und Datenerhebung		de						
 SQ		roled		Datenanalyse		de						
-Q	M	projectroleprojectbe	"(projectid==""project-beta"")"	In welcher Rolle siehst du dich im Projekt Beta?		de			Y			
+Q	M	projectroleprojectbe	"(projectid==""proj1"")"	In welcher Rolle siehst du dich im Projekt Beta?		de			Y			
 SQ		rolev		Datenvisualisierung		de						
 SQ		roled		Data Engineering		de						
-Q	M	projectroleprojectga	"(projectid==""project-gamma"")"	In welcher Rolle siehst du dich im Projekt Gamma?		de			Y			
+Q	M	projectroleprojectga	"(projectid==""proj2"")"	In welcher Rolle siehst du dich im Projekt Gamma?		de			Y			
 SQ		rolep		Projektmanagement		de						
 SQ		rolem		Machine Learning		de						
 Q	M	projectid	1	Which project(s) do you want to apply for?		en			Y			
 SQ		proje		Project Alpha		en						
 SQ		proj1		Project Beta		en						
 SQ		proj2		Project Gamma		en						
-Q	M	projectroleprojectal	"(projectid==""project-alpha"")"	Which role do you think you could fill in Project Alpha?		en			Y			
+Q	M	projectroleprojectal	"(projectid==""proje"")"	Which role do you think you could fill in Project Alpha?		en			Y			
 SQ		roles		Survey design and data collection		en						
 SQ		roled		Data analysis		en						
-Q	M	projectroleprojectbe	"(projectid==""project-beta"")"	Which role do you see yourself in for Project Beta?		en			Y			
+Q	M	projectroleprojectbe	"(projectid==""proj1"")"	Which role do you see yourself in for Project Beta?		en			Y			
 SQ		rolev		Data visualization		en						
 SQ		roled		Data engineering		en						
-Q	M	projectroleprojectga	"(projectid==""project-gamma"")"	Which role do you see yourself in for Project Gamma?		en			Y			
+Q	M	projectroleprojectga	"(projectid==""proj2"")"	Which role do you see yourself in for Project Gamma?		en			Y			
 SQ		rolep		Project management		en						
 SQ		rolem		Machine learning		en						
 G	3	ratingtechnologiesto	1	Tools		de						
 G	3	ratingtechnologiesto	1	Tools		en						
 Q	X	grouplt58n55	1	Deine Fähigkeiten und Erfahrungen		de						
 Q	F	ratingtechnologiesto	1	Bitte bewerte Deine Erfahrung mit den folgenden Technologien und Tools:	Hier kannst du  mehr darüber lesen, wie wir die verschiedenen Erfahrungsstufen definieren: https://docs.correlaid.org/project-manual/data4good-projects#experience-scale	de						
-SQ		soscisurvey	"(projectroleprojectalpha==""role-survey-design"")"	SoSci Survey		de			Y			
-SQ		python	"(projectroleprojectalpha==""role-data-analysis"")"	Python		de			Y			
-SQ		rstats	"(projectroleprojectalpha==""role-data-analysis"")"	R		de			Y			
-SQ		powerbi	"(projectroleprojectbeta==""role-visualization"")"	Power BI		de			Y			
-SQ		excel	"(projectroleprojectbeta==""role-visualization"")"	Microsoft Excel		de			Y			
-SQ		sql	"(projectroleprojectbeta==""role-data-engineering"")"	SQL		de			Y			
-SQ		git	"(projectroleprojectbeta==""role-data-engineering"")"	Git		de			Y			
-SQ		jupyter	"(projectroleprojectgamma==""role-machine-learning"")"	Jupyter Notebooks		de			Y			
-SQ		tensorflow	"(projectroleprojectgamma==""role-machine-learning"")"	TensorFlow / PyTorch		de			Y			
+SQ		soscisurvey	"(projectroleprojectalpha==""roles"")"	SoSci Survey		de			Y			
+SQ		python	"(projectroleprojectalpha==""roled"")"	Python		de			Y			
+SQ		rstats	"(projectroleprojectalpha==""roled"")"	R		de			Y			
+SQ		powerbi	"(projectroleprojectbeta==""rolev"")"	Power BI		de			Y			
+SQ		excel	"(projectroleprojectbeta==""rolev"")"	Microsoft Excel		de			Y			
+SQ		sql	"(projectroleprojectbeta==""roled"")"	SQL		de			Y			
+SQ		git	"(projectroleprojectbeta==""roled"")"	Git		de			Y			
+SQ		jupyter	"(projectroleprojectgamma==""rolem"")"	Jupyter Notebooks		de			Y			
+SQ		tensorflow	"(projectroleprojectgamma==""rolem"")"	TensorFlow / PyTorch		de			Y			
 A		begin		Anfänger:in		de						
 A		user		Benutzer:in		de						
 A		advan		Fortgeschrittene:r		de						
@@ -58,15 +58,15 @@ A		exper		Expert:in		de
 Q	T	toolsother	1	Andere relevante Tools	Bitte gib hier andere Tools an, die du kennst und die du für relevant erachtest.	de						
 Q	X	grouplt58n55	1	Your skills and experiences		en						
 Q	F	ratingtechnologiesto	1	Please rate your experience with the following technologies and tools:	Read more about what the different experience labels mean for us: https://docs.correlaid.org/project-manual/data4good-projects#experience-scale	en						
-SQ		soscisurvey	"(projectroleprojectalpha==""role-survey-design"")"	SoSci Survey		en			Y			
-SQ		python	"(projectroleprojectalpha==""role-data-analysis"")"	Python		en			Y			
-SQ		rstats	"(projectroleprojectalpha==""role-data-analysis"")"	R		en			Y			
-SQ		powerbi	"(projectroleprojectbeta==""role-visualization"")"	Power BI		en			Y			
-SQ		excel	"(projectroleprojectbeta==""role-visualization"")"	Microsoft Excel		en			Y			
-SQ		sql	"(projectroleprojectbeta==""role-data-engineering"")"	SQL		en			Y			
-SQ		git	"(projectroleprojectbeta==""role-data-engineering"")"	Git		en			Y			
-SQ		jupyter	"(projectroleprojectgamma==""role-machine-learning"")"	Jupyter Notebooks		en			Y			
-SQ		tensorflow	"(projectroleprojectgamma==""role-machine-learning"")"	TensorFlow / PyTorch		en			Y			
+SQ		soscisurvey	"(projectroleprojectalpha==""roles"")"	SoSci Survey		en			Y			
+SQ		python	"(projectroleprojectalpha==""roled"")"	Python		en			Y			
+SQ		rstats	"(projectroleprojectalpha==""roled"")"	R		en			Y			
+SQ		powerbi	"(projectroleprojectbeta==""rolev"")"	Power BI		en			Y			
+SQ		excel	"(projectroleprojectbeta==""rolev"")"	Microsoft Excel		en			Y			
+SQ		sql	"(projectroleprojectbeta==""roled"")"	SQL		en			Y			
+SQ		git	"(projectroleprojectbeta==""roled"")"	Git		en			Y			
+SQ		jupyter	"(projectroleprojectgamma==""rolem"")"	Jupyter Notebooks		en			Y			
+SQ		tensorflow	"(projectroleprojectgamma==""rolem"")"	TensorFlow / PyTorch		en			Y			
 A		begin		Beginner		en						
 A		user		User		en						
 A		advan		Advanced		en						
@@ -75,31 +75,31 @@ Q	T	toolsother	1	Other relevant tools	Please specifiy other tools you know that 
 G	4	ratingtechniques	1	Techniken		de						
 G	4	ratingtechniques	1	Techniques		en						
 Q	F	ratingtechniqueshead	1	Bitte bewerte Deine Erfahrung mit den folgenden Techniken.	Hier kannst du  mehr darüber lesen, wie wir die verschiedenen Erfahrungsstufen definieren: https://docs.correlaid.org/project-manual/data4good-projects#experience-scale	de						
-SQ		surveydesign	"(projectroleprojectalpha==""role-survey-design"")"	Entwicklung von Fragebögen		de			Y			
-SQ		indicatordevelopment	"(projectroleprojectalpha==""role-survey-design"")"	Entwicklung von Indikatoren		de			Y			
-SQ		datacollection	"(projectroleprojectalpha==""role-survey-design"")"	Datenerhebung		de			Y			
-SQ		datacleaning	"(projectroleprojectalpha==""role-data-analysis"")"	Datenbereinigung		de			Y			
-SQ		descriptivestatistic	"(projectroleprojectalpha==""role-data-analysis"")"	Deskriptive Statistik		de			Y			
-SQ		datavisualization	"(projectroleprojectbeta==""role-visualization"")"	Datenvisualisierung		de			Y			
-SQ		dataengineering	"(projectroleprojectbeta==""role-data-engineering"")"	Data Engineering		de			Y			
-SQ		automation	"(projectroleprojectbeta==""role-data-engineering"")"	Automatisierung		de			Y			
-SQ		projectplanning	"(projectroleprojectgamma==""role-project-management"")"	Projektplanung		de			Y			
-SQ		mlmodeling	"(projectroleprojectgamma==""role-machine-learning"")"	ML-Modellierung		de			Y			
+SQ		surveydesign	"(projectroleprojectalpha==""roles"")"	Entwicklung von Fragebögen		de			Y			
+SQ		indicatordevelopment	"(projectroleprojectalpha==""roles"")"	Entwicklung von Indikatoren		de			Y			
+SQ		datacollection	"(projectroleprojectalpha==""roles"")"	Datenerhebung		de			Y			
+SQ		datacleaning	"(projectroleprojectalpha==""roled"")"	Datenbereinigung		de			Y			
+SQ		descriptivestatistic	"(projectroleprojectalpha==""roled"")"	Deskriptive Statistik		de			Y			
+SQ		datavisualization	"(projectroleprojectbeta==""rolev"")"	Datenvisualisierung		de			Y			
+SQ		dataengineering	"(projectroleprojectbeta==""roled"")"	Data Engineering		de			Y			
+SQ		automation	"(projectroleprojectbeta==""roled"")"	Automatisierung		de			Y			
+SQ		projectplanning	"(projectroleprojectgamma==""rolep"")"	Projektplanung		de			Y			
+SQ		mlmodeling	"(projectroleprojectgamma==""rolem"")"	ML-Modellierung		de			Y			
 A		begin		Anfänger:in		de						
 A		user		Benutzer:in		de						
 A		advan		Fortgeschrittene:r		de						
 A		exper		Expert:in		de						
 Q	F	ratingtechniqueshead	1	Please rate your experience with the following techniques:	Read more about what the different experience labels mean for us: https://docs.correlaid.org/project-manual/data4good-projects#experience-scale	en						
-SQ		surveydesign	"(projectroleprojectalpha==""role-survey-design"")"	Survey design		en			Y			
-SQ		indicatordevelopment	"(projectroleprojectalpha==""role-survey-design"")"	Development of indicators		en			Y			
-SQ		datacollection	"(projectroleprojectalpha==""role-survey-design"")"	Data collection		en			Y			
-SQ		datacleaning	"(projectroleprojectalpha==""role-data-analysis"")"	Data cleaning		en			Y			
-SQ		descriptivestatistic	"(projectroleprojectalpha==""role-data-analysis"")"	Descriptive statistics		en			Y			
-SQ		datavisualization	"(projectroleprojectbeta==""role-visualization"")"	Data visualization		en			Y			
-SQ		dataengineering	"(projectroleprojectbeta==""role-data-engineering"")"	Data engineering		en			Y			
-SQ		automation	"(projectroleprojectbeta==""role-data-engineering"")"	Automation		en			Y			
-SQ		projectplanning	"(projectroleprojectgamma==""role-project-management"")"	Project planning		en			Y			
-SQ		mlmodeling	"(projectroleprojectgamma==""role-machine-learning"")"	ML modeling		en			Y			
+SQ		surveydesign	"(projectroleprojectalpha==""roles"")"	Survey design		en			Y			
+SQ		indicatordevelopment	"(projectroleprojectalpha==""roles"")"	Development of indicators		en			Y			
+SQ		datacollection	"(projectroleprojectalpha==""roles"")"	Data collection		en			Y			
+SQ		datacleaning	"(projectroleprojectalpha==""roled"")"	Data cleaning		en			Y			
+SQ		descriptivestatistic	"(projectroleprojectalpha==""roled"")"	Descriptive statistics		en			Y			
+SQ		datavisualization	"(projectroleprojectbeta==""rolev"")"	Data visualization		en			Y			
+SQ		dataengineering	"(projectroleprojectbeta==""roled"")"	Data engineering		en			Y			
+SQ		automation	"(projectroleprojectbeta==""roled"")"	Automation		en			Y			
+SQ		projectplanning	"(projectroleprojectgamma==""rolep"")"	Project planning		en			Y			
+SQ		mlmodeling	"(projectroleprojectgamma==""rolem"")"	ML modeling		en			Y			
 A		begin		Beginner		en						
 A		user		User		en						
 A		advan		Advanced		en						
@@ -107,23 +107,23 @@ A		exper		Expert		en
 G	5	ratingtopics	1	Themen		de						
 G	5	ratingtopics	1	Topics		en						
 Q	F	ratingtopicsheader	1	Bitte bewerte Deine Erfahrung mit den folgenden Themen:	Hier kannst du  mehr darüber lesen, wie wir die verschiedenen Erfahrungsstufen definieren: https://docs.correlaid.org/project-manual/data4good-projects#experience-scale	de						
-SQ		wirkungsmessung	"(projectroleprojectalpha==""role-survey-design"")"	Wirkungsmessung		de			Y			
-SQ		researchdesign	"(projectroleprojectalpha==""role-survey-design"")"	Research Design		de			Y			
-SQ		surveyresearch	"(projectroleprojectalpha==""role-survey-design"")"	Umfrageforschung		de			Y			
-SQ		dataprotection	"(projectroleprojectalpha==""role-survey-design"")"	Datenschutz		de			Y			
-SQ		resiliencementalheal	"(projectroleprojectalpha==""role-survey-design"")"	Resilienz und Mentale Gesundheit		de			Y			
-SQ		educationresearch	"(projectroleprojectalpha==""role-survey-design"")"	Bildungsforschung o.ä.		de			Y			
+SQ		wirkungsmessung	"(projectroleprojectalpha==""roles"")"	Wirkungsmessung		de			Y			
+SQ		researchdesign	"(projectroleprojectalpha==""roles"")"	Research Design		de			Y			
+SQ		surveyresearch	"(projectroleprojectalpha==""roles"")"	Umfrageforschung		de			Y			
+SQ		dataprotection	"(projectroleprojectalpha==""roles"")"	Datenschutz		de			Y			
+SQ		resiliencementalheal	"(projectroleprojectalpha==""roles"")"	Resilienz und Mentale Gesundheit		de			Y			
+SQ		educationresearch	"(projectroleprojectalpha==""roles"")"	Bildungsforschung o.ä.		de			Y			
 A		begin		Anfänger:in		de						
 A		user		Benutzer:in		de						
 A		advan		Fortgeschrittene:r		de						
 A		exper		Expert:in		de						
 Q	F	ratingtopicsheader	1	Please rate your experience with the following topics:	Read more about what the different experience labels mean for us: https://docs.correlaid.org/project-manual/data4good-projects#experience-scale	en						
-SQ		wirkungsmessung	"(projectroleprojectalpha==""role-survey-design"")"	Impact Measurement		en			Y			
-SQ		researchdesign	"(projectroleprojectalpha==""role-survey-design"")"	Research Design		en			Y			
-SQ		surveyresearch	"(projectroleprojectalpha==""role-survey-design"")"	Survey Research		en			Y			
-SQ		dataprotection	"(projectroleprojectalpha==""role-survey-design"")"	Data protection		en			Y			
-SQ		resiliencementalheal	"(projectroleprojectalpha==""role-survey-design"")"	Resilience and mental health		en			Y			
-SQ		educationresearch	"(projectroleprojectalpha==""role-survey-design"")"	Education research (or similar)		en			Y			
+SQ		wirkungsmessung	"(projectroleprojectalpha==""roles"")"	Impact Measurement		en			Y			
+SQ		researchdesign	"(projectroleprojectalpha==""roles"")"	Research Design		en			Y			
+SQ		surveyresearch	"(projectroleprojectalpha==""roles"")"	Survey Research		en			Y			
+SQ		dataprotection	"(projectroleprojectalpha==""roles"")"	Data protection		en			Y			
+SQ		resiliencementalheal	"(projectroleprojectalpha==""roles"")"	Resilience and mental health		en			Y			
+SQ		educationresearch	"(projectroleprojectalpha==""roles"")"	Education research (or similar)		en			Y			
 A		begin		Beginner		en						
 A		user		User		en						
 A		advan		Advanced		en						
@@ -136,14 +136,14 @@ Q	L	pastapplications	1	Hast du dich in der Vergangenheit bereits auf CorrelAid-P
 A		succe		Ja, und ich war mindestens einmal erfolgreich / Teil eines Projektteams.		de						
 A		notsu		Ja, aber ich war nicht erfolgreich / ich wurde bis jetzt immer abgelehnt.		de						
 A		first		Nein, das ist meine erste Bewerbung.		de						
-Q	S	pastapplicationsdeta	pastapplications == 'not_successful'	Bitte gib hier an, für welche Projekte du dich beworben hast, falls du dich noch erinnern kannst.	Grobe Angaben helfen uns auch schon weiter.	de						
+Q	S	pastapplicationsdeta	"pastapplications == ""notsu"""	Bitte gib hier an, für welche Projekte du dich beworben hast, falls du dich noch erinnern kannst.	Grobe Angaben helfen uns auch schon weiter.	de						
 Q	T	motivationskills	1	Please describe here what skills and experiences you would bring to the project.	Please write maximum 5 sentences per project that you are applying to.	en			Y			
 Q	T	motivationwhy	1	Please describe here why you want to get involved in this project.	Please write maximum 5 sentences per project that you are applying to.	en			Y			
 Q	L	pastapplications	1	Have you applied to a CorrelAid project in the past?	In order to give as many people as possible the opportunity to participate in one of our projects, applications of individuals who have unsuccessfully applied in the past are preferred given equal suitability for the project.	en			Y			
 A		succe		Yes, and I have been successful / part of a project team at least once.		en						
 A		notsu		Yes, but I have not been successful / all my applications have been rejected so far.		en						
 A		first		No, this is my first application.		en						
-Q	S	pastapplicationsdeta	pastapplications == 'not_successful'	If you can remember, please specify which project(s) you have applied for.	Any information is helpful to us.	en						
+Q	S	pastapplicationsdeta	"pastapplications == ""notsu"""	If you can remember, please specify which project(s) you have applied for.	Any information is helpful to us.	en						
 G	7	demographics	1	Über dich		de						
 G	7	demographics	1	About you		en						
 Q	S	firstname	1	Wie lautet dein Vorname?		de			Y			
@@ -155,7 +155,7 @@ A		male		Männlich		de
 A		nonbi		Nicht-binär / non-binary		de						
 A		notdi		Das möchte ich nicht angeben		de						
 A		selfi		Mein Geschlecht ist (eigene Angabe):		de						
-Q	S	genderselfidentifica	gender == 'self_identification'	Mein Geschlecht ist:	Bitte gebe hier dein Geschlecht an.	de			Y			
+Q	S	genderselfidentifica	"gender == ""selfi"""	Mein Geschlecht ist:	Bitte gebe hier dein Geschlecht an.	de			Y			
 Q	S	firstname	1	What is your first name?		en			Y			
 Q	S	lastname	1	What is your last name?		en			Y			
 Q	S	emailaddress	1	Which email address can we use to contact you?		en		regexMatch(self, '^[\w-\.]+@([\w-]+\.)+[\w-]{2,}$')	Y			
@@ -165,7 +165,7 @@ A		male		Male		en
 A		nonbi		Non-binary		en						
 A		notdi		I do not want to disclose my gender		en						
 A		selfi		My gender is (manually specify):		en						
-Q	S	genderselfidentifica	gender == 'self_identification'	My gender is:	Please specify your gender here.	en			Y			
+Q	S	genderselfidentifica	"gender == ""selfi"""	My gender is:	Please specify your gender here.	en			Y			
 G	8	G7	1	G7		de						
 G	8	G7	1	G7		en						
 Q	L	consentprivacypolicy	1	Einwilligung in die Datenschutzerklärung	Ich habe den Disclaimer gelesen und erteile hiermit meine Zustimmung zur Erhebung, Verarbeitung und Nutzung meiner personenbezogener Daten (Geschlecht und persönliche Fähigkeiten) zu internen und externen Reporting- und Präsentationszwecken. Daneben erteile ich ausdrücklich die Erlaubnis meine Kontaktdaten (Name und E-Mail) zur Kontaktaufnahme zu nutzen und diese bei erfolgreicher Bewerbung mit dem Projektteam zu teilen.	de			Y			
