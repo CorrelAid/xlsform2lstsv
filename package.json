@@ -1,6 +1,6 @@
 {
   "name": "xlsform2lstsv",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Convert XLSForm surveys to LimeSurvey TSV format",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
