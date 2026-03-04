@@ -6,7 +6,7 @@ G	1	consentsection	1	Consent and Demographics		en
 Q	S	consent	1	Do you consent to participate?		en						
 Q	N	age	1	What is your age?		en						
 Q	S	country	1	What country do you live in?		en						
-Q	S	adultconsent	"(consent==""yes"") and age >= 18"	Adult consent verification		en						
+Q	S	adultconsent	"(consent.NAOK==""yes"") and age >= 18"	Adult consent verification		en						
 Q	S	eligibleparticipant	age >= 18 and country == 'USA' or country == 'Canada'	Eligible participant		en						
 Q	S	validresponse	!(consent == '') and age > 0	Valid response check		en						
 Q	S	agecategory	1	Age category		en						

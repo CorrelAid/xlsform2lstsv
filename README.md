@@ -35,7 +35,7 @@ Convert XLSForm surveys to LimeSurvey TSV format.
   - its a complex task to ensure the transpiler covers everything and we currently cannot guarantee error free/complete transpiling 
 
 - constraint_message ❌
-- XLSForms Calculation ❌
+- XLSForms Calculation ✅ (`calculate` type → LimeSurvey Equation question `*`; `${var}` references in labels/hints converted to EM `{var}` syntax)
 - XLSForms Trigger ❌
 - Repeats ❌
 - LimeSurvey Assessments ❌

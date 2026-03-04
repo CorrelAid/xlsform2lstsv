@@ -26,9 +26,16 @@ describe('Integration: all_types_survey.json', () => {
 		it('should not contain any metadata skip types in output', async () => {
 			const rows = await convertFixture();
 			const allNames = rows.map(r => r.name);
-			for (const skip of ['start', 'end', 'today', 'deviceid', 'username', 'calc1', 'hidden1', 'audit']) {
+			for (const skip of ['start', 'end', 'today', 'deviceid', 'username', 'hidden1', 'audit']) {
 				expect(allNames).not.toContain(skip);
 			}
+		});
+
+		it('should convert calculate type to equation question', async () => {
+			const rows = await convertFixture();
+			const calc = findQ(rows, 'calc1');
+			expect(calc).toBeDefined();
+			expect(calc!['type/scale']).toBe('*');
 		});
 	});
 

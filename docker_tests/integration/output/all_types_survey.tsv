@@ -3,6 +3,7 @@ S		language	1	en		en
 S		format	1	A		en						
 SL		surveyls_title	1	Workshop-Feedback-Umfrage		en						
 G	1	G0	1	G0		en						
+Q	*	calc1	1	{1 + 1}		en						
 Q	S	orphanbefore	1	Wie lautet Ihre Teilnehmer-ID?		en						
 G	2	basictypes	1	Persönliche Angaben		en						
 Q	S	qtext	1	Wie heißen Sie (Vor- und Nachname)?		en						

@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { convertConstraint, convertRelevance, xpathToLimeSurvey } from '../../converters/xpathTranspiler';
+import { convertConstraint, convertRelevance, xpathToLimeSurvey, TranspilerContext } from '../../converters/xpathTranspiler';
 
 describe('XPath Function Conversion', () => {
 
@@ -138,6 +138,96 @@ describe('XPath Function Conversion', () => {
 		test('converts if() function to ternary', async () => {
 			const result = await xpathToLimeSurvey('if(${age} > 18, "adult", "minor")');
 			expect(result).toBe('(age > 18 ? "adult" : "minor")');
+		});
+	});
+
+	describe('selected() with TranspilerContext', () => {
+		// These tests verify that when a TranspilerContext is provided,
+		// selected() uses buildSelectedExpr to generate type-aware expressions.
+		// Without these, the bug where select_multiple generated (field=="code")
+		// instead of (field_code.NAOK == "Y") went undetected.
+
+		test('select_multiple: selected() produces field_code.NAOK == "Y"', async () => {
+			const ctx: TranspilerContext = {
+				buildSelectedExpr: (field, value) => `(${field}_${value}.NAOK == "Y")`,
+			};
+			const result = await xpathToLimeSurvey("selected(${project_id}, 'alpha')", ctx);
+			expect(result).toBe('(projectid_alpha.NAOK == "Y")');
+		});
+
+		test('select_one: selected() produces field.NAOK=="code"', async () => {
+			const ctx: TranspilerContext = {
+				buildSelectedExpr: (field, value) => `(${field}.NAOK=="${value}")`,
+			};
+			const result = await xpathToLimeSurvey("selected(${gender}, 'female')", ctx);
+			expect(result).toBe('(gender.NAOK=="female")');
+		});
+
+		test('buildSelectedExpr receives sanitized field name (hyphens/underscores removed)', async () => {
+			const ctx: TranspilerContext = {
+				buildSelectedExpr: (field, value) => `(${field}_${value}.NAOK == "Y")`,
+			};
+			const result = await xpathToLimeSurvey("selected(${my_field-name}, 'val')", ctx);
+			expect(result).toBe('(myfieldname_val.NAOK == "Y")');
+		});
+
+		test('without context, selected() falls back to basic equality', async () => {
+			const result = await xpathToLimeSurvey("selected(${field}, 'value')");
+			expect(result).toBe('(field=="value")');
+		});
+	});
+
+	describe('equality with lookupAnswerCode', () => {
+		// These tests verify that = / != comparisons rewrite choice values
+		// via lookupAnswerCode. Without these, the bug where relevance used
+		// unsanitized choice values (e.g., 'not_successful' instead of 'notsu')
+		// went undetected.
+
+		test('rewrites choice value in equality comparison', async () => {
+			const ctx: TranspilerContext = {
+				lookupAnswerCode: (_field, value) => {
+					if (value === 'not_successful') return 'notsu';
+					return value;
+				},
+			};
+			const result = await convertRelevance("${past_applications} = 'not_successful'", ctx);
+			expect(result).toBe('pastapplications == "notsu"');
+		});
+
+		test('rewrites choice value in != comparison', async () => {
+			const ctx: TranspilerContext = {
+				lookupAnswerCode: (_field, value) => {
+					if (value === 'option-one') return 'optio';
+					return value;
+				},
+			};
+			const result = await convertRelevance("${question} != 'option-one'", ctx);
+			expect(result).toBe('question != "optio"');
+		});
+
+		test('does not alter expression when lookup returns same value', async () => {
+			const ctx: TranspilerContext = {
+				lookupAnswerCode: (_field, value) => value,
+			};
+			const result = await convertRelevance("${field} != ''", ctx);
+			expect(result).toBe("field != ''");
+		});
+
+		test('combined: selected() with buildSelectedExpr and equality with lookupAnswerCode', async () => {
+			const ctx: TranspilerContext = {
+				buildSelectedExpr: (field, value) => `(${field}_${value}.NAOK == "Y")`,
+				lookupAnswerCode: (_field, value) => {
+					if (value === 'yes') return 'yes';
+					return value;
+				},
+			};
+			const result = await convertRelevance(
+				"selected(${multi_q}, 'opt1') and ${single_q} = 'yes'",
+				ctx,
+			);
+			expect(result).toContain('(multiq_opt1.NAOK == "Y")');
+			expect(result).toContain(' and ');
+			expect(result).toContain('singleq == \'yes\'');
 		});
 	});
 });

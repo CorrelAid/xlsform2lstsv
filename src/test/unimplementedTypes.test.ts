@@ -201,14 +201,16 @@ describe('Unimplemented XLSForm Types Validation', () => {
 			expect(rows.find(r => r.name === 'auditq')).toBeUndefined();
 		});
 
-		test('silently skips calculate type', async () => {
+		test('converts calculate type to equation question', async () => {
 			const survey = [
-				{ type: 'calculate', name: 'calc_q', label: 'Calculation', calculation: '${a} + ${b}' },
+				{ type: 'calculate', name: 'calc_q', calculation: '${a} + ${b}' },
 				{ type: 'text', name: 'q1', label: 'Question 1' }
 			];
 
 			const rows = await convertAndParse(survey);
-			expect(rows.find(r => r.name === 'calcq')).toBeUndefined();
+			const calcRow = rows.find(r => r.name === 'calcq');
+			expect(calcRow).toBeDefined();
+			expect(calcRow?.['type/scale']).toBe('*');
 		});
 
 		test('silently skips hidden type', async () => {

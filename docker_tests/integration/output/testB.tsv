@@ -16,41 +16,41 @@ Q	M	projectid	1	Für welche Projekte möchtest Du dich bewerben?		de			Y
 SQ		proje		Projekt Alpha		de						
 SQ		proj1		Projekt Beta		de						
 SQ		proj2		Projekt Gamma		de						
-Q	M	projectroleprojectal	"(projectid==""proje"")"	In welcher Rolle siehst du dich im Projekt Projekt Alpha?		de			Y			
+Q	M	projectroleprojectal	"(projectid_proje.NAOK == ""Y"")"	In welcher Rolle siehst du dich im Projekt Projekt Alpha?		de			Y			
 SQ		roles		Umfragedesign und Datenerhebung		de						
 SQ		roled		Datenanalyse		de						
-Q	M	projectroleprojectbe	"(projectid==""proj1"")"	In welcher Rolle siehst du dich im Projekt Beta?		de			Y			
+Q	M	projectroleprojectbe	"(projectid_proj1.NAOK == ""Y"")"	In welcher Rolle siehst du dich im Projekt Beta?		de			Y			
 SQ		rolev		Datenvisualisierung		de						
 SQ		roled		Data Engineering		de						
-Q	M	projectroleprojectga	"(projectid==""proj2"")"	In welcher Rolle siehst du dich im Projekt Gamma?		de			Y			
+Q	M	projectroleprojectga	"(projectid_proj2.NAOK == ""Y"")"	In welcher Rolle siehst du dich im Projekt Gamma?		de			Y			
 SQ		rolep		Projektmanagement		de						
 SQ		rolem		Machine Learning		de						
 Q	M	projectid	1	Which project(s) do you want to apply for?		en			Y			
 SQ		proje		Project Alpha		en						
 SQ		proj1		Project Beta		en						
 SQ		proj2		Project Gamma		en						
-Q	M	projectroleprojectal	"(projectid==""proje"")"	Which role do you think you could fill in Project Alpha?		en			Y			
+Q	M	projectroleprojectal	"(projectid_proje.NAOK == ""Y"")"	Which role do you think you could fill in Project Alpha?		en			Y			
 SQ		roles		Survey design and data collection		en						
 SQ		roled		Data analysis		en						
-Q	M	projectroleprojectbe	"(projectid==""proj1"")"	Which role do you see yourself in for Project Beta?		en			Y			
+Q	M	projectroleprojectbe	"(projectid_proj1.NAOK == ""Y"")"	Which role do you see yourself in for Project Beta?		en			Y			
 SQ		rolev		Data visualization		en						
 SQ		roled		Data engineering		en						
-Q	M	projectroleprojectga	"(projectid==""proj2"")"	Which role do you see yourself in for Project Gamma?		en			Y			
+Q	M	projectroleprojectga	"(projectid_proj2.NAOK == ""Y"")"	Which role do you see yourself in for Project Gamma?		en			Y			
 SQ		rolep		Project management		en						
 SQ		rolem		Machine learning		en						
 G	3	ratingtechnologiesto	1	Tools		de						
 G	3	ratingtechnologiesto	1	Tools		en						
 Q	X	grouplt58n55	1	Deine Fähigkeiten und Erfahrungen		de						
 Q	F	ratingtechnologiesto	1	Bitte bewerte Deine Erfahrung mit den folgenden Technologien und Tools:	Hier kannst du  mehr darüber lesen, wie wir die verschiedenen Erfahrungsstufen definieren: https://docs.correlaid.org/project-manual/data4good-projects#experience-scale	de						
-SQ		soscisurvey	"(projectroleprojectalpha==""roles"")"	SoSci Survey		de			Y			
-SQ		python	"(projectroleprojectalpha==""roled"")"	Python		de			Y			
-SQ		rstats	"(projectroleprojectalpha==""roled"")"	R		de			Y			
-SQ		powerbi	"(projectroleprojectbeta==""rolev"")"	Power BI		de			Y			
-SQ		excel	"(projectroleprojectbeta==""rolev"")"	Microsoft Excel		de			Y			
-SQ		sql	"(projectroleprojectbeta==""roled"")"	SQL		de			Y			
-SQ		git	"(projectroleprojectbeta==""roled"")"	Git		de			Y			
-SQ		jupyter	"(projectroleprojectgamma==""rolem"")"	Jupyter Notebooks		de			Y			
-SQ		tensorflow	"(projectroleprojectgamma==""rolem"")"	TensorFlow / PyTorch		de			Y			
+SQ		soscisurvey	"(projectroleprojectal_roles.NAOK == ""Y"")"	SoSci Survey		de			Y			
+SQ		python	"(projectroleprojectal_roled.NAOK == ""Y"")"	Python		de			Y			
+SQ		rstats	"(projectroleprojectal_roled.NAOK == ""Y"")"	R		de			Y			
+SQ		powerbi	"(projectroleprojectbe_rolev.NAOK == ""Y"")"	Power BI		de			Y			
+SQ		excel	"(projectroleprojectbe_rolev.NAOK == ""Y"")"	Microsoft Excel		de			Y			
+SQ		sql	"(projectroleprojectbe_roled.NAOK == ""Y"")"	SQL		de			Y			
+SQ		git	"(projectroleprojectbe_roled.NAOK == ""Y"")"	Git		de			Y			
+SQ		jupyter	"(projectroleprojectga_rolem.NAOK == ""Y"")"	Jupyter Notebooks		de			Y			
+SQ		tensorflow	"(projectroleprojectga_rolem.NAOK == ""Y"")"	TensorFlow / PyTorch		de			Y			
 A		begin		Anfänger:in		de						
 A		user		Benutzer:in		de						
 A		advan		Fortgeschrittene:r		de						
@@ -58,15 +58,15 @@ A		exper		Expert:in		de
 Q	T	toolsother	1	Andere relevante Tools	Bitte gib hier andere Tools an, die du kennst und die du für relevant erachtest.	de						
 Q	X	grouplt58n55	1	Your skills and experiences		en						
 Q	F	ratingtechnologiesto	1	Please rate your experience with the following technologies and tools:	Read more about what the different experience labels mean for us: https://docs.correlaid.org/project-manual/data4good-projects#experience-scale	en						
-SQ		soscisurvey	"(projectroleprojectalpha==""roles"")"	SoSci Survey		en			Y			
-SQ		python	"(projectroleprojectalpha==""roled"")"	Python		en			Y			
-SQ		rstats	"(projectroleprojectalpha==""roled"")"	R		en			Y			
-SQ		powerbi	"(projectroleprojectbeta==""rolev"")"	Power BI		en			Y			
-SQ		excel	"(projectroleprojectbeta==""rolev"")"	Microsoft Excel		en			Y			
-SQ		sql	"(projectroleprojectbeta==""roled"")"	SQL		en			Y			
-SQ		git	"(projectroleprojectbeta==""roled"")"	Git		en			Y			
-SQ		jupyter	"(projectroleprojectgamma==""rolem"")"	Jupyter Notebooks		en			Y			
-SQ		tensorflow	"(projectroleprojectgamma==""rolem"")"	TensorFlow / PyTorch		en			Y			
+SQ		soscisurvey	"(projectroleprojectal_roles.NAOK == ""Y"")"	SoSci Survey		en			Y			
+SQ		python	"(projectroleprojectal_roled.NAOK == ""Y"")"	Python		en			Y			
+SQ		rstats	"(projectroleprojectal_roled.NAOK == ""Y"")"	R		en			Y			
+SQ		powerbi	"(projectroleprojectbe_rolev.NAOK == ""Y"")"	Power BI		en			Y			
+SQ		excel	"(projectroleprojectbe_rolev.NAOK == ""Y"")"	Microsoft Excel		en			Y			
+SQ		sql	"(projectroleprojectbe_roled.NAOK == ""Y"")"	SQL		en			Y			
+SQ		git	"(projectroleprojectbe_roled.NAOK == ""Y"")"	Git		en			Y			
+SQ		jupyter	"(projectroleprojectga_rolem.NAOK == ""Y"")"	Jupyter Notebooks		en			Y			
+SQ		tensorflow	"(projectroleprojectga_rolem.NAOK == ""Y"")"	TensorFlow / PyTorch		en			Y			
 A		begin		Beginner		en						
 A		user		User		en						
 A		advan		Advanced		en						
@@ -75,31 +75,31 @@ Q	T	toolsother	1	Other relevant tools	Please specifiy other tools you know that 
 G	4	ratingtechniques	1	Techniken		de						
 G	4	ratingtechniques	1	Techniques		en						
 Q	F	ratingtechniqueshead	1	Bitte bewerte Deine Erfahrung mit den folgenden Techniken.	Hier kannst du  mehr darüber lesen, wie wir die verschiedenen Erfahrungsstufen definieren: https://docs.correlaid.org/project-manual/data4good-projects#experience-scale	de						
-SQ		surveydesign	"(projectroleprojectalpha==""roles"")"	Entwicklung von Fragebögen		de			Y			
-SQ		indicatordevelopment	"(projectroleprojectalpha==""roles"")"	Entwicklung von Indikatoren		de			Y			
-SQ		datacollection	"(projectroleprojectalpha==""roles"")"	Datenerhebung		de			Y			
-SQ		datacleaning	"(projectroleprojectalpha==""roled"")"	Datenbereinigung		de			Y			
-SQ		descriptivestatistic	"(projectroleprojectalpha==""roled"")"	Deskriptive Statistik		de			Y			
-SQ		datavisualization	"(projectroleprojectbeta==""rolev"")"	Datenvisualisierung		de			Y			
-SQ		dataengineering	"(projectroleprojectbeta==""roled"")"	Data Engineering		de			Y			
-SQ		automation	"(projectroleprojectbeta==""roled"")"	Automatisierung		de			Y			
-SQ		projectplanning	"(projectroleprojectgamma==""rolep"")"	Projektplanung		de			Y			
-SQ		mlmodeling	"(projectroleprojectgamma==""rolem"")"	ML-Modellierung		de			Y			
+SQ		surveydesign	"(projectroleprojectal_roles.NAOK == ""Y"")"	Entwicklung von Fragebögen		de			Y			
+SQ		indicatordevelopment	"(projectroleprojectal_roles.NAOK == ""Y"")"	Entwicklung von Indikatoren		de			Y			
+SQ		datacollection	"(projectroleprojectal_roles.NAOK == ""Y"")"	Datenerhebung		de			Y			
+SQ		datacleaning	"(projectroleprojectal_roled.NAOK == ""Y"")"	Datenbereinigung		de			Y			
+SQ		descriptivestatistic	"(projectroleprojectal_roled.NAOK == ""Y"")"	Deskriptive Statistik		de			Y			
+SQ		datavisualization	"(projectroleprojectbe_rolev.NAOK == ""Y"")"	Datenvisualisierung		de			Y			
+SQ		dataengineering	"(projectroleprojectbe_roled.NAOK == ""Y"")"	Data Engineering		de			Y			
+SQ		automation	"(projectroleprojectbe_roled.NAOK == ""Y"")"	Automatisierung		de			Y			
+SQ		projectplanning	"(projectroleprojectga_rolep.NAOK == ""Y"")"	Projektplanung		de			Y			
+SQ		mlmodeling	"(projectroleprojectga_rolem.NAOK == ""Y"")"	ML-Modellierung		de			Y			
 A		begin		Anfänger:in		de						
 A		user		Benutzer:in		de						
 A		advan		Fortgeschrittene:r		de						
 A		exper		Expert:in		de						
 Q	F	ratingtechniqueshead	1	Please rate your experience with the following techniques:	Read more about what the different experience labels mean for us: https://docs.correlaid.org/project-manual/data4good-projects#experience-scale	en						
-SQ		surveydesign	"(projectroleprojectalpha==""roles"")"	Survey design		en			Y			
-SQ		indicatordevelopment	"(projectroleprojectalpha==""roles"")"	Development of indicators		en			Y			
-SQ		datacollection	"(projectroleprojectalpha==""roles"")"	Data collection		en			Y			
-SQ		datacleaning	"(projectroleprojectalpha==""roled"")"	Data cleaning		en			Y			
-SQ		descriptivestatistic	"(projectroleprojectalpha==""roled"")"	Descriptive statistics		en			Y			
-SQ		datavisualization	"(projectroleprojectbeta==""rolev"")"	Data visualization		en			Y			
-SQ		dataengineering	"(projectroleprojectbeta==""roled"")"	Data engineering		en			Y			
-SQ		automation	"(projectroleprojectbeta==""roled"")"	Automation		en			Y			
-SQ		projectplanning	"(projectroleprojectgamma==""rolep"")"	Project planning		en			Y			
-SQ		mlmodeling	"(projectroleprojectgamma==""rolem"")"	ML modeling		en			Y			
+SQ		surveydesign	"(projectroleprojectal_roles.NAOK == ""Y"")"	Survey design		en			Y			
+SQ		indicatordevelopment	"(projectroleprojectal_roles.NAOK == ""Y"")"	Development of indicators		en			Y			
+SQ		datacollection	"(projectroleprojectal_roles.NAOK == ""Y"")"	Data collection		en			Y			
+SQ		datacleaning	"(projectroleprojectal_roled.NAOK == ""Y"")"	Data cleaning		en			Y			
+SQ		descriptivestatistic	"(projectroleprojectal_roled.NAOK == ""Y"")"	Descriptive statistics		en			Y			
+SQ		datavisualization	"(projectroleprojectbe_rolev.NAOK == ""Y"")"	Data visualization		en			Y			
+SQ		dataengineering	"(projectroleprojectbe_roled.NAOK == ""Y"")"	Data engineering		en			Y			
+SQ		automation	"(projectroleprojectbe_roled.NAOK == ""Y"")"	Automation		en			Y			
+SQ		projectplanning	"(projectroleprojectga_rolep.NAOK == ""Y"")"	Project planning		en			Y			
+SQ		mlmodeling	"(projectroleprojectga_rolem.NAOK == ""Y"")"	ML modeling		en			Y			
 A		begin		Beginner		en						
 A		user		User		en						
 A		advan		Advanced		en						
@@ -107,23 +107,23 @@ A		exper		Expert		en
 G	5	ratingtopics	1	Themen		de						
 G	5	ratingtopics	1	Topics		en						
 Q	F	ratingtopicsheader	1	Bitte bewerte Deine Erfahrung mit den folgenden Themen:	Hier kannst du  mehr darüber lesen, wie wir die verschiedenen Erfahrungsstufen definieren: https://docs.correlaid.org/project-manual/data4good-projects#experience-scale	de						
-SQ		wirkungsmessung	"(projectroleprojectalpha==""roles"")"	Wirkungsmessung		de			Y			
-SQ		researchdesign	"(projectroleprojectalpha==""roles"")"	Research Design		de			Y			
-SQ		surveyresearch	"(projectroleprojectalpha==""roles"")"	Umfrageforschung		de			Y			
-SQ		dataprotection	"(projectroleprojectalpha==""roles"")"	Datenschutz		de			Y			
-SQ		resiliencementalheal	"(projectroleprojectalpha==""roles"")"	Resilienz und Mentale Gesundheit		de			Y			
-SQ		educationresearch	"(projectroleprojectalpha==""roles"")"	Bildungsforschung o.ä.		de			Y			
+SQ		wirkungsmessung	"(projectroleprojectal_roles.NAOK == ""Y"")"	Wirkungsmessung		de			Y			
+SQ		researchdesign	"(projectroleprojectal_roles.NAOK == ""Y"")"	Research Design		de			Y			
+SQ		surveyresearch	"(projectroleprojectal_roles.NAOK == ""Y"")"	Umfrageforschung		de			Y			
+SQ		dataprotection	"(projectroleprojectal_roles.NAOK == ""Y"")"	Datenschutz		de			Y			
+SQ		resiliencementalheal	"(projectroleprojectal_roles.NAOK == ""Y"")"	Resilienz und Mentale Gesundheit		de			Y			
+SQ		educationresearch	"(projectroleprojectal_roles.NAOK == ""Y"")"	Bildungsforschung o.ä.		de			Y			
 A		begin		Anfänger:in		de						
 A		user		Benutzer:in		de						
 A		advan		Fortgeschrittene:r		de						
 A		exper		Expert:in		de						
 Q	F	ratingtopicsheader	1	Please rate your experience with the following topics:	Read more about what the different experience labels mean for us: https://docs.correlaid.org/project-manual/data4good-projects#experience-scale	en						
-SQ		wirkungsmessung	"(projectroleprojectalpha==""roles"")"	Impact Measurement		en			Y			
-SQ		researchdesign	"(projectroleprojectalpha==""roles"")"	Research Design		en			Y			
-SQ		surveyresearch	"(projectroleprojectalpha==""roles"")"	Survey Research		en			Y			
-SQ		dataprotection	"(projectroleprojectalpha==""roles"")"	Data protection		en			Y			
-SQ		resiliencementalheal	"(projectroleprojectalpha==""roles"")"	Resilience and mental health		en			Y			
-SQ		educationresearch	"(projectroleprojectalpha==""roles"")"	Education research (or similar)		en			Y			
+SQ		wirkungsmessung	"(projectroleprojectal_roles.NAOK == ""Y"")"	Impact Measurement		en			Y			
+SQ		researchdesign	"(projectroleprojectal_roles.NAOK == ""Y"")"	Research Design		en			Y			
+SQ		surveyresearch	"(projectroleprojectal_roles.NAOK == ""Y"")"	Survey Research		en			Y			
+SQ		dataprotection	"(projectroleprojectal_roles.NAOK == ""Y"")"	Data protection		en			Y			
+SQ		resiliencementalheal	"(projectroleprojectal_roles.NAOK == ""Y"")"	Resilience and mental health		en			Y			
+SQ		educationresearch	"(projectroleprojectal_roles.NAOK == ""Y"")"	Education research (or similar)		en			Y			
 A		begin		Beginner		en						
 A		user		User		en						
 A		advan		Advanced		en						

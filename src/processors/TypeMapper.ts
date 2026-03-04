@@ -30,6 +30,7 @@ export const TYPE_MAPPINGS: Record<string, {
 
   // Other types
   note: { limeSurveyType: 'X' },
+  calculate: { limeSurveyType: '*' },
   rank: { limeSurveyType: 'R', answerClass: 'A', supportsOther: true },
   
 

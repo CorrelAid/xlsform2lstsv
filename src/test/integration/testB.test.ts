@@ -68,28 +68,30 @@ describe('Integration: testB.xlsx', () => {
 
 		// The sosci_survey subquestion should have a proper relevance expression
 		// original: selected(${project_role_project-alpha}, 'role-survey-design')
-		// 'role-survey-design' sanitizes to 'roles' (remove hyphens → rolesurveydesign → truncate to 5)
+		// project_role_project-alpha → projectroleprojectal (20 char truncation)
+		// role-survey-design → roles (remove hyphens → rolesurveydesign → truncate to 5)
+		// select_multiple → fieldname_code.NAOK == "Y"
 		const sqRow = rows.find(r => r.class === 'SQ' && r.name === 'soscisurvey');
 		expect(sqRow).toBeDefined();
-		expect(sqRow!.relevance).toContain('projectroleprojectalpha');
-		expect(sqRow!.relevance).toContain('roles');
+		expect(sqRow!.relevance).toContain('projectroleprojectal_roles.NAOK == "Y"');
 
 		// Project-beta role relevance: selected(${project_role_project-beta}, 'role-visualization')
-		// 'role-visualization' sanitizes to 'rolev'
+		// project_role_project-beta → projectroleprojectbe (20 char truncation)
+		// role-visualization → rolev
 		const powerbiRow = rows.find(r => r.class === 'SQ' && r.name === 'powerbi');
 		expect(powerbiRow).toBeDefined();
-		expect(powerbiRow!.relevance).toContain('projectroleprojectbeta');
-		expect(powerbiRow!.relevance).toContain('rolev');
+		expect(powerbiRow!.relevance).toContain('projectroleprojectbe_rolev.NAOK == "Y"');
 
 		// Project-gamma role relevance: selected(${project_role_project-gamma}, 'role-machine-learning')
-		// 'role-machine-learning' sanitizes to 'rolem'
+		// project_role_project-gamma → projectroleprojectga (20 char truncation)
+		// role-machine-learning → rolem
 		const jupyterRow = rows.find(r => r.class === 'SQ' && r.name === 'jupyter');
 		expect(jupyterRow).toBeDefined();
-		expect(jupyterRow!.relevance).toContain('projectroleprojectgamma');
-		expect(jupyterRow!.relevance).toContain('rolem');
+		expect(jupyterRow!.relevance).toContain('projectroleprojectga_rolem.NAOK == "Y"');
 
 		// Simple equality relevant: ${past_applications} = 'not_successful'
-		// 'not_successful' sanitizes to 'notsu' (remove underscore → notsuccessful → truncate to 5)
+		// past_applications is select_one (type L) → fieldname.NAOK=="code"
+		// not_successful → notsu (remove underscore → notsuccessful → truncate to 5)
 		const pastDetailsRow = rows.find(r => r.name === 'pastapplicationsdeta' && r.class === 'Q');
 		expect(pastDetailsRow).toBeDefined();
 		expect(pastDetailsRow!.relevance).toContain('pastapplications');

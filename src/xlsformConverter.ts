@@ -1,6 +1,6 @@
 import { ConfigManager, ConversionConfig } from './config/ConfigManager.js';
 import { SurveyRow, ChoiceRow, SettingsRow } from './config/types.js';
-import { convertRelevance, convertConstraint } from './converters/xpathTranspiler.js';
+import { convertRelevance, convertConstraint, xpathToLimeSurvey, TranspilerContext } from './converters/xpathTranspiler.js';
 import { FieldSanitizer } from './processors/FieldSanitizer.js';
 import { TSVGenerator } from './processors/TSVGenerator.js';
 import { TypeMapper, TypeInfo, LSType } from './processors/TypeMapper.js';
@@ -9,7 +9,7 @@ import { getBaseLanguage } from './utils/languageUtils.js';
 // Metadata types that should be silently skipped (no visual representation)
 const SKIP_TYPES = [
 	'start', 'end', 'today', 'deviceid', 'username',
-	'calculate', 'hidden', 'audit'
+	'hidden', 'audit'
 ];
 
 // Unimplemented XLSForm types that should raise an error
@@ -67,6 +67,7 @@ export class XLSFormToTSVConverter {
 	private groupContentBuffer: TSVRowData[];
 	private answerCodeMap: Map<string, Map<string, string>>;
 	private questionToListMap: Map<string, string>;
+	private questionBaseTypeMap: Map<string, string>;
 
 	constructor(config?: Partial<ConversionConfig>) {
 		this.configManager = new ConfigManager(config);
@@ -93,6 +94,7 @@ export class XLSFormToTSVConverter {
 		this.groupContentBuffer = [];
 		this.answerCodeMap = new Map();
 		this.questionToListMap = new Map();
+		this.questionBaseTypeMap = new Map();
 	}
 
 	/**
@@ -275,11 +277,13 @@ export class XLSFormToTSVConverter {
 
 	private buildQuestionToListMap(surveyData: SurveyRow[]): void {
 		this.questionToListMap = new Map();
+		this.questionBaseTypeMap = new Map();
 		for (const row of surveyData) {
 			const typeInfo = this.parseType(row.type || '');
 			if (typeInfo.listName && row.name) {
 				const sanitizedName = this.sanitizeName(row.name.trim());
 				this.questionToListMap.set(sanitizedName, typeInfo.listName);
+				this.questionBaseTypeMap.set(sanitizedName, typeInfo.base);
 			}
 		}
 	}
@@ -651,6 +655,23 @@ export class XLSFormToTSVConverter {
 		return this.fieldSanitizer.sanitizeAnswerCode(code);
 	}
 
+	/**
+	 * Convert ${varname} references in text to LimeSurvey EM syntax {sanitizedname}.
+	 */
+	private convertVariableReferences(text: string): string {
+		return text.replace(/\$\{([^}]+)\}/g, (_, name: string) => {
+			const sanitized = name.replace(/[_-]/g, '');
+			return `{${sanitized}}`;
+		});
+	}
+
+	/**
+	 * Transpile an XLSForm calculation expression to a LimeSurvey EM expression.
+	 */
+	private async convertCalculation(calculation: string): Promise<string> {
+		return await xpathToLimeSurvey(calculation);
+	}
+
 	private async addGroup(row: SurveyRow): Promise<void> {
 		// Auto-generate name if missing (matches LimeSurvey behavior)
 		const groupName = row.name && row.name.trim() !== ''
@@ -736,22 +757,43 @@ export class XLSFormToTSVConverter {
 
 		// Notes have special handling
 		const isNote = xfTypeInfo.base === 'note';
+		const isCalculate = xfTypeInfo.base === 'calculate';
+
+		// For calculate type, transpile the calculation expression to EM syntax
+		let calculationExpr = '';
+		if (isCalculate && row.calculation) {
+			calculationExpr = await this.convertCalculation(row.calculation);
+		}
 
 		// Add main question for each language
 		for (const lang of this.availableLanguages) {
+			let text: string;
+			if (isCalculate) {
+				// Equation question: the EM expression wrapped in {} IS the question text
+				text = `{${calculationExpr}}`;
+			} else {
+				text = this.getLanguageSpecificValue(row.label, lang) || questionName;
+			}
+
+			// Convert ${var} references to EM {var} syntax in text and help
+			text = this.convertVariableReferences(text);
+			const help = this.convertVariableReferences(
+				this.getLanguageSpecificValue(row.hint, lang) || ''
+			);
+
 			this.bufferRow({
 				class: 'Q',
 				'type/scale': isNote ? 'X' : lsType.type,
 				name: questionName,
 				relevance: await this.convertRelevance(row.relevant),
-				text: this.getLanguageSpecificValue(row.label, lang) || questionName,
-				help: this.getLanguageSpecificValue(row.hint, lang) || '',
+				text,
+				help,
 				language: lang,
 				validation: "",
-				em_validation_q: isNote ? "" : await convertConstraint(row.constraint || ""),
-				mandatory: isNote ? '' : (row.required === 'yes' || row.required === 'true' ? 'Y' : ''),
-				other: isNote ? '' : (lsType.other ? 'Y' : ''),
-				default: isNote ? '' : (row.default || ''),
+				em_validation_q: (isNote || isCalculate) ? "" : await convertConstraint(row.constraint || ""),
+				mandatory: (isNote || isCalculate) ? '' : (row.required === 'yes' || row.required === 'true' ? 'Y' : ''),
+				other: (isNote || isCalculate) ? '' : (lsType.other ? 'Y' : ''),
+				default: (isNote || isCalculate) ? '' : (row.default || ''),
 				same_default: ''
 			});
 		}
@@ -935,18 +977,34 @@ export class XLSFormToTSVConverter {
 		}
 	}
 
+	private lookupAnswerCode(fieldName: string, choiceValue: string): { code: string; listName: string | undefined } {
+		// Truncate to 20 chars to match converter's field sanitization
+		// (the transpiler only removes _/- but doesn't truncate)
+		const truncated = fieldName.length > 20 ? fieldName.substring(0, 20) : fieldName;
+		const listName = this.questionToListMap.get(truncated);
+		if (!listName) return { code: choiceValue, listName: undefined };
+		const codeMap = this.answerCodeMap.get(listName);
+		if (!codeMap) return { code: choiceValue, listName };
+		return { code: codeMap.get(choiceValue) ?? choiceValue, listName };
+	}
+
 	private async convertRelevance(relevant?: string): Promise<string> {
 		if (!relevant) return '1';
-		return await convertRelevance(relevant, (questionName, choiceValue) => {
-			// Truncate to 20 chars to match converter's field sanitization
-			// (the transpiler only removes _/- but doesn't truncate)
-			const truncated = questionName.length > 20 ? questionName.substring(0, 20) : questionName;
-			const listName = this.questionToListMap.get(truncated);
-			if (!listName) return choiceValue;
-			const codeMap = this.answerCodeMap.get(listName);
-			if (!codeMap) return choiceValue;
-			return codeMap.get(choiceValue) ?? choiceValue;
-		});
+		const ctx: TranspilerContext = {
+			lookupAnswerCode: (fieldName: string, choiceValue: string) => {
+				return this.lookupAnswerCode(fieldName, choiceValue).code;
+			},
+			buildSelectedExpr: (fieldName: string, choiceValue: string) => {
+				const truncated = fieldName.length > 20 ? fieldName.substring(0, 20) : fieldName;
+				const { code } = this.lookupAnswerCode(fieldName, choiceValue);
+				const baseType = this.questionBaseTypeMap.get(truncated);
+				if (baseType === 'select_multiple') {
+					return `(${truncated}_${code}.NAOK == "Y")`;
+				}
+				return `(${truncated}.NAOK=="${code}")`;
+			},
+		};
+		return await convertRelevance(relevant, ctx);
 	}
 
 
