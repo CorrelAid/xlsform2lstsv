@@ -12,6 +12,7 @@ interface TSVRow {
   other: string;
   default: string;
   same_default: string;
+  hidden?: string;
 }
 
 export class TSVGenerator {
@@ -36,13 +37,14 @@ export class TSVGenerator {
       'mandatory',
       'other',
       'default',
-      'same_default'
+      'same_default',
+      'hidden'
     ];
 
     const lines = [headers.join('\t')];
 
     for (const row of this.rows) {
-      const values = headers.map((h) => this.escapeForTSV(row[h as keyof TSVRow] || ''));
+      const values = headers.map((h) => this.escapeForTSV(row[h as keyof TSVRow] ?? ''));
       lines.push(values.join('\t'));
     }
 

@@ -73,21 +73,21 @@ describe('Integration: testB.xlsx', () => {
 		// select_multiple → fieldname_code.NAOK == "Y"
 		const sqRow = rows.find(r => r.class === 'SQ' && r.name === 'soscisurvey');
 		expect(sqRow).toBeDefined();
-		expect(sqRow!.relevance).toContain('projectroleprojectal_roles.NAOK == "Y"');
+		expect(sqRow!.relevance).toContain("projectroleprojectal_roles.NAOK == 'Y'");
 
 		// Project-beta role relevance: selected(${project_role_project-beta}, 'role-visualization')
 		// project_role_project-beta → projectroleprojectbe (20 char truncation)
 		// role-visualization → rolev
 		const powerbiRow = rows.find(r => r.class === 'SQ' && r.name === 'powerbi');
 		expect(powerbiRow).toBeDefined();
-		expect(powerbiRow!.relevance).toContain('projectroleprojectbe_rolev.NAOK == "Y"');
+		expect(powerbiRow!.relevance).toContain("projectroleprojectbe_rolev.NAOK == 'Y'");
 
 		// Project-gamma role relevance: selected(${project_role_project-gamma}, 'role-machine-learning')
 		// project_role_project-gamma → projectroleprojectga (20 char truncation)
 		// role-machine-learning → rolem
 		const jupyterRow = rows.find(r => r.class === 'SQ' && r.name === 'jupyter');
 		expect(jupyterRow).toBeDefined();
-		expect(jupyterRow!.relevance).toContain('projectroleprojectga_rolem.NAOK == "Y"');
+		expect(jupyterRow!.relevance).toContain("projectroleprojectga_rolem.NAOK == 'Y'");
 
 		// Simple equality relevant: ${past_applications} = 'not_successful'
 		// past_applications is select_one (type L) → fieldname.NAOK=="code"
@@ -96,6 +96,48 @@ describe('Integration: testB.xlsx', () => {
 		expect(pastDetailsRow).toBeDefined();
 		expect(pastDetailsRow!.relevance).toContain('pastapplications');
 		expect(pastDetailsRow!.relevance).toContain('notsu');
+	});
+
+	it('should produce calculate/equation questions with correct expressions', async () => {
+		const { surveyData, choicesData, settingsData } = XLSLoader.parseXLSData(testFileData, { skipValidation: true });
+
+		const converter = new XLSFormToTSVConverter();
+		const tsv = await converter.convert(surveyData, choicesData, settingsData);
+		const rows = parseTSV(tsv);
+
+		// Calculate fields should produce equation questions (type *)
+		const calcRows = rows.filter(r => r['type/scale'] === '*' && r.language === 'de');
+		expect(calcRows.length).toBe(3);
+
+		// NO_TC_project-alpha: if(selected(${project_id},'project-alpha') and not(selected(${project_role_project-alpha},'team_coordinator')), ...)
+		// select_multiple selected() → field_code.NAOK == "Y"
+		const notcRow = calcRows.find(r => r.name === 'NOTCprojectalpha');
+		expect(notcRow).toBeDefined();
+		expect(notcRow!.text).toContain("projectid_proje.NAOK == 'Y'");
+		expect(notcRow!.text).toContain("projectroleprojectal_teamc.NAOK == 'Y'");
+		expect(notcRow!.text).toContain('!');
+		expect(notcRow!.mandatory).toBe('');
+		expect(notcRow!.hidden).toBe('1');
+
+		// TT_project-alpha: if(selected(${project_id},'project-alpha') and selected(${project_role_project-alpha},'team_trainee')), ...)
+		const ttRow = calcRows.find(r => r.name === 'TTprojectalpha');
+		expect(ttRow).toBeDefined();
+		expect(ttRow!.text).toContain("projectid_proje.NAOK == 'Y'");
+		expect(ttRow!.text).toContain("projectroleprojectal_teamt.NAOK == 'Y'");
+
+		// missing_coord uses conditional commas:
+		// normalize-space(concat(${NO_TC}, if(${NO_TC} != '' and ${TT} != '', ', ', ''), ${TT}))
+		// → trim(NOTC + if(NOTC != '' and TT != '', ', ', '') + TT)
+		const coordRow = calcRows.find(r => r.name === 'missingcoord');
+		expect(coordRow).toBeDefined();
+		expect(coordRow!.text).toContain('trim(');
+		expect(coordRow!.text).toContain('NOTCprojectalpha');
+		expect(coordRow!.text).toContain('TTprojectalpha');
+		// Verify conditional comma: if(..., ', ', '') between the two values
+		expect(coordRow!.text).toContain("if(NOTCprojectalpha != '' and TTprojectalpha != ''");
+		expect(coordRow!.text).toContain("', '");
+		// Should NOT have unconditional commas between values
+		expect(coordRow!.text).not.toMatch(/NOTCprojectalpha \+ ',' \+ TTprojectalpha/);
 	});
 
 	it('should preserve correct question ordering from the survey sheet', async () => {
@@ -133,41 +175,45 @@ describe('Integration: testB.xlsx', () => {
 		const tsv = await converter.convert(surveyData, choicesData, settingsData);
 		const rows = parseTSV(tsv);
 
-		// Extract unique group names from G-class rows
-		const groupNames = new Set<string>();
+		// Count distinct groups by type/scale key (stable across languages)
+		const groupKeys = new Set<string>();
+		const groupNamesDe = new Set<string>();
 		for (const r of rows) {
 			if (r.class === 'G') {
-				groupNames.add(r.name);
+				groupKeys.add(r['type/scale']);
+				if (r.language === 'de') groupNamesDe.add(r.name);
 			}
 		}
 
 		// grouplt58n55 is parent-only (no direct questions, only child groups)
 		// so it gets flattened into a note question instead of a G row
-		expect(groupNames).not.toContain('grouplt58n55');
+		// Group names are now labels (displayed as group titles in LimeSurvey)
+		expect(groupNamesDe).not.toContain('Deine Fähigkeiten und Erfahrungen');
 
-		// Named groups from the XLSForm
+		// Named groups from the XLSForm — group name is the label (de)
 		for (const group of [
-			'groupgi4rv46',
-			'ratingtechnologiesto',
-			'ratingtechniques',
-			'ratingtopics',
-			'grouppr7pr34',
-			'demographics',
+			'Hallo!',
+			'Tools',
+			'Techniken',
+			'Themen',
+			'Du und das Projekt',
+			'Über dich',
 		]) {
-			expect(groupNames).toContain(group);
+			expect(groupNamesDe).toContain(group);
 		}
 
 		// Orphan questions (outside any group) get auto-generated groups:
 		// - project_id and project_role_* are between groupgi4rv46 and grouplt58n55
 		// - consent_privacy_policy is after demographics
-		expect(groupNames.size).toBe(8);
+		// Count by type/scale key (unique per group, shared across languages)
+		expect(groupKeys.size).toBe(8);
 
 		// projectroleprojectal must NOT be in the same group as Hallo
 		const gRows = rows.filter(r => r.class === 'G' || r.class === 'Q');
 		let currentGroup = '';
 		const questionGroup = new Map<string, string>();
 		for (const r of gRows) {
-			if (r.class === 'G') currentGroup = r.name;
+			if (r.class === 'G') currentGroup = r['type/scale'];
 			if (r.class === 'Q') {
 				if (!questionGroup.has(r.name)) questionGroup.set(r.name, currentGroup);
 			}

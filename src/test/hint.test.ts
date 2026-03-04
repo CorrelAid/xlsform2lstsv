@@ -249,10 +249,11 @@ describe('Hint Functionality', () => {
 
 			const rows = await convertAndParse(survey);
 			const groupRows = findRowsByClass(rows, 'G');
-			const personalGroup = groupRows.find(r => r.name === 'personal');
+			const personalGroup = groupRows.find(r => r.name === 'Personal Information');
 
 			expect(personalGroup).toBeDefined();
-			expect(personalGroup?.help).toBe('Please provide your personal details');
+			// For groups, hint goes into text (description) column
+			expect(personalGroup?.text).toBe('Please provide your personal details');
 		});
 
 		test('handles group without hint', async () => {
@@ -268,10 +269,10 @@ describe('Hint Functionality', () => {
 
 			const rows = await convertAndParse(survey);
 			const groupRows = findRowsByClass(rows, 'G');
-			const personalGroup = groupRows.find(r => r.name === 'personal');
+			const personalGroup = groupRows.find(r => r.name === 'Personal Information');
 
 			expect(personalGroup).toBeDefined();
-			expect(personalGroup?.help).toBe('');
+			expect(personalGroup?.text).toBe('');
 		});
 	});
 
@@ -322,11 +323,13 @@ describe('Hint Functionality', () => {
 
 			const rows = await convertAndParse(survey);
 			const groupRows = findRowsByClass(rows, 'G');
-			const englishGroup = groupRows.find(r => r.name === 'demo' && r.language === 'en');
-			const spanishGroup = groupRows.find(r => r.name === 'demo' && r.language === 'es');
+			// Group name is the label
+			const englishGroup = groupRows.find(r => r.name === 'Demographic Information' && r.language === 'en');
+			const spanishGroup = groupRows.find(r => r.name === 'Información Demográfica' && r.language === 'es');
 
-			expect(englishGroup?.help).toBe('Please provide demographic information');
-			expect(spanishGroup?.help).toBe('Por favor proporcione información demográfica');
+			// For groups, hint goes into text (description) column
+			expect(englishGroup?.text).toBe('Please provide demographic information');
+			expect(spanishGroup?.text).toBe('Por favor proporcione información demográfica');
 		});
 
 		test('handles missing hint in one language', async () => {

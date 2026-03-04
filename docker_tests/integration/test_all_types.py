@@ -200,12 +200,12 @@ def test_group_structure(generated_files_dir: Path):
     rows = _parse_tsv(tsv_path)
     group_names = {r["name"] for r in rows if r["class"] == "G"}
 
-    # Named groups present
-    for name in ("basictypes", "appearances", "matrixinner", "orothertypes", "features"):
-        assert name in group_names, f"Expected group '{name}' not found"
+    # Named groups present (group name = label in LimeSurvey TSV)
+    for name in ("Persönliche Angaben", "Ausführliches Feedback", "Programmierkenntnisse", "Weitere Fragen", "Anmeldedaten"):
+        assert name in group_names, f"Expected group '{name}' not found. Available: {group_names}"
 
     # Parent-only group (matrix_wrapper) should NOT be a group
-    assert "matrixwrapper" not in group_names, "Parent-only group should be flattened"
+    assert "Selbsteinschätzung technischer Fähigkeiten" not in group_names, "Parent-only group should be flattened"
 
     # Parent-only group should appear as note (type X)
     note = next((r for r in rows if r["class"] == "Q" and r["name"] == "matrixwrapper"), None)
@@ -411,13 +411,13 @@ def test_all_types_import(limesurvey_client: Client, generated_files_dir: Path):
     try:
         verify_survey_import(limesurvey_client, survey_id)
 
-        # Verify groups
+        # Verify groups (group name = label in LimeSurvey TSV)
         verify_group_exists(limesurvey_client, survey_id, [
-            "basictypes",
-            "appearances",
-            "matrixinner",
-            "orothertypes",
-            "features",
+            "Persönliche Angaben",
+            "Ausführliches Feedback",
+            "Programmierkenntnisse",
+            "Weitere Fragen",
+            "Anmeldedaten",
         ])
 
         # Verify key questions exist

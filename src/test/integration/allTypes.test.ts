@@ -171,7 +171,7 @@ describe('Integration: all_types_survey.json', () => {
 		it('should have named groups for groups with direct questions', async () => {
 			const rows = await convertFixture();
 			const groupNames = new Set(rows.filter(r => r.class === 'G').map(r => r.name));
-			for (const name of ['basictypes', 'appearances', 'matrixinner', 'orothertypes', 'features']) {
+			for (const name of ['Persönliche Angaben', 'Ausführliches Feedback', 'Programmierkenntnisse', 'Weitere Fragen', 'Anmeldedaten']) {
 				expect(groupNames).toContain(name);
 			}
 		});
@@ -179,7 +179,7 @@ describe('Integration: all_types_survey.json', () => {
 		it('should flatten parent-only group (matrix_wrapper) to note', async () => {
 			const rows = await convertFixture();
 			const groupNames = new Set(rows.filter(r => r.class === 'G').map(r => r.name));
-			expect(groupNames).not.toContain('matrixwrapper');
+			expect(groupNames).not.toContain('Selbsteinschätzung technischer Fähigkeiten');
 
 			const noteRow = findQ(rows, 'matrixwrapper');
 			expect(noteRow).toBeDefined();

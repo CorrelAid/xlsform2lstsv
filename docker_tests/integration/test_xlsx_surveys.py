@@ -18,6 +18,7 @@ from test_helpers import (
     verify_multilingual_content,
     read_tsv_content,
     cleanup_survey,
+    get_survey_logic_summary,
 )
 
 
@@ -203,22 +204,31 @@ def test_testB_groups(generated_files_dir: Path):
 
     # grouplt58n55 is parent-only (no direct questions, only child groups)
     # so it gets flattened into a note question instead of a G row
+    # Group names are now labels (displayed as group titles in LimeSurvey)
+    # Multilingual groups have different names per language, check de labels
     named_groups = {
-        "groupgi4rv46",
-        "ratingtechnologiesto",
-        "ratingtechniques",
-        "ratingtopics",
-        "grouppr7pr34",
-        "demographics",
+        "Hallo!",
+        "Tools",
+        "Techniken",
+        "Themen",
+        "Du und das Projekt",
+        "Über dich",
     }
 
     missing = named_groups - group_names
     assert not missing, f"Missing groups: {missing}. Found: {group_names}"
 
+    # Count distinct groups by type/scale key (column index 1), stable across languages
+    group_keys = set()
+    for line in lines:
+        parts = line.split("\t")
+        if len(parts) >= 3 and parts[0] == "G":
+            group_keys.add(parts[1])
+
     # Orphan questions (outside any group) get auto-generated groups:
     # - project_id and project_role_* between groupgi4rv46 and grouplt58n55
     # - consent_privacy_policy after demographics
-    assert len(group_names) == 8, f"Expected exactly 8 groups (6 named + 2 auto), got {len(group_names)}"
+    assert len(group_keys) == 8, f"Expected exactly 8 groups (6 named + 2 auto), got {len(group_keys)}: {group_keys}"
 
     # grouplt58n55 should appear as a note question (type X)
     note_found = False
@@ -301,15 +311,16 @@ def test_testB_import(limesurvey_client: Client, generated_files_dir: Path):
         verify_survey_import(limesurvey_client, survey_id)
 
         # Verify named groups were imported (grouplt58n55 was flattened to note)
+        # Group names are now labels (de is base language)
         # Plus 2 auto-generated groups for orphan questions
         expected_groups = [
-            "groupgi4rv46",
+            "Hallo!",
             "G1",
-            "ratingtechnologiesto",
-            "ratingtechniques",
-            "ratingtopics",
-            "grouppr7pr34",
-            "demographics",
+            "Tools",
+            "Techniken",
+            "Themen",
+            "Du und das Projekt",
+            "Über dich",
             "G7",
         ]
         verify_group_exists(limesurvey_client, survey_id, expected_groups)
@@ -449,3 +460,152 @@ def test_testB_question_order_in_groups(limesurvey_client: Client, generated_fil
         print(f"\n✓ Question ordering verified across all {len(questions_by_group)} groups")
     finally:
         cleanup_survey(limesurvey_client, survey_id)
+
+
+def test_testB_equation_expressions(limesurvey_client: Client, generated_files_dir: Path):
+    """Verify that equation (calculate) questions have correct EM expressions after import.
+
+    Equation questions (type '*') store their expression in the 'question' property.
+    This test checks that:
+    - Expressions arrive without TSV escaping artifacts (doubled quotes, etc.)
+    - .NAOK references are intact
+    - EM functions like trim() are preserved
+    - The expression is evaluable (no raw XLSForm syntax)
+    """
+    tsv_path = generated_files_dir / "testB.tsv"
+    if not tsv_path.exists():
+        pytest.skip("testB.tsv not found")
+
+    survey_id = import_survey_from_tsv(
+        limesurvey_client,
+        tsv_path,
+        "testB Equation Expression Test"
+    )
+
+    try:
+        questions = limesurvey_client.list_questions(survey_id)
+
+        # Find equation questions (type '*') — only parent questions
+        equation_questions = {}
+        for q in questions:
+            parent_qid = q.get("parent_qid") if isinstance(q, dict) else getattr(q, "parent_qid", 0)
+            if parent_qid and int(parent_qid) != 0:
+                continue
+            qtype = q.get("type") if isinstance(q, dict) else q.type
+            if qtype == "*":
+                qid = q.get("qid") if isinstance(q, dict) else q.qid
+                title = q.get("title") if isinstance(q, dict) else q.title
+                props = limesurvey_client.get_question_properties(qid)
+                equation_questions[title] = props
+
+        assert len(equation_questions) >= 3, (
+            f"Expected at least 3 equation questions, got {len(equation_questions)}: "
+            f"{list(equation_questions.keys())}"
+        )
+
+        # Print all equation expressions for diagnostic purposes
+        for title, props in equation_questions.items():
+            expr = props.get("question", "")
+            print(f"\n  Equation '{title}': {expr}")
+
+        # --- NOTCprojectalpha ---
+        notc = equation_questions.get("NOTCprojectalpha", {})
+        notc_expr = notc.get("question", "")
+        # Must contain .NAOK references without escaping artifacts
+        assert ".NAOK" in notc_expr, f"NOTCprojectalpha missing .NAOK: {notc_expr}"
+        assert '""' not in notc_expr, f"NOTCprojectalpha has doubled quotes (TSV escaping leak): {notc_expr}"
+        # Must not contain raw XLSForm syntax
+        assert "${" not in notc_expr, f"NOTCprojectalpha has raw XLSForm references: {notc_expr}"
+        # Should contain the if/ternary expression
+        assert "?" in notc_expr or "if(" in notc_expr.lower(), (
+            f"NOTCprojectalpha missing conditional expression: {notc_expr}"
+        )
+
+        # --- TTprojectalpha ---
+        tt = equation_questions.get("TTprojectalpha", {})
+        tt_expr = tt.get("question", "")
+        assert ".NAOK" in tt_expr, f"TTprojectalpha missing .NAOK: {tt_expr}"
+        assert '""' not in tt_expr or tt_expr.count('""') == tt_expr.count("''"), (
+            f"TTprojectalpha has doubled quotes (TSV escaping leak): {tt_expr}"
+        )
+
+        # --- missingcoord ---
+        coord = equation_questions.get("missingcoord", {})
+        coord_expr = coord.get("question", "")
+        assert "trim(" in coord_expr, f"missingcoord missing trim(): {coord_expr}"
+        assert "NOTCprojectalpha" in coord_expr, f"missingcoord missing NOTCprojectalpha ref: {coord_expr}"
+        assert "TTprojectalpha" in coord_expr, f"missingcoord missing TTprojectalpha ref: {coord_expr}"
+
+        print(f"\n✓ All equation expressions verified (no escaping artifacts)")
+    finally:
+        cleanup_survey(limesurvey_client, survey_id)
+
+
+def test_testB_relevance_in_limesurvey(limesurvey_client: Client, generated_files_dir: Path):
+    """Verify that relevance expressions arrive correctly in LimeSurvey after import.
+
+    Checks that:
+    - select_multiple selected() → field_code.NAOK == 'Y' format is preserved
+    - select_one equality → field.NAOK=='code' format is preserved
+    - No raw XLSForm ${...} references
+    - No TSV escaping artifacts
+    """
+    tsv_path = generated_files_dir / "testB.tsv"
+    if not tsv_path.exists():
+        pytest.skip("testB.tsv not found")
+
+    survey_id = import_survey_from_tsv(
+        limesurvey_client,
+        tsv_path,
+        "testB Relevance Expression Test"
+    )
+
+    try:
+        questions = limesurvey_client.list_questions(survey_id)
+
+        # Build qid -> props lookup for all questions (including subquestions)
+        all_props = {}
+        for q in questions:
+            qid = int(q.get("qid") if isinstance(q, dict) else q.qid)
+            title = q.get("title") if isinstance(q, dict) else q.title
+            props = limesurvey_client.get_question_properties(qid)
+            all_props[title] = props
+
+        # Print all questions with non-trivial relevance
+        print("\n  Questions with relevance expressions:")
+        for title, props in all_props.items():
+            rel = props.get("relevance", "1")
+            if rel and rel != "1":
+                print(f"    {title}: {rel}")
+
+        # Check that no relevance contains raw XLSForm syntax
+        for title, props in all_props.items():
+            rel = props.get("relevance", "")
+            assert "${" not in rel, f"Question '{title}' has raw XLSForm in relevance: {rel}"
+
+        # Check specific questions with known relevance patterns
+
+        # Subquestions for select_multiple roles should have .NAOK relevance
+        # soscisurvey subquestion: selected(${project_role_project-alpha}, 'role-survey-design')
+        # → projectroleprojectal_roles.NAOK == 'Y'
+        if "soscisurvey" in all_props:
+            sosci_rel = all_props["soscisurvey"].get("relevance", "")
+            print(f"\n  soscisurvey relevance: {sosci_rel}")
+            assert ".NAOK" in sosci_rel, f"soscisurvey missing .NAOK in relevance: {sosci_rel}"
+            assert '""' not in sosci_rel, f"soscisurvey has doubled quotes: {sosci_rel}"
+
+        # pastapplicationsdeta: ${past_applications} = 'not_successful' → pastapplications == 'notsu'
+        if "pastapplicationsdeta" in all_props:
+            past_rel = all_props["pastapplicationsdeta"].get("relevance", "")
+            print(f"  pastapplicationsdeta relevance: {past_rel}")
+            assert "pastapplications" in past_rel, f"pastapplicationsdeta missing field ref: {past_rel}"
+            assert "notsu" in past_rel, f"pastapplicationsdeta missing truncated answer code: {past_rel}"
+
+        print(f"\n✓ Relevance expressions verified in LimeSurvey")
+    finally:
+        cleanup_survey(limesurvey_client, survey_id)
+
+
+# ===========================
+# Application form diagnostics
+# ===========================

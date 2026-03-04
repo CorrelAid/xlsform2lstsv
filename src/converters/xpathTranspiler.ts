@@ -168,14 +168,21 @@ function transpile(node: XPathNode, ctx?: TranspilerContext): string {
           return `endsWith(${transpile(node.args[0] as XPathNode, ctx)}, ${transpile(node.args[1] as XPathNode, ctx)})`;
         }
         break;
+      case 'normalize-space':
+        if (node.args?.length === 1) {
+          return `trim(${transpile(node.args[0] as XPathNode, ctx)})`;
+        }
+        break;
       case 'not':
         if (node.args?.length === 1) {
           return `!(${transpile(node.args[0] as XPathNode, ctx)})`;
         }
         break;
       case 'if':
+        // Use if() function instead of ternary (? :) because EM's ternary parser
+        // can misinterpret colons inside string literals (e.g. '2026-03-CHW: Chancenwerk')
         if (node.args?.length === 3) {
-          return `(${transpile(node.args[0] as XPathNode, ctx)} ? ${transpile(node.args[1] as XPathNode, ctx)} : ${transpile(node.args[2] as XPathNode, ctx)})`;
+          return `if(${transpile(node.args[0] as XPathNode, ctx)}, ${transpile(node.args[1] as XPathNode, ctx)}, ${transpile(node.args[2] as XPathNode, ctx)})`;
         }
         break;
       case 'today':
@@ -206,7 +213,7 @@ function transpile(node: XPathNode, ctx?: TranspilerContext): string {
           const rawValue = rightNode.value as string;
           const rewritten = lookupAnswerCode(fieldName, rawValue);
           if (rewritten !== rawValue) {
-            return `${fieldName} == "${rewritten}"`;
+            return `${fieldName} == '${rewritten}'`;
           }
         }
         return `${transpile(leftNode, ctx)} == ${transpile(rightNode, ctx)}`;
@@ -219,7 +226,7 @@ function transpile(node: XPathNode, ctx?: TranspilerContext): string {
           const rawValue = rightNode.value as string;
           const rewritten = lookupAnswerCode(fieldName, rawValue);
           if (rewritten !== rawValue) {
-            return `${fieldName} != "${rewritten}"`;
+            return `${fieldName} != '${rewritten}'`;
           }
         }
         return `${transpile(leftNode, ctx)} != ${transpile(rightNode, ctx)}`;

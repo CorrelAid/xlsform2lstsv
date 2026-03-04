@@ -78,6 +78,16 @@ describe('XPath Function Conversion', () => {
 			const result = await xpathToLimeSurvey("ends-with(${name}, 'Jr')");
 			expect(result).toBe('endsWith(name, \'Jr\')');
 		});
+
+		test('converts normalize-space() function', async () => {
+			const result = await xpathToLimeSurvey('normalize-space(${name})');
+			expect(result).toBe('trim(name)');
+		});
+
+		test('converts normalize-space() with concat argument', async () => {
+			const result = await xpathToLimeSurvey("normalize-space(concat(${a}, ',', ${b}))");
+			expect(result).toBe("trim(a + ',' + b)");
+		});
 	});
 
 	describe('number functions', () => {
@@ -135,9 +145,9 @@ describe('XPath Function Conversion', () => {
 	});
 
 	describe('conditional functions', () => {
-		test('converts if() function to ternary', async () => {
+		test('converts if() function to if()', async () => {
 			const result = await xpathToLimeSurvey('if(${age} > 18, "adult", "minor")');
-			expect(result).toBe('(age > 18 ? "adult" : "minor")');
+			expect(result).toBe('if(age > 18, "adult", "minor")');
 		});
 	});
 
@@ -191,7 +201,7 @@ describe('XPath Function Conversion', () => {
 				},
 			};
 			const result = await convertRelevance("${past_applications} = 'not_successful'", ctx);
-			expect(result).toBe('pastapplications == "notsu"');
+			expect(result).toBe("pastapplications == 'notsu'");
 		});
 
 		test('rewrites choice value in != comparison', async () => {
@@ -202,7 +212,7 @@ describe('XPath Function Conversion', () => {
 				},
 			};
 			const result = await convertRelevance("${question} != 'option-one'", ctx);
-			expect(result).toBe('question != "optio"');
+			expect(result).toBe("question != 'optio'");
 		});
 
 		test('does not alter expression when lookup returns same value', async () => {

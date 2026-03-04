@@ -152,8 +152,7 @@ describe('XPath Relevance Conversion', () => {
 			const result = await convertRelevance(
 				"if(${age} < 18, 'minor', if(${age} < 65, 'adult', 'senior'))"
 			);
-			expect(result).toContain('?');
-			expect(result).toContain(':');
+			expect(result).toContain('if(');
 			expect(result).toContain('age');
 			expect(result).not.toContain('{age}');
 		});

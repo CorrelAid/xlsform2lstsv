@@ -42,7 +42,7 @@ interface TSVRowData {
 	class: string; 'type/scale': string; name: string; relevance: string;
 	text: string; help: string; language: string; validation: string;
 	em_validation_q: string; mandatory: string; other: string;
-	default: string; same_default: string;
+	default: string; same_default: string; hidden?: string;
 }
 
 export class XLSFormToTSVConverter {
@@ -669,7 +669,7 @@ export class XLSFormToTSVConverter {
 	 * Transpile an XLSForm calculation expression to a LimeSurvey EM expression.
 	 */
 	private async convertCalculation(calculation: string): Promise<string> {
-		return await xpathToLimeSurvey(calculation);
+		return await xpathToLimeSurvey(calculation, this.buildTranspilerContext());
 	}
 
 	private async addGroup(row: SurveyRow): Promise<void> {
@@ -692,10 +692,10 @@ export class XLSFormToTSVConverter {
 			this.tsvGenerator.addRow({
 				class: 'G',
 				'type/scale': groupSeqKey,
-				name: groupName,
+				name: this.getLanguageSpecificValue(row.label, lang) || groupName,
 				relevance: await this.convertRelevance(row.relevant),
-				text: this.getLanguageSpecificValue(row.label, lang) || groupName,
-				help: this.getLanguageSpecificValue(row.hint, lang) || '',
+				text: this.getLanguageSpecificValue(row.hint, lang) || '',
+				help: '',
 				language: lang,
 				validation: '',
 				em_validation_q: "",
@@ -794,7 +794,8 @@ export class XLSFormToTSVConverter {
 				mandatory: (isNote || isCalculate) ? '' : (row.required === 'yes' || row.required === 'true' ? 'Y' : ''),
 				other: (isNote || isCalculate) ? '' : (lsType.other ? 'Y' : ''),
 				default: (isNote || isCalculate) ? '' : (row.default || ''),
-				same_default: ''
+				same_default: '',
+				hidden: isCalculate ? '1' : '',
 			});
 		}
 
@@ -988,9 +989,8 @@ export class XLSFormToTSVConverter {
 		return { code: codeMap.get(choiceValue) ?? choiceValue, listName };
 	}
 
-	private async convertRelevance(relevant?: string): Promise<string> {
-		if (!relevant) return '1';
-		const ctx: TranspilerContext = {
+	private buildTranspilerContext(): TranspilerContext {
+		return {
 			lookupAnswerCode: (fieldName: string, choiceValue: string) => {
 				return this.lookupAnswerCode(fieldName, choiceValue).code;
 			},
@@ -999,12 +999,16 @@ export class XLSFormToTSVConverter {
 				const { code } = this.lookupAnswerCode(fieldName, choiceValue);
 				const baseType = this.questionBaseTypeMap.get(truncated);
 				if (baseType === 'select_multiple') {
-					return `(${truncated}_${code}.NAOK == "Y")`;
+					return `(${truncated}_${code}.NAOK == 'Y')`;
 				}
-				return `(${truncated}.NAOK=="${code}")`;
+				return `(${truncated}.NAOK=='${code}')`;
 			},
 		};
-		return await convertRelevance(relevant, ctx);
+	}
+
+	private async convertRelevance(relevant?: string): Promise<string> {
+		if (!relevant) return '1';
+		return await convertRelevance(relevant, this.buildTranspilerContext());
 	}
 
 

@@ -84,20 +84,18 @@ describe('Language-Specific Parameters', () => {
 			// Should have 3 group rows (one per language)
 			expect(groupRows.length).toBeGreaterThanOrEqual(3);
 
-			// Check English group
-			const enGroup = groupRows.find(r => r.language === 'en' && r.name === 'demo');
-			expect(enGroup?.text).toBe('Demographics');
+			// Group name is the label (displayed as group title in LimeSurvey)
+			const enGroup = groupRows.find(r => r.language === 'en' && r.name === 'Demographics');
+			expect(enGroup).toBeDefined();
 
-			// Check Spanish group
-			const esGroup = groupRows.find(r => r.language === 'es' && r.name === 'demo');
-			expect(esGroup?.text).toBe('Datos demográficos');
+			const esGroup = groupRows.find(r => r.language === 'es' && r.name === 'Datos demográficos');
+			expect(esGroup).toBeDefined();
 
-			// Check French group
-			const frGroup = groupRows.find(r => r.language === 'fr' && r.name === 'demo');
-			expect(frGroup?.text).toBe('Données démographiques');
+			const frGroup = groupRows.find(r => r.language === 'fr' && r.name === 'Données démographiques');
+			expect(frGroup).toBeDefined();
 		});
 
-		test('uses same group ID across languages', async () => {
+		test('uses same group type/scale key across languages', async () => {
 			const survey = [
 				{
 					type: 'begin_group',
@@ -115,10 +113,12 @@ describe('Language-Specific Parameters', () => {
 			const rows = await convertAndParse(survey);
 			const groupRows = findRowsByClass(rows, 'G');
 
-			// All group rows should have the same name (group identifier)
-			const demoGroups = groupRows.filter(r => r.name === 'demo');
-			expect(demoGroups.length).toBeGreaterThanOrEqual(2);
-			expect(demoGroups.every(r => r.name === 'demo')).toBe(true);
+			// Group name varies by language but type/scale key is shared
+			const enGroup = groupRows.find(r => r.language === 'en' && r.name === 'Demographics');
+			const esGroup = groupRows.find(r => r.language === 'es' && r.name === 'Datos demográficos');
+			expect(enGroup).toBeDefined();
+			expect(esGroup).toBeDefined();
+			expect(enGroup!['type/scale']).toBe(esGroup!['type/scale']);
 		});
 
 		test('includes language-specific group descriptions', async () => {
@@ -143,13 +143,12 @@ describe('Language-Specific Parameters', () => {
 			const rows = await convertAndParse(survey);
 			const groupRows = findRowsByClass(rows, 'G');
 
-			// Check English help text
-			const enGroup = groupRows.find(r => r.language === 'en' && r.name === 'demo');
-			expect(enGroup?.help).toBe('Please provide demographic information');
+			// Hint goes into text (description) column for groups
+			const enGroup = groupRows.find(r => r.language === 'en' && r.name === 'Demographics');
+			expect(enGroup?.text).toBe('Please provide demographic information');
 
-			// Check Spanish help text
-			const esGroup = groupRows.find(r => r.language === 'es' && r.name === 'demo');
-			expect(esGroup?.help).toBe('Por favor proporcione información demográfica');
+			const esGroup = groupRows.find(r => r.language === 'es' && r.name === 'Datos demográficos');
+			expect(esGroup?.text).toBe('Por favor proporcione información demográfica');
 		});
 
 		test('includes group-level relevance for each language', async () => {
@@ -181,9 +180,9 @@ describe('Language-Specific Parameters', () => {
 			const rows = await convertAndParse(survey, choices);
 			const groupRows = findRowsByClass(rows, 'G');
 
-			// Both language versions should have the same relevance
-			const enGroup = groupRows.find(r => r.language === 'en' && r.name === 'det');
-			const esGroup = groupRows.find(r => r.language === 'es' && r.name === 'det');
+			// Group name is the label
+			const enGroup = groupRows.find(r => r.language === 'en' && r.name === 'Details');
+			const esGroup = groupRows.find(r => r.language === 'es' && r.name === 'Detalles');
 
 			expect(enGroup?.relevance).toContain('info');
 			expect(esGroup?.relevance).toContain('info');
@@ -795,12 +794,12 @@ describe('Language-Specific Parameters', () => {
 			const settings = [{ form_title: 'Test', default_language: 'en' }];
 			const rows = await convertAndParse(survey, [], settings);
 
-			// Expected order: G g1(en), G g1(de), Q q1(en), Q q1(de), G g2(en), G g2(de), Q q2(en), Q q2(de)
+			// Group names are labels now (Group 1/Gruppe 1, Group 2/Gruppe 2)
 			const contentRows = rows.filter(r => ['G', 'Q'].includes(r.class));
 			const sequence = contentRows.map(r => `${r.class}:${r.name}:${r.language}`);
 
 			// g1 content should be fully flushed before g2 starts
-			const g2Start = sequence.findIndex(s => s.startsWith('G:g2'));
+			const g2Start = sequence.findIndex(s => s.startsWith('G:Group 2'));
 			const q1DeIdx = sequence.findIndex(s => s === 'Q:q1:de');
 			expect(q1DeIdx).toBeLessThan(g2Start);
 
@@ -998,11 +997,13 @@ describe('Language-Specific Parameters', () => {
 
 			const rows = await convertAndParse(survey);
 
-			// Check that group IDs are consistent
+			// Group names are labels (vary by language), matched by type/scale key
 			const groupRows = findRowsByClass(rows, 'G');
-			const grp1Rows = groupRows.filter(r => r.name === 'grp1');
-			expect(grp1Rows.length).toBeGreaterThanOrEqual(2);
-			expect(grp1Rows.every(r => r.name === 'grp1')).toBe(true);
+			const enGroup = groupRows.find(r => r.language === 'en' && r.name === 'Group 1');
+			const esGroup = groupRows.find(r => r.language === 'es' && r.name === 'Grupo 1');
+			expect(enGroup).toBeDefined();
+			expect(esGroup).toBeDefined();
+			expect(enGroup!['type/scale']).toBe(esGroup!['type/scale']);
 
 			// Check that question IDs are consistent
 			const questionRows = findRowsByClass(rows, 'Q');

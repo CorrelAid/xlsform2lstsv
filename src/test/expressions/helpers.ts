@@ -260,9 +260,9 @@ export const functionTests: ExpressionTestCase[] = [
         converter: 'relevance'
     },
     {
-        description: 'if() function to ternary',
+        description: 'if() function to if()',
         input: 'if(${age} > 18, "adult", "minor")',
-        expected: '(age > 18 ? "adult" : "minor")',
+        expected: 'if(age > 18, "adult", "minor")',
         converter: 'relevance'
     }
 ];

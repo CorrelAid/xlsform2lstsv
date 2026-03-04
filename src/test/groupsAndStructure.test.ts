@@ -15,11 +15,12 @@ describe('Groups and Survey Structure', () => {
 			const groups = findRowsByClass(rows, 'G');
 
 			expect(groups.length).toBeGreaterThan(0);
-			const demoGroup = findRowByName(rows, 'demo');
-			expect(demoGroup?.text).toBe('Demographics');
+			const demoGroup = findRowByName(rows, 'Demographics');
+			expect(demoGroup).toBeDefined();
+			expect(demoGroup?.class).toBe('G');
 		});
 
-		
+
 
 		test('auto-generates group name if missing', async () => {
 			const survey = [
@@ -31,10 +32,9 @@ describe('Groups and Survey Structure', () => {
 			const rows = await convertAndParse(survey);
 			const groups = findRowsByClass(rows, 'G');
 
-			// Should have auto-generated group name
-			const autoGroup = groups.find(g => g.name.match(/^G\d+$/));
+			// Label is used as group name for display
+			const autoGroup = groups.find(g => g.name === 'Unnamed Group');
 			expect(autoGroup).toBeDefined();
-			expect(autoGroup?.text).toBe('Unnamed Group');
 		});
 
 		test('handles multiple groups', async () => {
@@ -52,8 +52,8 @@ describe('Groups and Survey Structure', () => {
 
 			// Should have at least 2 groups (plus possible default)
 			expect(groups.length).toBeGreaterThanOrEqual(2);
-			expect(findRowByName(rows, 'g1')).toBeDefined();
-			expect(findRowByName(rows, 'g2')).toBeDefined();
+			expect(findRowByName(rows, 'Group 1')).toBeDefined();
+			expect(findRowByName(rows, 'Group 2')).toBeDefined();
 		});
 
 		test('converts group with hint', async () => {
@@ -69,9 +69,10 @@ describe('Groups and Survey Structure', () => {
 			];
 
 			const rows = await convertAndParse(survey);
-			const group = findRowByName(rows, 'pers');
+			const group = findRowByName(rows, 'Personal Info');
 
-			expect(group?.help).toBe('Please provide your personal information');
+			// Hint goes into the text (description) column for groups
+			expect(group?.text).toBe('Please provide your personal information');
 		});
 
 		test('converts group with relevance', async () => {
@@ -93,7 +94,7 @@ describe('Groups and Survey Structure', () => {
 			];
 
 			const rows = await convertAndParse(survey, choices);
-			const group = findRowByName(rows, 'det');
+			const group = findRowByName(rows, 'Details');
 
 			expect(group?.relevance).toContain('hasinfo'); // Underscores removed
 		});
@@ -117,11 +118,11 @@ describe('Groups and Survey Structure', () => {
 			const groupNames = groups.map(g => g.name);
 
 			// parent_only should NOT be a group (it has no direct questions)
-			expect(groupNames).not.toContain('parentonly');
+			expect(groupNames).not.toContain('Section Header');
 
 			// outer and inner should be groups
-			expect(groupNames).toContain('outer');
-			expect(groupNames).toContain('inner');
+			expect(groupNames).toContain('Outer Group');
+			expect(groupNames).toContain('Inner Group');
 
 			// parent_only should appear as a note question (type X)
 			const noteRow = rows.find(r => r.class === 'Q' && r.name === 'parentonly');
@@ -145,8 +146,8 @@ describe('Groups and Survey Structure', () => {
 			const groupNames = groups.map(g => g.name);
 
 			// Both should be groups (both have direct questions)
-			expect(groupNames).toContain('g1');
-			expect(groupNames).toContain('g2');
+			expect(groupNames).toContain('Group With Questions');
+			expect(groupNames).toContain('Nested Group');
 		});
 
 		test('restores parent group context after nested group ends', async () => {
@@ -166,9 +167,9 @@ describe('Groups and Survey Structure', () => {
 			const groups = findRowsByClass(rows, 'G');
 			const groupNames = groups.map(g => g.name);
 
-			expect(groupNames).toContain('parent');
-			expect(groupNames).toContain('child');
-			expect(groupNames).toContain('sibling');
+			expect(groupNames).toContain('Parent');
+			expect(groupNames).toContain('Child');
+			expect(groupNames).toContain('Sibling');
 		});
 
 		test('handles deeply nested parent-only groups', async () => {
@@ -187,9 +188,9 @@ describe('Groups and Survey Structure', () => {
 			const groupNames = groups.map(g => g.name);
 
 			// Only leaf should be a group
-			expect(groupNames).toContain('leaf');
-			expect(groupNames).not.toContain('level1');
-			expect(groupNames).not.toContain('level2');
+			expect(groupNames).toContain('Leaf Group');
+			expect(groupNames).not.toContain('Level 1 Header');
+			expect(groupNames).not.toContain('Level 2 Header');
 
 			// Both parent-only groups should be note questions
 			const level1Note = rows.find(r => r.class === 'Q' && r.name === 'level1');
@@ -232,13 +233,13 @@ describe('Groups and Survey Structure', () => {
 			const groupNames = groups.map(g => g.name);
 
 			// section and subsection_a are parent-only → flattened to notes
-			expect(groupNames).not.toContain('section');
-			expect(groupNames).not.toContain('subsectiona');
+			expect(groupNames).not.toContain('Main Section');
+			expect(groupNames).not.toContain('Subsection A');
 
 			// leaf_a, subsection_b (has direct q3), leaf_b → kept as groups
-			expect(groupNames).toContain('leafa');
-			expect(groupNames).toContain('subsectionb');
-			expect(groupNames).toContain('leafb');
+			expect(groupNames).toContain('Leaf A');
+			expect(groupNames).toContain('Subsection B');
+			expect(groupNames).toContain('Leaf B');
 
 			// Flattened groups become note questions (type X)
 			const sectionNote = rows.find(r => r.class === 'Q' && r.name === 'section');
@@ -253,7 +254,7 @@ describe('Groups and Survey Structure', () => {
 
 			// Notes should appear inside the first child group they precede
 			const allRows = rows.filter(r => r.class === 'G' || r.class === 'Q');
-			const leafAGroupIdx = allRows.findIndex(r => r.class === 'G' && r.name === 'leafa');
+			const leafAGroupIdx = allRows.findIndex(r => r.class === 'G' && r.name === 'Leaf A');
 			const sectionNoteIdx = allRows.findIndex(r => r.class === 'Q' && r.name === 'section');
 			const subANoteIdx = allRows.findIndex(r => r.class === 'Q' && r.name === 'subsectiona');
 
@@ -290,10 +291,10 @@ describe('Groups and Survey Structure', () => {
 			const groupNames = groups.map(g => g.name);
 
 			// Only l3 and flat should be groups
-			expect(groupNames).toContain('l3');
-			expect(groupNames).toContain('flat');
-			expect(groupNames).not.toContain('l1');
-			expect(groupNames).not.toContain('l2');
+			expect(groupNames).toContain('Layer 3');
+			expect(groupNames).toContain('Flat Group');
+			expect(groupNames).not.toContain('Layer 1');
+			expect(groupNames).not.toContain('Layer 2');
 			expect(groups).toHaveLength(2);
 
 			// l1 and l2 should be note questions inside l3
@@ -311,8 +312,8 @@ describe('Groups and Survey Structure', () => {
 			expect(l2Idx).toBeLessThan(deepQIdx);
 
 			// l3 group should come before flat group
-			const l3Idx = groups.findIndex(g => g.name === 'l3');
-			const flatIdx = groups.findIndex(g => g.name === 'flat');
+			const l3Idx = groups.findIndex(g => g.name === 'Layer 3');
+			const flatIdx = groups.findIndex(g => g.name === 'Flat Group');
 			expect(l3Idx).toBeLessThan(flatIdx);
 		});
 
@@ -344,17 +345,19 @@ describe('Groups and Survey Structure', () => {
 			const groupNames = groups.map(g => g.name);
 
 			// Only inner should be a group (outer and middle are parent-only)
-			expect(groupNames).toContain('inner');
-			expect(groupNames).not.toContain('outer');
-			expect(groupNames).not.toContain('middle');
+			// Group name is the label, so multilingual groups have different names per language
+			expect(groupNames).toContain('Inner');
+			expect(groupNames).toContain('Innere');
+			expect(groupNames).not.toContain('Outer');
+			expect(groupNames).not.toContain('Äußere');
+			expect(groupNames).not.toContain('Middle');
+			expect(groupNames).not.toContain('Mittlere');
 
 			// inner group should have multilingual G rows via type/scale key
-			const innerGroups = groups.filter(g => g.name === 'inner');
-			expect(innerGroups).toHaveLength(2);
-			const innerEn = innerGroups.find(g => g.language === 'en');
-			const innerDe = innerGroups.find(g => g.language === 'de');
-			expect(innerEn?.text).toBe('Inner');
-			expect(innerDe?.text).toBe('Innere');
+			const innerEn = groups.find(g => g.name === 'Inner' && g.language === 'en');
+			const innerDe = groups.find(g => g.name === 'Innere' && g.language === 'de');
+			expect(innerEn).toBeDefined();
+			expect(innerDe).toBeDefined();
 
 			// Both share the same type/scale (group sequence key)
 			expect(innerEn!['type/scale']).toBe(innerDe!['type/scale']);
@@ -384,7 +387,7 @@ describe('Groups and Survey Structure', () => {
 
 			// Should have a default group
 			expect(groups.length).toBeGreaterThan(0);
-			expect(groups[0].text).toBe('Questions');
+			expect(groups[0].name).toBe('Questions');
 		});
 
 		test('does not create default group when explicit groups exist', async () => {
@@ -398,7 +401,7 @@ describe('Groups and Survey Structure', () => {
 			const groups = findRowsByClass(rows, 'G');
 
 			// Should not have a default "Questions" group
-			const defaultGroup = groups.find(g => g.text === 'Questions' && g.name === 'Questions');
+			const defaultGroup = groups.find(g => g.name === 'Questions');
 			expect(defaultGroup).toBeUndefined();
 		});
 	});

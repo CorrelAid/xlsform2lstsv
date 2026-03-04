@@ -35,7 +35,7 @@ describe('Comprehensive Expression Conversion Tests', () => {
 
             test('expression with nested functions', async () => {
                 const result = await xpathToLimeSurvey('if(string-length(${name}) > 5, concat(${first}, " ", ${last}), ${nickname})');
-                expect(result).toBe('(strlen(name) > 5 ? first + " " + last : nickname)');
+                expect(result).toBe('if(strlen(name) > 5, first + " " + last, nickname)');
             });
 
             test('expression with multiple field references and operators', async () => {
@@ -103,13 +103,13 @@ describe('Comprehensive Expression Conversion Tests', () => {
             const result = await runCompleteExpressionTest({
                 description: 'if() function regression',
                 input: 'if(${age} > 18, "adult", "minor")',
-                expected: '(age > 18 ? "adult" : "minor")',
+                expected: 'if(age > 18, "adult", "minor")',
                 converter: 'ast'
             });
             
-            // Additional validation: ensure ternary operators are present
-            expect(result).toContain('?');
-            expect(result).toContain(':');
+            // Additional validation: ensure if() function syntax is present
+            expect(result).toContain('if(');
+            expect(result).toContain(',');
         });
 
         test('boolean operators should work with lowercase', async () => {
