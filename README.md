@@ -1,4 +1,5 @@
 [![npm version](https://img.shields.io/npm/v/xlsform2lstsv)](https://www.npmjs.com/package/xlsform2lstsv)
+[![AI-Assisted](https://img.shields.io/badge/AI--assisted-Claude%20Code-blueviolet?logo=anthropic&logoColor=white)](./AI_DISCLOSURE.md)
 
 
 # xlsform2lstsv
