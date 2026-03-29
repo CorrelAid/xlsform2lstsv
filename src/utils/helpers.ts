@@ -27,6 +27,31 @@ function isObject(item: unknown): item is object {
 }
 
 /**
+ * Deduplicate a list of names by appending numeric suffixes on collision.
+ * Returns a new array with unique names, preserving order.
+ */
+export function deduplicateNames(names: string[], maxLength: number): string[] {
+  const result = [...names];
+  const used = new Set<string>();
+  for (let i = 0; i < result.length; i++) {
+    if (!result[i]) continue;
+    let name = result[i];
+    if (used.has(name)) {
+      let counter = 1;
+      let candidate: string;
+      do {
+        const suffix = String(counter);
+        candidate = name.substring(0, maxLength - suffix.length) + suffix;
+        counter++;
+      } while (used.has(candidate));
+      result[i] = candidate;
+    }
+    used.add(result[i]);
+  }
+  return result;
+}
+
+/**
  * Sanitize field names for LimeSurvey compatibility
  * Removes underscores/hyphens and truncates to 20 characters (LimeSurvey question title limit)
  */

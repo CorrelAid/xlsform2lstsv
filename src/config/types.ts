@@ -35,6 +35,7 @@ export interface SettingsRow {
   form_title?: string;
   form_id?: string;
   default_language?: string;
+  style?: string;
   [key: string]: unknown;
 }
 
@@ -62,6 +63,26 @@ export interface ConversionConfig {
   debugLogging?: boolean;
 
   /**
+   * Promote a note named "welcome" to LimeSurvey's surveyls_welcometext (default: true)
+   */
+  convertWelcomeNote?: boolean;
+
+  /**
+   * Promote a note named "end" to LimeSurvey's surveyls_endtext (default: true)
+   */
+  convertEndNote?: boolean;
+
+  /**
+   * Detect the _other question pattern and convert to LimeSurvey's native "other" option (default: true)
+   */
+  convertOtherPattern?: boolean;
+
+  /**
+   * Parse labels and hints as markdown and convert to HTML (default: true)
+   */
+  convertMarkdown?: boolean;
+
+  /**
    * Default values for survey elements
    */
   defaults: {
@@ -78,6 +99,10 @@ export interface ConversionConfig {
 export const defaultConfig: ConversionConfig = {
   handleRepeats: 'warn',
   debugLogging: false,
+  convertWelcomeNote: true,
+  convertEndNote: true,
+  convertOtherPattern: true,
+  convertMarkdown: true,
 
   defaults: {
     language: 'en',

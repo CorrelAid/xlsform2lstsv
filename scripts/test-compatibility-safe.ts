@@ -30,13 +30,13 @@ async function testLimeSurveyCompatibilitySafe() {
     try {
       // First, teardown any existing containers
       console.log(`   🧹 Cleaning up previous containers...`);
-      execSync('cd tests/integration && docker-compose down -v', {
+      execSync('cd docker_tests/integration && docker-compose down -v', {
         stdio: 'inherit'
       });
       
       // Start new containers with specific version
       console.log(`   🐳 Starting LimeSurvey ${version}...`);
-      execSync(`cd tests/integration && LIMESURVEY_VERSION=${version} docker-compose up -d`, {
+      execSync(`cd docker_tests/integration && LIMESURVEY_VERSION=${version} docker-compose up -d`, {
         stdio: 'inherit',
         env: { ...process.env, LIMESURVEY_VERSION: version }
       });
@@ -51,7 +51,7 @@ async function testLimeSurveyCompatibilitySafe() {
       
       // Run integration tests
       console.log(`   🧪 Running integration tests...`);
-      execSync(`cd tests/integration && LIMESURVEY_VERSION=${version} uv run pytest test_generated_surveys.py`, {
+      execSync(`cd docker_tests/integration && LIMESURVEY_VERSION=${version} uv run pytest test_generated_surveys.py`, {
         stdio: 'inherit',
         env: { ...process.env, LIMESURVEY_VERSION: version }
       });
@@ -80,7 +80,7 @@ async function testLimeSurveyCompatibilitySafe() {
     } finally {
       // Clean up after each test
       try {
-        execSync('cd tests/integration && docker-compose down -v', {
+        execSync('cd docker_tests/integration && docker-compose down -v', {
           stdio: 'ignore'
         });
       } catch (cleanupError) {

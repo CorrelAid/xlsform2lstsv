@@ -392,7 +392,7 @@ describe('Hint Functionality', () => {
 			const rows = await convertAndParse(survey);
 			const question = findRowByName(rows, 'q1');
 
-			expect(question?.help).toBe('Special chars: <>&"\'NewlineTab');
+			expect(question?.help).toBe('Special chars: &lt;&gt;&amp;&quot;&#39;NewlineTab');
 		});
 
 		test('handles hint with unicode characters', async () => {
@@ -474,7 +474,7 @@ describe('Hint Functionality', () => {
 			const rows = await convertAndParse(survey);
 			const question = findRowByName(rows, 'q1');
 
-			expect(question?.help).toBe('   ');
+			expect(question?.help).toBe('');
 		});
 	});
 });

@@ -444,6 +444,152 @@ describe('Groups and Survey Structure', () => {
 			expect(titleRow?.text).toBe('Untitled Survey');
 		});
 
+		test('sets format=A by default', async () => {
+			const survey = [{ type: 'text', name: 'q1', label: 'Question' }];
+			const rows = await convertAndParse(survey, [], [{ form_title: 'Test', default_language: 'en' }]);
+			const formatRow = findRowsByClass(rows, 'S').find(r => r.name === 'format');
+			expect(formatRow?.text).toBe('A');
+		});
+
+		test('sets format=G when style=pages', async () => {
+			const survey = [{ type: 'text', name: 'q1', label: 'Question' }];
+			const rows = await convertAndParse(survey, [], [{ form_title: 'Test', default_language: 'en', style: 'pages' }]);
+			const formatRow = findRowsByClass(rows, 'S').find(r => r.name === 'format');
+			expect(formatRow?.text).toBe('G');
+		});
+
+		test('note named "welcome" becomes surveyls_welcometext SL row and is not a question', async () => {
+			const survey = [
+				{ type: 'note', name: 'welcome', label: 'Welcome to the survey!' },
+				{ type: 'text', name: 'q1', label: 'Question' },
+			];
+			const rows = await convertAndParse(survey, [], [{ form_title: 'Test', default_language: 'en' }]);
+			const welcomeRow = findRowsByClass(rows, 'SL').find(r => r.name === 'surveyls_welcometext');
+			expect(welcomeRow).toBeDefined();
+			expect(welcomeRow?.text).toBe('Welcome to the survey!');
+			// Should NOT appear as a question
+			const qRows = findRowsByClass(rows, 'Q');
+			expect(qRows.find(r => r.name === 'welcome')).toBeUndefined();
+		});
+
+		test('note named "end" becomes surveyls_endtext SL row and is not a question', async () => {
+			const survey = [
+				{ type: 'text', name: 'q1', label: 'Question' },
+				{ type: 'note', name: 'end', label: 'Thank you for participating!' },
+			];
+			const rows = await convertAndParse(survey, [], [{ form_title: 'Test', default_language: 'en' }]);
+			const endRow = findRowsByClass(rows, 'SL').find(r => r.name === 'surveyls_endtext');
+			expect(endRow).toBeDefined();
+			expect(endRow?.text).toBe('Thank you for participating!');
+			// Should NOT appear as a question
+			const qRows = findRowsByClass(rows, 'Q');
+			expect(qRows.find(r => r.name === 'end')).toBeUndefined();
+		});
+
+		test('welcome and end notes both work together', async () => {
+			const survey = [
+				{ type: 'note', name: 'welcome', label: 'Hello!' },
+				{ type: 'text', name: 'q1', label: 'Question' },
+				{ type: 'note', name: 'end', label: 'Goodbye!' },
+			];
+			const rows = await convertAndParse(survey, [], [{ form_title: 'Test', default_language: 'en' }]);
+			const slRows = findRowsByClass(rows, 'SL');
+			expect(slRows.find(r => r.name === 'surveyls_welcometext')?.text).toBe('Hello!');
+			expect(slRows.find(r => r.name === 'surveyls_endtext')?.text).toBe('Goodbye!');
+		});
+
+		test('welcome/end notes with multilingual labels emit correct SL rows per language', async () => {
+			const survey = [
+				{ type: 'note', name: 'welcome', label: { en: 'Welcome!', de: 'Willkommen!' } },
+				{ type: 'text', name: 'q1', label: { en: 'Question', de: 'Frage' } },
+				{ type: 'note', name: 'end', label: { en: 'Bye!', de: 'Tschüss!' } },
+			];
+			const rows = await convertAndParse(survey, [], [{ form_title: 'Test', default_language: 'en' }]);
+			const slRows = findRowsByClass(rows, 'SL');
+			const enWelcome = slRows.find(r => r.name === 'surveyls_welcometext' && r.language === 'en');
+			const deWelcome = slRows.find(r => r.name === 'surveyls_welcometext' && r.language === 'de');
+			expect(enWelcome?.text).toBe('Welcome!');
+			expect(deWelcome?.text).toBe('Willkommen!');
+			const enEnd = slRows.find(r => r.name === 'surveyls_endtext' && r.language === 'en');
+			const deEnd = slRows.find(r => r.name === 'surveyls_endtext' && r.language === 'de');
+			expect(enEnd?.text).toBe('Bye!');
+			expect(deEnd?.text).toBe('Tschüss!');
+		});
+
+		test('group wrapping only a welcome note is suppressed (no G row emitted)', async () => {
+			const survey = [
+				{ type: 'begin_group', name: 'intro_group', label: 'Intro' },
+				{ type: 'note', name: 'welcome', label: 'Welcome!' },
+				{ type: 'end_group' },
+				{ type: 'begin_group', name: 'questions', label: 'Questions' },
+				{ type: 'text', name: 'q1', label: 'Question' },
+				{ type: 'end_group' },
+			];
+			const rows = await convertAndParse(survey, [], [{ form_title: 'Test', default_language: 'en' }]);
+			const groupNames = findRowsByClass(rows, 'G').map(r => r.name);
+			expect(groupNames).not.toContain('Intro');
+			expect(groupNames).toContain('Questions');
+			expect(findRowsByClass(rows, 'SL').find(r => r.name === 'surveyls_welcometext')?.text).toBe('Welcome!');
+		});
+
+		test('group wrapping only an end note is suppressed (no G row emitted)', async () => {
+			const survey = [
+				{ type: 'begin_group', name: 'questions', label: 'Questions' },
+				{ type: 'text', name: 'q1', label: 'Question' },
+				{ type: 'end_group' },
+				{ type: 'begin_group', name: 'outro_group', label: 'Outro' },
+				{ type: 'note', name: 'end', label: 'Thank you!' },
+				{ type: 'end_group' },
+			];
+			const rows = await convertAndParse(survey, [], [{ form_title: 'Test', default_language: 'en' }]);
+			const groupNames = findRowsByClass(rows, 'G').map(r => r.name);
+			expect(groupNames).toContain('Questions');
+			expect(groupNames).not.toContain('Outro');
+			expect(findRowsByClass(rows, 'SL').find(r => r.name === 'surveyls_endtext')?.text).toBe('Thank you!');
+		});
+
+		test('group wrapping welcome note AND other questions is kept as a regular group', async () => {
+			const survey = [
+				{ type: 'begin_group', name: 'intro_group', label: 'Intro' },
+				{ type: 'note', name: 'welcome', label: 'Welcome!' },
+				{ type: 'text', name: 'q1', label: 'Question' },
+				{ type: 'end_group' },
+			];
+			const rows = await convertAndParse(survey, [], [{ form_title: 'Test', default_language: 'en' }]);
+			const groupNames = findRowsByClass(rows, 'G').map(r => r.name);
+			expect(groupNames).toContain('Intro');
+			// welcome still promoted to SL
+			expect(findRowsByClass(rows, 'SL').find(r => r.name === 'surveyls_welcometext')?.text).toBe('Welcome!');
+			// but q1 is a regular question inside the kept group
+			expect(findRowsByClass(rows, 'Q').find(r => r.name === 'q1')).toBeDefined();
+		});
+
+		test('multilingual welcome/end in wrapping groups produce correct SL rows per language', async () => {
+			const survey = [
+				{ type: 'begin_group', name: 'intro_group', label: { en: 'Intro', de: 'Einleitung' } },
+				{ type: 'note', name: 'welcome', label: { en: 'Welcome!', de: 'Willkommen!' } },
+				{ type: 'end_group' },
+				{ type: 'begin_group', name: 'questions', label: { en: 'Questions', de: 'Fragen' } },
+				{ type: 'text', name: 'q1', label: { en: 'Name', de: 'Name' } },
+				{ type: 'end_group' },
+				{ type: 'begin_group', name: 'outro_group', label: { en: 'Outro', de: 'Abschluss' } },
+				{ type: 'note', name: 'end', label: { en: 'Bye!', de: 'Tschüss!' } },
+				{ type: 'end_group' },
+			];
+			const rows = await convertAndParse(survey, [], [{ form_title: 'Test', default_language: 'en' }]);
+			const slRows = findRowsByClass(rows, 'SL');
+			const groupNames = findRowsByClass(rows, 'G').map(r => r.name);
+
+			// Only the real content group survives
+			expect(groupNames).not.toContain('Intro');
+			expect(groupNames).not.toContain('Outro');
+			expect(groupNames.some(n => n === 'Questions' || n === 'Fragen')).toBe(true);
+
+			expect(slRows.find(r => r.name === 'surveyls_welcometext' && r.language === 'en')?.text).toBe('Welcome!');
+			expect(slRows.find(r => r.name === 'surveyls_welcometext' && r.language === 'de')?.text).toBe('Willkommen!');
+			expect(slRows.find(r => r.name === 'surveyls_endtext' && r.language === 'en')?.text).toBe('Bye!');
+			expect(slRows.find(r => r.name === 'surveyls_endtext' && r.language === 'de')?.text).toBe('Tschüss!');
+		});
 
 	});
 

@@ -24,7 +24,7 @@ SQ		green		Data Science		en
 Q	R	qrank	1	Ordnen Sie die folgenden Aspekte nach Wichtigkeit		en							
 A		fam		Vernetzung		en							
 A		work		Fachliche Inhalte		en							
-A		fun		Location & Verpflegung		en							
+A		fun		Location &amp; Verpflegung		en							
 Q	X	qnote	1	Im nächsten Abschnitt bitten wir Sie um Ihr ausführliches Feedback. Bitte nehmen Sie sich Zeit.		en							
 G	3	Ausführliches Feedback	1			en							
 Q	T	qmultilinetext	1	Beschreiben Sie bitte Ihre Erfahrungen beim Workshop		en							
@@ -33,6 +33,9 @@ Q	L	qlikert	1	Wie zufrieden waren Sie mit der Organisation insgesamt?		en
 A		low		Schlecht		en							
 A		mid		Mittelmäßig		en							
 A		high		Ausgezeichnet		en							
+Q	!	qminimal	1	Bevorzugst du Dropdown?		en							
+A		yes		Ja		en							
+A		no		Nein		en							
 G	4	Programmierkenntnisse	1			en							
 Q	X	matrixwrapper	1	Selbsteinschätzung technischer Fähigkeiten		en							
 Q	F	matrixheader	1	Wie schätzen Sie Ihre Kenntnisse ein?		en							
@@ -55,7 +58,7 @@ SQ		green		Data Science		en
 Q	R	qrankother	1	Was hat Ihnen an der Veranstaltung am meisten gebracht?		en				Y			
 A		fam		Vernetzung		en							
 A		work		Fachliche Inhalte		en							
-A		fun		Location & Verpflegung		en							
+A		fun		Location &amp; Verpflegung		en							
 G	6	Anmeldedaten	1			en							
 Q	S	qmandatory	1	Wie lautet Ihre E-Mail-Adresse?		en			Y				
 Q	S	qhint	1	Wie lautet Ihre Telefonnummer?	Format: +49 123 456789	en							

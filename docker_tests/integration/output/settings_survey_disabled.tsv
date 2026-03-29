@@ -1,0 +1,15 @@
+class	type/scale	name	relevance	text	help	language	validation	em_validation_q	mandatory	other	default	same_default	hidden
+S		language	1	en		en							
+S		format	1	A		en							
+SL		surveyls_title	1	Settings Test Survey		en							
+G	1	G0	1	G0		en							
+Q	X	welcome	1	**Welcome** to the survey!		en							
+G	2	Main Questions	1			en							
+Q	L	favcolor	1	What is your _favorite_ color?		en							
+A		red		Red		en							
+A		blue		Blue		en							
+A		other		Other		en							
+Q	S	favcolorother	favcolor == 'other'	Please specify your color		en							
+Q	S	comment	1	Any **comments**?		en							
+G	3	G2	1	G2		en							
+Q	X	end	1	**Thank you** for participating!		en							

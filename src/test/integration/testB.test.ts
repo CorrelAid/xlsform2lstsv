@@ -46,7 +46,8 @@ describe('Integration: testB.xlsx', () => {
 		const rows = parseTSV(tsv);
 
 		// The tools matrix header should be type F (Array)
-		const toolsMatrix = rows.filter(r => r.name === 'ratingtechnologiesto' && r.class === 'Q');
+		// Name is deduplicated: rating_technologies_tools already claims 'ratingtechnologiesto'
+		const toolsMatrix = rows.filter(r => r.name === 'ratingtechnologiest1' && r.class === 'Q');
 		expect(toolsMatrix.length).toBeGreaterThan(0);
 		expect(toolsMatrix[0]['type/scale']).toBe('F');
 
@@ -161,8 +162,8 @@ describe('Integration: testB.xlsx', () => {
 		expect(indexOf('projectid')).toBeLessThan(indexOf('projectroleprojectal'));
 		expect(indexOf('projectroleprojectal')).toBeLessThan(indexOf('projectroleprojectbe'));
 		expect(indexOf('projectroleprojectbe')).toBeLessThan(indexOf('projectroleprojectga'));
-		expect(indexOf('projectroleprojectga')).toBeLessThan(indexOf('ratingtechnologiesto'));
-		expect(indexOf('ratingtechnologiesto')).toBeLessThan(indexOf('ratingtechniqueshead'));
+		expect(indexOf('projectroleprojectga')).toBeLessThan(indexOf('ratingtechnologiest1'));
+		expect(indexOf('ratingtechnologiest1')).toBeLessThan(indexOf('ratingtechniqueshead'));
 		expect(indexOf('ratingtechniqueshead')).toBeLessThan(indexOf('ratingtopicsheader'));
 		expect(indexOf('motivationskills')).toBeLessThan(indexOf('firstname'));
 		expect(indexOf('gender')).toBeLessThan(indexOf('consentprivacypolicy'));

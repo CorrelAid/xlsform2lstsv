@@ -78,8 +78,22 @@ describe('Appearance Handling', () => {
 		});
 	});
 
-	describe('unsupported appearances', () => {
-		test('minimal appearance triggers a warning', async () => {
+	describe('minimal (dropdown)', () => {
+		test('select_one with minimal appearance produces type ! (Dropdown)', async () => {
+			const survey = [
+				{ type: 'select_one yn', name: 'q1', label: 'Yes?', appearance: 'minimal' }
+			];
+			const choices = createChoices('yn', [
+				{ name: 'yes', label: 'Yes' },
+				{ name: 'no', label: 'No' },
+			]);
+			const rows = await convertAndParse(survey, choices);
+			const q = findRowByName(rows, 'q1');
+			expect(q).toBeDefined();
+			expect(q!['type/scale']).toBe('!');
+		});
+
+		test('minimal does not trigger a warning', async () => {
 			const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 			const survey = [
 				{ type: 'select_one yn', name: 'q1', label: 'Yes?', appearance: 'minimal' }
@@ -90,13 +104,28 @@ describe('Appearance Handling', () => {
 			]);
 			await convertAndParse(survey, choices);
 			const appearanceWarnings = warnSpy.mock.calls.filter(
+				call => typeof call[0] === 'string' && call[0].includes('Unsupported appearance')
+			);
+			expect(appearanceWarnings).toHaveLength(0);
+			warnSpy.mockRestore();
+		});
+
+		test('minimal on non-select_one type does not change type', async () => {
+			const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+			const survey = [
+				{ type: 'text', name: 'q1', label: 'Name', appearance: 'minimal' }
+			];
+			await convertAndParse(survey);
+			const appearanceWarnings = warnSpy.mock.calls.filter(
 				call => typeof call[0] === 'string' && call[0].includes('Unsupported appearance "minimal"')
 			);
 			expect(appearanceWarnings).toHaveLength(1);
 			warnSpy.mockRestore();
 		});
+	});
 
-		test('multiple unsupported appearances each trigger a warning', async () => {
+	describe('unsupported appearances', () => {
+		test('minimal with other unsupported appearance warns only for unsupported part', async () => {
 			const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 			const survey = [
 				{ type: 'select_one yn', name: 'q1', label: 'Pick', appearance: 'minimal horizontal' }
@@ -109,7 +138,8 @@ describe('Appearance Handling', () => {
 			const appearanceWarnings = warnSpy.mock.calls.filter(
 				call => typeof call[0] === 'string' && call[0].includes('Unsupported appearance')
 			);
-			expect(appearanceWarnings).toHaveLength(2);
+			expect(appearanceWarnings).toHaveLength(1);
+			expect(appearanceWarnings[0][0]).toContain('"horizontal"');
 			warnSpy.mockRestore();
 		});
 

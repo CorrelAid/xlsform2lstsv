@@ -121,6 +121,14 @@ describe('Integration: all_types_survey.json', () => {
 			expect(findQ(rows, 'qlikert')!['type/scale']).toBe('L');
 		});
 
+		it('select_one + minimal → ! (Dropdown)', async () => {
+			const rows = await convertFixture();
+			expect(findQ(rows, 'qminimal')!['type/scale']).toBe('!');
+			// Should have A answer rows like a normal select_one
+			const answers = rows.filter(r => r.class === 'A' && (r.name === 'yes' || r.name === 'no'));
+			expect(answers.length).toBeGreaterThanOrEqual(2);
+		});
+
 		it('select_one + label → F (matrix header)', async () => {
 			const rows = await convertFixture();
 			expect(findQ(rows, 'matrixheader')!['type/scale']).toBe('F');

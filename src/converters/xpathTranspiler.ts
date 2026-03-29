@@ -41,6 +41,8 @@ export interface TranspilerContext {
   lookupAnswerCode?: AnswerCodeLookup;
   /** Build a complete selected() expression, handling select_one vs select_multiple */
   buildSelectedExpr?: (sanitizedFieldName: string, originalChoiceValue: string) => string;
+  /** Get the truncated field name (sanitized and truncated to 20 chars) */
+  getTruncatedFieldName?: (fieldName: string) => string;
 }
 
 function isVariableRef(node: XPathNode): boolean {
@@ -213,7 +215,9 @@ function transpile(node: XPathNode, ctx?: TranspilerContext): string {
           const rawValue = rightNode.value as string;
           const rewritten = lookupAnswerCode(fieldName, rawValue);
           if (rewritten !== rawValue) {
-            return `${fieldName} == '${rewritten}'`;
+            // Use truncated field name if available
+            const truncatedFieldName = ctx?.getTruncatedFieldName ? ctx.getTruncatedFieldName(fieldName) : fieldName;
+            return `${truncatedFieldName} == '${rewritten}'`;
           }
         }
         return `${transpile(leftNode, ctx)} == ${transpile(rightNode, ctx)}`;
@@ -226,7 +230,9 @@ function transpile(node: XPathNode, ctx?: TranspilerContext): string {
           const rawValue = rightNode.value as string;
           const rewritten = lookupAnswerCode(fieldName, rawValue);
           if (rewritten !== rawValue) {
-            return `${fieldName} != '${rewritten}'`;
+            // Use truncated field name if available
+            const truncatedFieldName = ctx?.getTruncatedFieldName ? ctx.getTruncatedFieldName(fieldName) : fieldName;
+            return `${truncatedFieldName} != '${rewritten}'`;
           }
         }
         return `${transpile(leftNode, ctx)} != ${transpile(rightNode, ctx)}`;
@@ -275,7 +281,10 @@ function transpile(node: XPathNode, ctx?: TranspilerContext): string {
   if (node.steps && node.steps.length > 0) {
     const step = node.steps[0];
     if (step.name) {
-      return sanitizeName(step.name);
+      const fieldName = sanitizeName(step.name);
+      // Use truncated field name if available in context
+      const truncatedFieldName = ctx?.getTruncatedFieldName ? ctx.getTruncatedFieldName(fieldName) : fieldName;
+      return truncatedFieldName;
     }
     // Handle self reference (.)
     if (step.axis === 'self') {
@@ -508,7 +517,7 @@ export async function convertRelevance(xpathExpr: string, ctx?: TranspilerContex
   const result = await xpathToLimeSurvey(normalizedXPath, ctx);
 
   // Handle edge case: selected() with just {field} (without $)
-  if (result && result.includes('selected(')) {
+  if (result && typeof result === 'string' && result.includes('selected(')) {
     return result.replace(
       /selected\s*\(\s*\{(\w+)\}\s*,\s*["']([^'"]+)["']\s*\)/g,
       (_match: string, fieldName: string, value: string) => {

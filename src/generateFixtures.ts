@@ -12,7 +12,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 
-import { SurveyRow, ChoiceRow, SettingsRow } from './config/types.js';
+import { SurveyRow, ChoiceRow, SettingsRow, ConversionConfig } from './config/types.js';
 import { XLSLoader } from './processors/XLSLoader.js';
 import { XLSFormToTSVConverter } from './xlsformConverter.js';
 
@@ -44,7 +44,7 @@ function cleanOutputDirectory(dir: string): void {
   }
 }
 
-async function generateTSVFromFixture(fixturePath: string, outputPath: string): Promise<void> {
+async function generateTSVFromFixture(fixturePath: string, outputPath: string, config: Partial<ConversionConfig> = {}): Promise<void> {
   console.log(`Processing: ${path.basename(fixturePath)}`);
 
   // Read fixture
@@ -54,7 +54,7 @@ async function generateTSVFromFixture(fixturePath: string, outputPath: string): 
   // Convert to TSV with configuration that removes underscores but doesn't truncate field names
   // This matches LimeSurvey's behavior (removes underscores but allows longer field names)
   // Answer codes are already limited to 5 chars in the fixtures
-  const converter = new XLSFormToTSVConverter({});
+  const converter = new XLSFormToTSVConverter(config);
   const tsv = await converter.convert(
     fixture.survey,
     fixture.choices,
@@ -125,6 +125,24 @@ async function main(): Promise<void> {
       jsonSuccessCount++;
     } catch (error) {
       console.error(`  ✗ Error processing ${baseName}:`, error);
+    }
+    console.log('');
+  }
+
+  // Generate settings variant: same fixture with all conversion settings disabled
+  const settingsFixturePath = path.join(FIXTURES_DIR, 'settings_survey.json');
+  if (fs.existsSync(settingsFixturePath)) {
+    const variantPath = path.join(OUTPUT_DIR, 'settings_survey_disabled.tsv');
+    try {
+      await generateTSVFromFixture(settingsFixturePath, variantPath, {
+        convertWelcomeNote: false,
+        convertEndNote: false,
+        convertOtherPattern: false,
+        convertMarkdown: false,
+      });
+      jsonSuccessCount++;
+    } catch (error) {
+      console.error('  ✗ Error processing settings_survey_disabled:', error);
     }
     console.log('');
   }

@@ -1,0 +1,157 @@
+class	type/scale	name	relevance	text	help	language	validation	em_validation_q	mandatory	other	default	same_default	hidden
+S		language	1	de		de							
+S		format	1	G		de							
+SL		surveyls_title	1	Bedarfserhebung für Migrant*innenorganisationen in Sachsen		de							
+SL		surveyls_welcometext	1	"<p><strong><a href=""https://www.zusammenlebenev.de/"">Das Zusammenleben e.V.</a></strong> aus Freital möchte Ihr Engagement bis 2029 gezielt  mit Angeboten unterstützen, die ihnen wirklich helfen.</p><br /><p>Diese Umfrage richtet sich an Engagierte in Migrant*innenorganisationen in Sachsen. Sie hilft uns zu verstehen, welche Herausforderungen Sie haben, welche Unterstützung Sie brauchen und welche Möglichkeiten Sie für die Zukunft sehen.</p><br /><p>Unterstützt wird das Projekt vom <strong>LaSMO e.V.</strong>, dem Landesverband der Migrant*innenorganisationen in Sachsen.</p><br /><p><strong>Dauer:</strong> ca. 10 Minuten<br><strong>Bitte beachten:</strong> Pro Organisation bitte nur einmal teilnehmen.</p><br /><p>Vielen Dank für Ihre Zeit!</p>"		de							
+G	1	Teil A – Allgemeine Angaben	1			de							
+Q	L	landkreise	1	In welchem Landkreis sind Sie aktiv?		de							
+A		bautz		Bautzen		de							
+A		erzge		Erzgebirge		de							
+A		goerl		Görlitz		de							
+A		landk		Landkreis Leipzig		de							
+A		meiss		Meißen		de							
+A		mitte		Mittelsachsen		de							
+A		nords		Nordsachsen		de							
+A		saech		Sächsische Schweiz-Osterzgebirge		de							
+A		vogtl		Vogtlandkreis		de							
+A		zwick		Zwickau		de							
+Q	M	themenfelder	1	Was sind die Themenfelder Ihrer Arbeit?		de							
+SQ		bildu		Bildung		de							
+SQ		integ		Integration		de							
+SQ		geflu		Geflüchtetensozialarbeit		de							
+SQ		jugen		Jugendarbeit		de							
+SQ		fraue		Frauenarbeit		de							
+SQ		kultu		Kultur		de							
+SQ		sport		Sport		de							
+SQ		sonst		Sonstiges		de							
+Q	S	themenfelderother	(themenfelder_sonst.NAOK == 'Y')	Sonstige Themenfelder (bitte angeben)		de							
+Q	N	vieleehrenamtkomm	1	Wie viele Menschen machen aktiv <strong>ehrenamtlich</strong> mit in Ihrer Organisation?		de							
+Q	N	vielehauptamtkomm	1	Wie viele Menschen machen aktiv <strong>hauptamtlich</strong> mit in Ihrer Organisation? 		de							
+G	2	Teil B – Zusammenarbeit mit Kommunen und Landkreisen	1			de							
+Q	L	zusammenarbeitstadt	1	Arbeitet Ihre Organisation derzeit mit der Stadt oder dem Landkreis zusammen?		de			Y				
+A		ja		Ja		de							
+A		nein		Nein		de							
+Q	L	zusammenarbeitstadte	zusammenarbeitstadt == 'ja'	Wie würden Sie die Zusammenarbeit bewerten?		de							
+A		sehrg		Sehr gut		de							
+A		eherg		Eher gut		de							
+A		ehers		Eher schlecht		de							
+A		schle		Schlecht		de							
+Q	T	zusammenarbeitverbes	zusammenarbeitstadte == 'schle' or zusammenarbeitstadte == 'ehers'	Was könnte die Zusammenarbeit mit Städten und Landkreisen besser machen?		de							
+Q	M	ansprechpersonen	zusammenarbeitstadt == 'ja'	Mit welchen Ansprechpersonen oder Einrichtungen von der Stadt oder dem Landkreis arbeiten Sie im Moment zusammen?		de							
+SQ		integ		Integrationsbeauftragte		de							
+SQ		ausla		Ausländerbeauftragte		de							
+SQ		beira		Beiräte oder Kommissionen (z. B. Integrationsbeirat)		de							
+SQ		facha		Fachämter (z. B. Jugend, Soziales, Kultur)		de							
+SQ		buerg		Bürgermeister*innen oder Verwaltungsspitzen		de							
+SQ		sonst		Sonstiges		de							
+Q	S	ansprechpersonenothe	(ansprechpersonen_sonst.NAOK == 'Y')	Sonstiges (bitte angeben)		de							
+Q	L	zusammenarbeitstadtf	zusammenarbeitstadt == 'ja'	Wie oft sprechen oder treffen Sie sich mit diesen Stellen?		de							
+A		regel		Regelmäßig (monatlich oder öfter)		de							
+A		geleg		Gelegentlich (1–3 Mal im Jahr)		de							
+A		selte		Selten (weniger als 1 Mal im Jahr)		de							
+Q	L	wissengesetz	1	Kennen Sie das sächsische Integrations- und Teilhabegesetz?		de			Y				
+A		ja		Ja		de							
+A		nein		Nein		de							
+Q	L	veraenderunggesetzar	wissengesetz == 'ja'	Hat sich etwas verändert, seit das sächsische Integrations- und Teilhabegesetz gilt?		de							
+A		jahab		Ja, es haben sich neue Kooperationsmöglichkeiten ergeben		de							
+A		jazus		Ja, die Zusammenarbeit ist schwieriger geworden		de							
+A		neink		Nein, keine Veränderungen		de							
+Q	T	gesetzveraenderungte	veraenderunggesetzar != 'jahab' or veraenderunggesetzar != 'jazus'	Bitte beschreiben Sie diese Veränderungen.		de							
+G	3	Teil C – Organisationsentwicklung	1			de							
+Q	M	entscheidungsverfahr	1	Wie trifft Ihre Organisation Entscheidungen?		de			Y				
+SQ		vorst		Durch Vorstandsbeschlüsse		de							
+SQ		mitgl		In Mitgliederversammlungen		de							
+SQ		einze		Durch einzelne Personen		de							
+SQ		arbei		In Arbeitsgruppen		de							
+SQ		sonst		Sonstiges		de							
+Q	S	entscheidungsverfahr	(entscheidungsverfahr_sonst.NAOK == 'Y')	Sonstiges (bitte angeben)		de							
+Q	T	schwierigkeiten	1	Welche Schwierigkeiten gibt es, wenn Ihre Mitglieder bei Entscheidungen mitmachen sollen? (Sie können die Probleme auch als Stichpunkte aufschreiben.)		de							
+Q	M	teilhabegruppen	1	Wer nimmt in ihrer Organisation oft teil? Mehrere Antworten möglich.		de			Y				
+SQ		migra		Menschen mit Migrationshintergrund		de							
+SQ		kinde		Kinder/Jugendliche		de							
+SQ		fraue		Frauen		de							
+SQ		geflü		Geflüchtete/Flüchtlinge		de							
+SQ		mensc		Menschen ohne Migrationshintergrund		de							
+SQ		sozia		sozial benachteiligte Menschen (z. B. durch geringes Einkommen)		de							
+SQ		studi		Studierende und/oder Akademiker		de							
+SQ		senio		Senioren		de							
+SQ		peopl		People of Color		de							
+SQ		mens1		Menschen einer bestimmten Religion		de							
+SQ		pfleg		pflege- und/oder pflegebedürftige oder gesundheitlich eingeschränkte Menschen		de							
+SQ		ander		andere Personen		de							
+SQ		lsbti		LSBTI*-Community		de							
+Q	S	menschenother	(teilhabegruppen_sonstiges.NAOK == 'Y')	Sonstiges (bitte angeben)		de							
+G	4	Teil D – Erfahrungen mit Krisen	1			de							
+Q	M	probleme	1	Welche Probleme oder schwierige Situationen gab es in Ihrer Organisation?		de			Y				
+SQ		polit		Politische Anfeindung		de							
+SQ		finan		Finanzierungsprobleme		de							
+SQ		verlu		Verlust aktiver Mitglieder		de							
+SQ		inter		interne Konflikte		de							
+SQ		diskr		Diskriminierung / Rassistische Vorfälle		de							
+SQ		sonst		Sonstiges		de							
+Q	S	problemeother	(probleme_sonst.NAOK == 'Y')	Sonstiges (bitte angeben)		de							
+Q	L	problemeansprechpers	1	Hat Ihre Organisation feste Regeln oder bestimmte Personen, an die man sich in einer Krise wenden kann? (Bitte Antwort kurz erklären.)		de							
+A		ja		Ja		de							
+A		nein		Nein		de							
+Q	T	problemeansprechpers	1	Bitte erläutern oder begründen Sie dies.		de							
+Q	M	hilfe	1	Welche Hilfe war für Ihre Organisation in schwierigen Situationen besonders wichtig?		de			Y				
+SQ		austa		Austausch mit anderen Vereinen		de							
+SQ		berat		Beratung durch externe Stellen		de							
+SQ		solid		Solidarität in der Community		de							
+SQ		eigen		Eigene Erfahrungswerte		de							
+SQ		sonst		Sonstiges		de							
+Q	S	hilfeother	(hilfe_sonst.NAOK == 'Y')	Sonstiges (bitte angeben)		de							
+G	5	Teil E – Digitalisierung	1			de							
+Q	M	mediennutzung	1	Welcher dieser Aussagen trifft auf Ihre Organisation zu?		de							
+SQ		email		Wir kommunizieren hautpsächliche per E-Mail		de							
+SQ		messe		Wir nutzen Messenger (z.B. WhatsApp, Telegram)		de							
+SQ		websi		Wir haben eine eigene Webseite		de							
+SQ		sozia		Wir nutzen soziale Medien (Insgagram, Tiktok, Facebook, ...)		de							
+SQ		digit		Wir arbeiten mit digitalen Tools (z. B. Zoom, Google Drive, Nextcloud)		de							
+SQ		analo		Wir arbeiten überwiegend analog		de							
+Q	M	problemedigital	1	Welche Probleme gibt es, wenn Ihr Verein digital arbeiten will?		de			Y				
+SQ		fehle		Fehlende technische Ausstattung		de							
+SQ		unsic		Unsicherheiten im Umgang mit digitalen Tools		de							
+SQ		fehl1		Fehlende Kenntnisse zu Datenschutz		de							
+SQ		keini		Kein Internetzugang		de							
+SQ		mange		Mangelnde Beteiligung bei Online-Angebote		de							
+SQ		sonst		Sonstiges		de							
+Q	S	problemedigitalother	(probleme2.NAOK=='sonstiges')	Sonstiges (bitte angeben)		de							
+Q	M	hilfedigital	1	Welche Hilfe wünschen Sie sich, damit Ihr Verein besser digital arbeiten kann?		de							
+SQ		schul		Schulungen zu digitalen Tools		de							
+SQ		berat		Beratung zu Datenschutz und IT-Sicherheit		de							
+SQ		techn		Technikförderung (z.B. Laptops, Kameras)		de							
+SQ		austa		Austausch mit anderen Organisationen zu guten Lösungen		de							
+SQ		aufba		Aufbau einer digitalen Plattform für Migrant*innenorganisationen in Sachsen		de							
+SQ		sonst		Sonstiges		de							
+Q	S	hilfedigitalother	(hilfe2.NAOK=='sonstiges')	Sonstiges (bitte angeben)		de							
+G	6	Teil F – Unterstützung	1			de							
+Q	M	unterstuetzungthemen	1	Bei welchen der folgenden Themen brauchen Sie Unterstützung?		de							
+SQ		verei		Vereinsrecht / Satzung		de							
+SQ		zusam		Zusammenarbeit mit der Verwaltung		de							
+SQ		digit		Digitalisierung		de							
+SQ		oeffe		Öffentlichkeitsarbeit		de							
+SQ		mitgl		Mitgliedergewinnung		de							
+SQ		inter		Interkulturelle Öffnung		de							
+SQ		finan		Finanzierungsstrategien		de							
+Q	M	unterstuetzungart	1	Welche der folgenden Arten von Angeboten oder Veranstaltungen sind für Sie grundsätzlich relevant?		de							
+SQ		praes		Präsenz-Workshops		de							
+SQ		onlin		Online-Schulungen		de							
+SQ		einze		Einzelberatung		de							
+SQ		peert		Peer-to-Peer-Formate		de							
+Q	M	austauschformate	1	Welche der folgenden Formate des Austauschs mit anderen Organisationen sind für Sie grundsätzlich relevant?		de							
+SQ		netzw		Netzwerktreffen		de							
+SQ		fachk		Fachkonferenzen		de							
+SQ		arbei		Eigene Arbeit auf Veranstaltungen vorstellen		de							
+Q	S	artunterstuetzungoth	1	Sonstiges (bitte angeben)		de							
+G	7	Kontaktdaten	1			de							
+Q	X	kontaktnote	1	Ihre Kontaktdaten werden ausschließlich zur Kontaktaufnahme für die Auszahlung der Aufwandsentschädigung verwendet.		de							
+Q	S	verein	1	Verein / Organisation		de							
+Q	S	email	1	E-Mail-Adresse		de		regexMatch(self, '^[^@\s]+@[^@\s]+\.[^@\s]+$')					
+Q	S	telefon	1	Telefonnummer		de							
+Q	L	kooperationoptin	1	Dürfen wir Ihre Kontaktdaten zusätzlich für eine Kontaktaufnahme bezüglich einer Zusammenarbeit nutzen?	Freiwillig – keine Auswirkung auf die Vergütung.	de							
+A		ja		Ja		de							
+A		nein		Nein		de							
+Q	X	datenschutzhinweis	1	"Informationen zur Verarbeitung Ihrer Daten finden Sie in unserer <a href=""https://www.ihre-organisation.de/datenschutz"" target=""_blank"">Datenschutzerklärung (TODO)</a>."		de							
+G	8	abschluss	1			de							
+Q	X	abschlussdanke	1	<p>Vielen Dank für Ihre Teilnahme!</p><br /><p>Dies ist die letzte Seite. Mit einem Klick auf <strong>Senden</strong> werden Ihre Antworten übermittelt.</p><br /><p>Wir melden uns in Kürze bezüglich der Aufwandsentschädigung bei Ihnen.</p>		de							

@@ -123,11 +123,15 @@ def test_appearance_modifiers(generated_files_dir: Path):
     q = next(r for r in rows if r["class"] == "Q" and r["name"] == "qlikert")
     assert q["type/scale"] == "L", f"likert should stay L, got {q['type/scale']}"
 
+    # minimal → ! (Dropdown)
+    q = next(r for r in rows if r["class"] == "Q" and r["name"] == "qminimal")
+    assert q["type/scale"] == "!", f"minimal should be !, got {q['type/scale']}"
+
     # matrix header (label) → F
     q = next(r for r in rows if r["class"] == "Q" and r["name"] == "matrixheader")
     assert q["type/scale"] == "F", f"matrix header should be F, got {q['type/scale']}"
 
-    print("✓ Appearance modifiers verified (multiline→T, likert→L, label→F)")
+    print("✓ Appearance modifiers verified (multiline→T, likert→L, minimal→!, label→F)")
 
 
 def test_matrix_structure(generated_files_dir: Path):
@@ -385,10 +389,10 @@ def test_all_ls_type_codes_present(generated_files_dir: Path):
     rows = _parse_tsv(tsv_path)
     q_types = {r["type/scale"] for r in rows if r["class"] == "Q"}
 
-    for code in ("S", "T", "N", "D", "L", "M", "R", "X", "F"):
+    for code in ("S", "T", "N", "D", "L", "!", "M", "R", "X", "F"):
         assert code in q_types, f"LimeSurvey type code '{code}' missing from Q rows"
 
-    print(f"✓ All 9 LS type codes present: {sorted(q_types)}")
+    print(f"✓ All 10 LS type codes present: {sorted(q_types)}")
 
 
 # ===========================
@@ -425,7 +429,7 @@ def test_all_types_import(limesurvey_client: Client, generated_files_dir: Path):
             "qtext", "qstring", "qinteger", "qint", "qdecimal",
             "qdate", "qtime", "qdatetime",
             "qselectone", "qselectmulti", "qrank", "qnote",
-            "qmultilinetext", "qmultilinestring", "qlikert",
+            "qmultilinetext", "qmultilinestring", "qlikert", "qminimal",
             "matrixheader",
             "qsel1other", "qselmother", "qrankother",
             "qmandatory", "qhint", "qconstraint", "qdefault",

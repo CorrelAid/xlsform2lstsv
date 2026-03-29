@@ -1,0 +1,13 @@
+class	type/scale	name	relevance	text	help	language	validation	em_validation_q	mandatory	other	default	same_default	hidden
+S		language	1	en		en							
+S		format	1	G		en							
+SL		surveyls_title	1	Multi-Page Survey		en							
+G	1	Page One	1			en							
+Q	S	name	1	Your name		en							
+Q	N	age	1	Your age		en							
+G	2	Page Two	1			en							
+Q	L	favcolor	1	Favourite colour		en							
+A		red		Red		en							
+A		blue		Blue		en							
+A		green		Green		en							
+Q	X	thankyou	1	Thank you!		en							

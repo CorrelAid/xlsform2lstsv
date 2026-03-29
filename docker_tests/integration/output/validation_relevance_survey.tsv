@@ -2,8 +2,8 @@ class	type/scale	name	relevance	text	help	language	validation	em_validation_q	ma
 S		language	1	en		en							
 S		format	1	A		en							
 SL		surveyls_title	1	Validation and Relevance Test		en							
+SL		surveyls_welcometext	1	Validation and Relevance Test Survey		en							
 G		Questions	1	Questions		en							
-Q	X	welcome	1	Validation and Relevance Test Survey		en							
 Q	S	username	1	Username		en		self != ''					
 Q	N	age	1	Age		en		self >= 18 and self <= 120					
 Q	N	price	1	Price		en		self > 0 and self < 1000					
