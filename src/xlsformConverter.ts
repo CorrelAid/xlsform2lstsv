@@ -618,6 +618,13 @@ export class XLSFormToTSVConverter {
 			class: 'S', name: 'format', text: surveyFormat,
 		}));
 
+		// Hide "no answer" option on non-mandatory questions
+		if (this.configManager.getConfig().hideNoAnswer !== false) {
+			this.tsvGenerator.addRow(this.row({
+				class: 'S', name: 'shownoanswer', text: 'N',
+			}));
+		}
+
 		// SL rows: survey title + welcome/end text, base language first then others
 		const emitSLRows = (lang: string) => {
 			this.tsvGenerator.addRow(this.row({

@@ -78,6 +78,7 @@ const tsv = await XLSFormParser.convertXLSFileToTSV('survey.xlsx', {
 | `convertEndNote` | `boolean` | `true` | Promote a `note` named `end` to LimeSurvey's survey end text. |
 | `convertOtherPattern` | `boolean` | `true` | Auto-detect the `_other` question pattern and set `other=Y`. |
 | `convertMarkdown` | `boolean` | `true` | Parse labels/hints as Markdown and convert to HTML. |
+| `hideNoAnswer` | `boolean` | `true` | Hide the "no answer" option on non-mandatory questions. |
 
 ## Implemented features
 

@@ -83,6 +83,11 @@ export interface ConversionConfig {
   convertMarkdown?: boolean;
 
   /**
+   * Hide the "no answer" option on non-mandatory questions (default: true)
+   */
+  hideNoAnswer?: boolean;
+
+  /**
    * Default values for survey elements
    */
   defaults: {
@@ -103,6 +108,7 @@ export const defaultConfig: ConversionConfig = {
   convertEndNote: true,
   convertOtherPattern: true,
   convertMarkdown: true,
+  hideNoAnswer: true,
 
   defaults: {
     language: 'en',
