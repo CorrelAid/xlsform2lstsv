@@ -1,6 +1,7 @@
 class	type/scale	name	relevance	text	help	language	validation	em_validation_q	mandatory	other	default	same_default	hidden
 S		language	1	de		de							
 S		format	1	G		de							
+S		shownoanswer	1	N		de							
 SL		surveyls_title	1	Bedarfserhebung für Migrant*innenorganisationen in Sachsen		de							
 SL		surveyls_welcometext	1	"<p><strong><a href=""https://www.zusammenlebenev.de/"">Das Zusammenleben e.V.</a></strong> aus Freital möchte Ihr Engagement bis 2029 gezielt  mit Angeboten unterstützen, die ihnen wirklich helfen.</p><br /><p>Diese Umfrage richtet sich an Engagierte in Migrant*innenorganisationen in Sachsen. Sie hilft uns zu verstehen, welche Herausforderungen Sie haben, welche Unterstützung Sie brauchen und welche Möglichkeiten Sie für die Zukunft sehen.</p><br /><p>Unterstützt wird das Projekt vom <strong>LaSMO e.V.</strong>, dem Landesverband der Migrant*innenorganisationen in Sachsen.</p><br /><p><strong>Dauer:</strong> ca. 10 Minuten<br><strong>Bitte beachten:</strong> Pro Organisation bitte nur einmal teilnehmen.</p><br /><p>Vielen Dank für Ihre Zeit!</p>"		de							
 G	1	Teil A – Allgemeine Angaben	1			de							
@@ -23,8 +24,8 @@ SQ		jugen		Jugendarbeit		de
 SQ		fraue		Frauenarbeit		de							
 SQ		kultu		Kultur		de							
 SQ		sport		Sport		de							
-SQ		sonst		Sonstiges		de							
-Q	S	themenfelderother	(themenfelder_sonst.NAOK == 'Y')	Sonstige Themenfelder (bitte angeben)		de							
+SQ		other		Sonstiges		de							
+Q	S	themenfelderother	(themenfelder_other.NAOK == 'Y')	Sonstige Themenfelder (bitte angeben)		de							
 Q	N	vieleehrenamtkomm	1	Wie viele Menschen machen aktiv <strong>ehrenamtlich</strong> mit in Ihrer Organisation?		de							
 Q	N	vielehauptamtkomm	1	Wie viele Menschen machen aktiv <strong>hauptamtlich</strong> mit in Ihrer Organisation? 		de							
 G	2	Teil B – Zusammenarbeit mit Kommunen und Landkreisen	1			de							
@@ -43,8 +44,8 @@ SQ		ausla		Ausländerbeauftragte		de
 SQ		beira		Beiräte oder Kommissionen (z. B. Integrationsbeirat)		de							
 SQ		facha		Fachämter (z. B. Jugend, Soziales, Kultur)		de							
 SQ		buerg		Bürgermeister*innen oder Verwaltungsspitzen		de							
-SQ		sonst		Sonstiges		de							
-Q	S	ansprechpersonenothe	(ansprechpersonen_sonst.NAOK == 'Y')	Sonstiges (bitte angeben)		de							
+SQ		other		Sonstiges		de							
+Q	S	ansprechpersonenothe	(ansprechpersonen_other.NAOK == 'Y')	Sonstiges (bitte angeben)		de							
 Q	L	zusammenarbeitstadtf	zusammenarbeitstadt == 'ja'	Wie oft sprechen oder treffen Sie sich mit diesen Stellen?		de							
 A		regel		Regelmäßig (monatlich oder öfter)		de							
 A		geleg		Gelegentlich (1–3 Mal im Jahr)		de							
@@ -56,15 +57,15 @@ Q	L	veraenderunggesetzar	wissengesetz == 'ja'	Hat sich etwas verändert, seit da
 A		jahab		Ja, es haben sich neue Kooperationsmöglichkeiten ergeben		de							
 A		jazus		Ja, die Zusammenarbeit ist schwieriger geworden		de							
 A		neink		Nein, keine Veränderungen		de							
-Q	T	gesetzveraenderungte	veraenderunggesetzar != 'jahab' or veraenderunggesetzar != 'jazus'	Bitte beschreiben Sie diese Veränderungen.		de							
+Q	T	gesetzveraenderungte	wissengesetz == 'ja' and veraenderunggesetzar == 'jahab' or veraenderunggesetzar == 'jazus'	Bitte beschreiben Sie diese Veränderungen.		de							
 G	3	Teil C – Organisationsentwicklung	1			de							
 Q	M	entscheidungsverfahr	1	Wie trifft Ihre Organisation Entscheidungen?		de			Y				
 SQ		vorst		Durch Vorstandsbeschlüsse		de							
 SQ		mitgl		In Mitgliederversammlungen		de							
 SQ		einze		Durch einzelne Personen		de							
 SQ		arbei		In Arbeitsgruppen		de							
-SQ		sonst		Sonstiges		de							
-Q	S	entscheidungsverfahr	(entscheidungsverfahr_sonst.NAOK == 'Y')	Sonstiges (bitte angeben)		de							
+SQ		other		Sonstiges		de							
+Q	S	entscheidungsverfah1	(entscheidungsverfahr_other.NAOK == 'Y')	Sonstiges (bitte angeben)		de							
 Q	T	schwierigkeiten	1	Welche Schwierigkeiten gibt es, wenn Ihre Mitglieder bei Entscheidungen mitmachen sollen? (Sie können die Probleme auch als Stichpunkte aufschreiben.)		de							
 Q	M	teilhabegruppen	1	Wer nimmt in ihrer Organisation oft teil? Mehrere Antworten möglich.		de			Y				
 SQ		migra		Menschen mit Migrationshintergrund		de							
@@ -80,7 +81,7 @@ SQ		mens1		Menschen einer bestimmten Religion		de
 SQ		pfleg		pflege- und/oder pflegebedürftige oder gesundheitlich eingeschränkte Menschen		de							
 SQ		ander		andere Personen		de							
 SQ		lsbti		LSBTI*-Community		de							
-Q	S	menschenother	(teilhabegruppen_sonstiges.NAOK == 'Y')	Sonstiges (bitte angeben)		de							
+Q	S	teilhabegruppenother	(teilhabegruppen_other.NAOK == 'Y')	Sonstiges (bitte angeben)		de							
 G	4	Teil D – Erfahrungen mit Krisen	1			de							
 Q	M	probleme	1	Welche Probleme oder schwierige Situationen gab es in Ihrer Organisation?		de			Y				
 SQ		polit		Politische Anfeindung		de							
@@ -88,19 +89,19 @@ SQ		finan		Finanzierungsprobleme		de
 SQ		verlu		Verlust aktiver Mitglieder		de							
 SQ		inter		interne Konflikte		de							
 SQ		diskr		Diskriminierung / Rassistische Vorfälle		de							
-SQ		sonst		Sonstiges		de							
-Q	S	problemeother	(probleme_sonst.NAOK == 'Y')	Sonstiges (bitte angeben)		de							
+SQ		other		Sonstiges		de							
+Q	S	problemeother	(probleme_other.NAOK == 'Y')	Sonstiges (bitte angeben)		de							
 Q	L	problemeansprechpers	1	Hat Ihre Organisation feste Regeln oder bestimmte Personen, an die man sich in einer Krise wenden kann? (Bitte Antwort kurz erklären.)		de							
 A		ja		Ja		de							
 A		nein		Nein		de							
-Q	T	problemeansprechpers	1	Bitte erläutern oder begründen Sie dies.		de							
+Q	T	problemeansprechper1	1	Bitte erläutern oder begründen Sie dies.		de							
 Q	M	hilfe	1	Welche Hilfe war für Ihre Organisation in schwierigen Situationen besonders wichtig?		de			Y				
 SQ		austa		Austausch mit anderen Vereinen		de							
 SQ		berat		Beratung durch externe Stellen		de							
 SQ		solid		Solidarität in der Community		de							
 SQ		eigen		Eigene Erfahrungswerte		de							
-SQ		sonst		Sonstiges		de							
-Q	S	hilfeother	(hilfe_sonst.NAOK == 'Y')	Sonstiges (bitte angeben)		de							
+SQ		other		Sonstiges		de							
+Q	S	hilfeother	(hilfe_other.NAOK == 'Y')	Sonstiges (bitte angeben)		de							
 G	5	Teil E – Digitalisierung	1			de							
 Q	M	mediennutzung	1	Welcher dieser Aussagen trifft auf Ihre Organisation zu?		de							
 SQ		email		Wir kommunizieren hautpsächliche per E-Mail		de							
@@ -115,16 +116,16 @@ SQ		unsic		Unsicherheiten im Umgang mit digitalen Tools		de
 SQ		fehl1		Fehlende Kenntnisse zu Datenschutz		de							
 SQ		keini		Kein Internetzugang		de							
 SQ		mange		Mangelnde Beteiligung bei Online-Angebote		de							
-SQ		sonst		Sonstiges		de							
-Q	S	problemedigitalother	(probleme2.NAOK=='sonstiges')	Sonstiges (bitte angeben)		de							
+SQ		other		Sonstiges		de							
+Q	S	problemedigitalother	(problemedigital_other.NAOK == 'Y')	Sonstiges (bitte angeben)		de							
 Q	M	hilfedigital	1	Welche Hilfe wünschen Sie sich, damit Ihr Verein besser digital arbeiten kann?		de							
 SQ		schul		Schulungen zu digitalen Tools		de							
 SQ		berat		Beratung zu Datenschutz und IT-Sicherheit		de							
 SQ		techn		Technikförderung (z.B. Laptops, Kameras)		de							
 SQ		austa		Austausch mit anderen Organisationen zu guten Lösungen		de							
 SQ		aufba		Aufbau einer digitalen Plattform für Migrant*innenorganisationen in Sachsen		de							
-SQ		sonst		Sonstiges		de							
-Q	S	hilfedigitalother	(hilfe2.NAOK=='sonstiges')	Sonstiges (bitte angeben)		de							
+SQ		other		Sonstiges		de							
+Q	S	hilfedigitalother	(hilfedigital_other.NAOK == 'Y')	Sonstiges (bitte angeben)		de							
 G	6	Teil F – Unterstützung	1			de							
 Q	M	unterstuetzungthemen	1	Bei welchen der folgenden Themen brauchen Sie Unterstützung?		de							
 SQ		verei		Vereinsrecht / Satzung		de							
@@ -143,7 +144,7 @@ Q	M	austauschformate	1	Welche der folgenden Formate des Austauschs mit anderen O
 SQ		netzw		Netzwerktreffen		de							
 SQ		fachk		Fachkonferenzen		de							
 SQ		arbei		Eigene Arbeit auf Veranstaltungen vorstellen		de							
-Q	S	artunterstuetzungoth	1	Sonstiges (bitte angeben)		de							
+Q	S	unterstuetzungsonsti	1	Sonstiges (bitte angeben)		de							
 G	7	Kontaktdaten	1			de							
 Q	X	kontaktnote	1	Ihre Kontaktdaten werden ausschließlich zur Kontaktaufnahme für die Auszahlung der Aufwandsentschädigung verwendet.		de							
 Q	S	verein	1	Verein / Organisation		de							
